@@ -72,7 +72,7 @@ export default function ViewEstimatePage() {
         </div>
 
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-4">
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <div>
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Created</p>
               <p className="text-sm font-medium">{new Date(data.created_at as string).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}</p>

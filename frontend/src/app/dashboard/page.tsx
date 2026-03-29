@@ -25,6 +25,7 @@ export default function DashboardPage() {
   const [estimates, setEstimates] = useState<Estimate[]>([]);
   const [usage, setUsage] = useState<Usage | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     async function load() {
@@ -32,8 +33,8 @@ export default function DashboardPage() {
         const [est, usg] = await Promise.all([getEstimates(), getUsage()]);
         setEstimates(est);
         setUsage(usg);
-      } catch {
-        // Auth might have expired
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Failed to load data. Please try again.");
       }
       setLoading(false);
     }
@@ -74,13 +75,19 @@ export default function DashboardPage() {
         </button>
       </nav>
 
-      <div className="max-w-5xl mx-auto px-8 py-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-8 py-8">
         <h1 className="text-3xl font-bold mb-1 tracking-tight">Dashboard</h1>
         <p className="text-gray-500 text-sm mb-8">Your cost estimation workspace.</p>
 
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-red-700 text-sm mb-6">
+            {error}
+          </div>
+        )}
+
         {/* Stats */}
         {usage && (
-          <div className="grid grid-cols-2 gap-4 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
               <p className="text-sm font-medium text-gray-500 mb-1">Estimates</p>
               <p className="text-3xl font-bold text-gray-900">{usage.total_estimates}</p>
@@ -93,7 +100,7 @@ export default function DashboardPage() {
         )}
 
         {/* Actions */}
-        <div className="grid grid-cols-2 gap-4 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
           <button
             onClick={() => router.push("/estimate/new")}
             className="flex items-center justify-center gap-3 bg-primary-600 text-white px-6 py-5 rounded-xl hover:bg-primary-700 transition-colors shadow-sm text-lg font-semibold"
@@ -131,8 +138,8 @@ export default function DashboardPage() {
             <p className="text-gray-400 text-sm">Upload your first engineering drawing to get started.</p>
           </div>
         ) : (
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-            <table className="w-full">
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden overflow-x-auto">
+            <table className="w-full min-w-[500px]">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/50">
                   <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>

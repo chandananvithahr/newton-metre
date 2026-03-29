@@ -4,7 +4,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Nav */}
-      <nav className="flex items-center justify-between px-8 py-5 border-b border-gray-100">
+      <nav className="flex items-center justify-between px-4 sm:px-8 py-5 border-b border-gray-100">
         <span className="text-xl font-bold tracking-tight text-primary-700">Costimize</span>
         <Link
           href="/login"
@@ -17,11 +17,11 @@ export default function LandingPage() {
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-50 via-white to-slate-50" />
-        <div className="relative max-w-4xl mx-auto px-8 py-28 text-center">
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-8 py-16 sm:py-28 text-center">
           <div className="inline-block mb-6 px-4 py-1.5 bg-primary-100 text-primary-700 rounded-full text-sm font-medium">
             Physics-based cost estimation
           </div>
-          <h1 className="text-5xl md:text-6xl font-extrabold mb-6 leading-tight tracking-tight text-gray-900">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold mb-6 leading-tight tracking-tight text-gray-900">
             Know the real cost<br />
             <span className="text-primary-600">before you negotiate.</span>
           </h1>
@@ -42,7 +42,7 @@ export default function LandingPage() {
       </section>
 
       {/* How it works */}
-      <section className="max-w-5xl mx-auto px-8 py-20">
+      <section className="max-w-5xl mx-auto px-4 sm:px-8 py-12 sm:py-20">
         <h2 className="text-3xl font-bold mb-4 text-center tracking-tight">How it works</h2>
         <p className="text-gray-500 text-center mb-12 max-w-xl mx-auto">
           Upload a drawing, get a detailed cost breakdown in under 60 seconds.
@@ -96,7 +96,7 @@ export default function LandingPage() {
 
       {/* Industries */}
       <section className="bg-gradient-to-b from-slate-50 to-slate-100 py-20">
-        <div className="max-w-4xl mx-auto px-8 text-center">
+        <div className="max-w-4xl mx-auto px-4 sm:px-8 text-center">
           <h2 className="text-3xl font-bold mb-4 tracking-tight">Built for procurement teams</h2>
           <p className="text-gray-500 mb-6">
             Defense, aerospace, and automotive manufacturers across India.
