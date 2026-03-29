@@ -12,59 +12,87 @@ AI.Procurve (Costimize) — an AI-powered procurement negotiation intelligence t
 
 **Core value:** "Here's what this part SHOULD cost, line by line. Now negotiate."
 
+## Live Deployment
+
+| Service | URL |
+|---------|-----|
+| **Frontend** | https://frontend-theta-ecru-95.vercel.app |
+| **Backend API** | https://costimize-api-production.up.railway.app |
+| **API Health** | https://costimize-api-production.up.railway.app/api/health |
+| **Supabase** | project ypzeffbhlslonqmqiaeh |
+
 ## Repository Structure
 
-There are two apps in this repo:
+### `frontend/` — Next.js Web App (Vercel)
 
-### `costimize-v2/` — Active Development (Should-Cost Intelligence)
+6 pages: landing, login/signup, dashboard, new estimate, estimate detail, similarity search. Tailwind CSS v4 with Stitch-designed deep blue theme. Vercel Analytics enabled.
 
-The current, modular app with 4 part types (mechanical, sheet metal, PCB, cable), physics-based engines, and 105 passing tests. **This is where all new work happens.**
+### `costimize-v2/` — Python Engines + FastAPI Backend (Railway)
+
+4 part types (mechanical, sheet metal, PCB, cable), physics-based engines, 164 passing tests. FastAPI API serves the frontend.
 
 ### Root files (`app.py`, `vision.py`, `cost_engine.py`) — Legacy v1
 
-The original monolithic CNC turning-only estimator. Kept for reference but no longer actively developed.
+Original monolithic CNC turning-only estimator. Kept for reference.
 
 ---
 
-## costimize-v2 — Tech Stack & Commands
-
-### Tech Stack
+## Tech Stack
 
 | Layer | Technology | Why |
 |-------|-----------|-----|
-| **Frontend + Backend** | Streamlit | Full web app in Python, fast to iterate, deploys anywhere |
-| **AI Vision** | OpenAI GPT-4o (primary), Google Gemini (fallback) | Extracts dimensions + processes from engineering drawings |
-| **AI BOM Extraction** | GPT-4o / Gemini | Extracts BOM from PDF documents |
-| **Web Scraping** | BeautifulSoup + requests | Component prices (DigiKey/Mouser) + material prices |
-| **Data Parsing** | pandas + openpyxl | BOM files (CSV/Excel), PO files (CSV/Excel) |
-| **Data Storage** | JSON files | No database needed for MVP — `data/cache/`, `data/history/` |
+| **Frontend** | Next.js + Tailwind CSS v4 | Vercel deploy, responsive UI |
+| **Backend API** | FastAPI (Python) | Serves engines via REST API |
+| **Database** | Supabase (Postgres + pgvector) | Auth, estimates, embeddings |
+| **Auth** | Supabase Auth (JWT) | Backend validates on every route |
+| **AI Vision** | OpenAI GPT-4o (primary), Google Gemini (fallback) | Extracts dimensions + processes |
 | **AI Validation** | Gemini 1.5 Flash | Cross-checks physics engine estimates |
-| **Similarity Search** | Gemini API + numpy (FAISS optional) | Drawing visual similarity via 256-dim embeddings |
-| **Testing** | pytest | 161 tests across 12 test files |
-| **Language** | Python 3.11+ | |
+| **Similarity Search** | Gemini API + pgvector | Drawing visual similarity via 256-dim embeddings |
+| **Analytics** | Vercel Analytics + usage_log table | Page views + API usage tracking |
+| **Testing** | pytest | 164 tests across 12 test files |
+| **Language** | Python 3.11+ (backend), TypeScript (frontend) | |
 
 ### Commands
 
 ```bash
+# Frontend
+cd frontend && npm install && npm run dev     # http://localhost:3000
+cd frontend && npx next build                 # Production build
+
+# Backend (Streamlit — original UI, still works)
 cd costimize-v2
 pip install -r requirements.txt
-streamlit run app.py              # Web app at http://localhost:8501
-python -m pytest tests/ -v        # Run all 161 tests
-python -m pytest tests/test_mechanical_engine.py -v  # Run single test file
+streamlit run app.py                          # http://localhost:8501
+
+# Backend (FastAPI — production API)
+cd costimize-v2
+pip install -r api/requirements.txt
+uvicorn api.main:app --reload                 # http://localhost:8000
+
+# Tests
+cd costimize-v2 && python -m pytest tests/ -v # Run all 164 tests
 ```
 
 ### Environment Variables
 
-Required in `costimize-v2/.env` (see `.env.example`):
+**Backend** (Railway or local `.env`):
+- `SUPABASE_URL` — Supabase project URL
+- `SUPABASE_SERVICE_ROLE_KEY` — service role key (NOT anon key)
 - `OPENAI_API_KEY` — primary vision API (GPT-4o)
-- `GEMINI_API_KEY` or `GOOGLE_API_KEY` — fallback vision API
+- `GEMINI_API_KEY` — fallback vision API + validation
+- `ALLOWED_ORIGINS` — comma-separated CORS origins
+- `ENVIRONMENT` — set to `production` to disable /docs
+
+**Frontend** (`frontend/.env.local`):
+- `NEXT_PUBLIC_SUPABASE_URL` — Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase anon key
+- `NEXT_PUBLIC_API_URL` — Backend API URL
 
 ### Deployment
 
-Streamlit apps deploy as standard web apps:
-- **Streamlit Cloud** — free tier, connect GitHub repo, auto-deploy
-- **Railway / Render** — `streamlit run app.py --server.port $PORT --server.address 0.0.0.0`
-- **Any VM / VPS** — same command, expose port 8501
+- **Frontend:** Vercel auto-deploys from GitHub master. Manual: `cd frontend && vercel --prod`
+- **Backend:** Railway deploys from `C:\Users\chand\costimize-deploy` (~705KB clean directory with only API essentials)
+- **Git note:** books/, papers/, sandvik/ stripped from git history. Do NOT re-add large PDFs to git
 
 ---
 
@@ -73,6 +101,22 @@ Streamlit apps deploy as standard web apps:
 ### Project Structure
 
 ```
+frontend/                             # Next.js frontend (Vercel)
+├── src/app/
+│   ├── layout.tsx                    # Root layout, Google Fonts, Vercel Analytics
+│   ├── globals.css                   # Tailwind v4 + design system tokens
+│   ├── page.tsx                      # Landing page (hero, how-it-works, industries)
+│   ├── login/page.tsx                # Signup/login with Supabase Auth
+│   ├── dashboard/page.tsx            # Stats, actions, recent estimates table
+│   ├── estimate/new/page.tsx         # Upload → extract → review → calculate → result
+│   ├── estimate/[id]/page.tsx        # Estimate detail view
+│   └── similar/page.tsx              # Multi-file similarity search
+├── src/lib/
+│   ├── api.ts                        # API client with safeFetch error handling
+│   └── supabase.ts                   # Supabase browser client
+├── src/middleware.ts                  # Auth middleware (protects /dashboard, /estimate, /similar)
+└── .env.local                        # Supabase + API URL config
+
 costimize-v2/
 ├── app.py                        # Tab router + sidebar PO upload (~40 lines)
 ├── config.py                     # All rates, constants, API keys (single source of truth)
@@ -141,13 +185,7 @@ costimize-v2/
 │   ├── validation/               # Validated estimate pairs for ML training
 │   └── similarity/               # Vector index + metadata (session-scoped for regular users)
 │
-├── papers/                       # 10 reference PDFs (~190MB) — machining handbooks, research papers
-│   ├── Fundamentals_of_CNC_Machining.pdf
-│   ├── Fundamentals-of-Machining-and-Machine-Tools-Boothryd.pdf
-│   ├── handbook-drilling-threading-2009-en.pdf
-│   ├── Machinery's Handbook (large print)
-│   ├── 2506.13026v1.pdf          # ARKNESS: KG + LLM for CNC process planning
-│   └── 1297057.pdf               # CAPP-GPT: process planning from CAD B-Rep
+├── papers/                       # Reference PDFs — LOCAL ONLY, stripped from git history
 │
 ├── docs/research/                # 23 research docs (17,000+ lines total)
 │   ├── MASTER-RESEARCH-REPORT.md # Single source of truth — all research consolidated
@@ -177,7 +215,7 @@ costimize-v2/
 ├── demos/
 │   └── dinov2_demo.py            # Interactive DINOv2 demo (requires torch, for learning)
 │
-└── tests/                        # 161 tests across 12 files
+└── tests/                        # 164 tests across 12 files
     ├── test_config.py            # 2 tests
     ├── test_mechanical_engine.py  # 19 tests (physics-based MRR, Sandvik, Taylor)
     ├── test_sheet_metal_engine.py # 28 tests (laser cutting, bending, material, integration)
@@ -252,7 +290,7 @@ costimize-v2/
 ### Key Design Decisions
 
 - **Frozen dataclasses** for all cost breakdown results (immutable)
-- **No database** — JSON files for MVP (cache + history + validation + similarity)
+- **Supabase Postgres** — production database with RLS, pgvector for similarity. JSON files still used for Streamlit MVP mode
 - **AI fallback chain** — OpenAI → Gemini for all vision/extraction
 - **Rule-based fallbacks** — process detection works without AI
 - **24hr cache** on all scraped prices
@@ -290,6 +328,11 @@ See `MASTER-RESEARCH-REPORT.md` for the consolidated single source of truth.
 
 ## Legacy v1 (Root Files)
 
-The original single-process CNC turning estimator. Monolithic `app.py` (1146 lines).
+The original single-process CNC turning estimator. Monolithic `app.py` (1146 lines). Not actively developed.
 
-Not actively developed. See `costimize-v2/` for current work.
+## Git Notes
+
+- **books/**, **papers/**, **sandvik/** directories exist locally but are stripped from git history (200MB+ PDFs)
+- Root `.gitignore` uses `/lib/` (not `lib/`) to avoid blocking `frontend/src/lib/`
+- costimize-v2 was originally a git submodule, now inlined into the monorepo
+- Backend deploys from a separate clean directory (`C:\Users\chand\costimize-deploy`), NOT from the monorepo
