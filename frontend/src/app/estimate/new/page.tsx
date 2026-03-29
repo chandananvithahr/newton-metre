@@ -80,44 +80,85 @@ export default function NewEstimatePage() {
     return n.toLocaleString("en-IN", { maximumFractionDigits: 0 });
   }
 
+  const confidenceBadge = (tier: string | null) => {
+    if (!tier) return null;
+    const styles = {
+      high: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      medium: "bg-amber-50 text-amber-700 border-amber-200",
+      low: "bg-red-50 text-red-700 border-red-200",
+      insufficient: "bg-gray-100 text-gray-500 border-gray-200",
+    };
+    return (
+      <span className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${styles[tier as keyof typeof styles] || styles.insufficient}`}>
+        {tier.toUpperCase()} confidence
+      </span>
+    );
+  };
+
+  // Upload step
   if (step === "upload") {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <nav className="flex items-center justify-between px-8 py-4 bg-white border-b">
-          <span className="text-xl font-bold cursor-pointer" onClick={() => router.push("/dashboard")}>Costimize</span>
+      <div className="min-h-screen bg-slate-50">
+        <nav className="flex items-center px-8 py-4 bg-white border-b border-gray-100 shadow-sm">
+          <span
+            className="text-xl font-bold tracking-tight text-primary-700 cursor-pointer"
+            onClick={() => router.push("/dashboard")}
+          >
+            Costimize
+          </span>
         </nav>
-        <div className="max-w-2xl mx-auto px-8 py-16">
-          <h1 className="text-3xl font-bold mb-2">New Estimate</h1>
-          <p className="text-gray-600 mb-8">Upload an engineering drawing to get a should-cost breakdown.</p>
+        <div className="max-w-2xl mx-auto px-8 py-12">
+          <h1 className="text-3xl font-bold mb-2 tracking-tight">New Estimate</h1>
+          <p className="text-gray-500 mb-8">Upload an engineering drawing to get a should-cost breakdown.</p>
 
-          <div className="bg-white rounded-xl shadow p-8">
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-6">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+            <div
+              className="border-2 border-dashed border-gray-200 rounded-xl p-10 text-center mb-6 hover:border-primary-300 hover:bg-primary-50/30 transition-colors cursor-pointer"
+              onClick={() => document.getElementById("file-input")?.click()}
+            >
+              <div className="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 h-6 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                </svg>
+              </div>
+              {file ? (
+                <p className="text-sm font-medium text-gray-900">{file.name}</p>
+              ) : (
+                <>
+                  <p className="text-sm font-medium text-gray-700 mb-1">Click to upload or drag and drop</p>
+                  <p className="text-xs text-gray-400">PDF, PNG, or JPG (max 10MB)</p>
+                </>
+              )}
               <input
+                id="file-input"
                 type="file"
                 accept=".pdf,.png,.jpg,.jpeg"
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
-                className="mx-auto"
+                className="hidden"
               />
-              <p className="text-gray-500 text-sm mt-2">PDF, PNG, or JPG (max 10MB)</p>
             </div>
 
             <div className="flex items-center gap-4 mb-6">
-              <label className="text-sm font-medium">Quantity:</label>
+              <label className="text-sm font-medium text-gray-700">Quantity:</label>
               <input
                 type="number"
                 min={1}
                 value={quantity}
                 onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                className="w-24 px-3 py-2 border rounded-lg"
+                className="w-24 px-3 py-2.5 border border-gray-200 rounded-lg bg-gray-50/50 outline-none text-sm font-mono"
               />
             </div>
 
-            {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-red-700 text-sm mb-4">
+                {error}
+              </div>
+            )}
 
             <button
               onClick={handleUpload}
               disabled={!file}
-              className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              className="w-full bg-primary-600 text-white py-3.5 rounded-lg font-semibold hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
             >
               Analyze Drawing
             </button>
@@ -127,37 +168,40 @@ export default function NewEstimatePage() {
     );
   }
 
+  // Extracting step
   if (step === "extracting") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <h1 className="text-2xl font-bold mb-2">Analyzing Drawing...</h1>
-          <p className="text-gray-600">AI is extracting dimensions, tolerances, and processes.</p>
+          <div className="w-12 h-12 border-3 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-5" />
+          <h1 className="text-2xl font-bold mb-2 tracking-tight">Analyzing Drawing...</h1>
+          <p className="text-gray-500">AI is extracting dimensions, tolerances, and processes.</p>
         </div>
       </div>
     );
   }
 
+  // Review step
   if (step === "review" && extractedData) {
-    const dims = extractedData.dimensions as Record<string, unknown> || {};
+    const dims = (extractedData.dimensions as Record<string, unknown>) || {};
     return (
-      <div className="min-h-screen bg-gray-50">
-        <nav className="flex items-center justify-between px-8 py-4 bg-white border-b">
-          <span className="text-xl font-bold">Costimize</span>
+      <div className="min-h-screen bg-slate-50">
+        <nav className="flex items-center px-8 py-4 bg-white border-b border-gray-100 shadow-sm">
+          <span className="text-xl font-bold tracking-tight text-primary-700">Costimize</span>
         </nav>
         <div className="max-w-2xl mx-auto px-8 py-8">
-          <h1 className="text-3xl font-bold mb-6">Review Extracted Data</h1>
+          <h1 className="text-3xl font-bold mb-2 tracking-tight">Review Extracted Data</h1>
+          <p className="text-gray-500 text-sm mb-6">Verify the AI-extracted data before calculating costs.</p>
 
-          <div className="bg-white rounded-xl shadow p-6 mb-6">
-            <h2 className="font-semibold mb-3">Dimensions</h2>
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-4">
+            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Dimensions</h2>
             <table className="w-full">
               <tbody>
                 {Object.entries(dims).map(([key, val]) =>
                   val != null && (
-                    <tr key={key} className="border-b last:border-0">
-                      <td className="py-2 text-gray-600 capitalize">{key.replace(/_/g, " ")}</td>
-                      <td className="py-2 text-right font-mono">{String(val)}</td>
+                    <tr key={key} className="border-b border-gray-50 last:border-0">
+                      <td className="py-2.5 text-sm text-gray-600 capitalize">{key.replace(/_/g, " ")}</td>
+                      <td className="py-2.5 text-right font-mono text-sm font-medium text-gray-900">{String(val)}</td>
                     </tr>
                   ),
                 )}
@@ -165,19 +209,38 @@ export default function NewEstimatePage() {
             </table>
           </div>
 
-          <div className="bg-white rounded-xl shadow p-6 mb-6">
-            <p><span className="font-semibold">Material:</span> {String(extractedData.material || "Not detected")}</p>
-            <p><span className="font-semibold">Processes:</span> {(extractedData.suggested_processes as string[] || []).join(", ")}</p>
-            <p><span className="font-semibold">AI Confidence:</span> {String(extractedData.confidence || "—")}</p>
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-6 space-y-2">
+            <div className="flex justify-between">
+              <span className="text-sm text-gray-500">Material</span>
+              <span className="text-sm font-medium">{String(extractedData.material || "Not detected")}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-gray-500">Processes</span>
+              <span className="text-sm font-medium">{(extractedData.suggested_processes as string[] || []).join(", ")}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-gray-500">AI Confidence</span>
+              <span className="text-sm font-medium">{String(extractedData.confidence || "—")}</span>
+            </div>
           </div>
 
-          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-red-700 text-sm mb-4">
+              {error}
+            </div>
+          )}
 
-          <div className="flex gap-4">
-            <button onClick={handleCalculate} className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700">
+          <div className="flex gap-3">
+            <button
+              onClick={handleCalculate}
+              className="flex-1 bg-primary-600 text-white py-3.5 rounded-lg font-semibold hover:bg-primary-700 transition-colors shadow-sm"
+            >
               Calculate Cost
             </button>
-            <button onClick={() => setStep("upload")} className="px-6 py-3 border rounded-lg hover:bg-gray-50">
+            <button
+              onClick={() => setStep("upload")}
+              className="px-6 py-3.5 border border-gray-200 rounded-lg hover:bg-gray-50 text-sm font-medium text-gray-700 transition-colors"
+            >
               Re-upload
             </button>
           </div>
@@ -186,124 +249,141 @@ export default function NewEstimatePage() {
     );
   }
 
+  // Calculating step
   if (step === "calculating") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <h1 className="text-2xl font-bold mb-2">Calculating Cost...</h1>
-          <p className="text-gray-600">Physics engine computing line-by-line breakdown.</p>
+          <div className="w-12 h-12 border-3 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-5" />
+          <h1 className="text-2xl font-bold mb-2 tracking-tight">Calculating Cost...</h1>
+          <p className="text-gray-500">Physics engine computing line-by-line breakdown.</p>
         </div>
       </div>
     );
   }
 
+  // Result step
   if (step === "result" && result) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <nav className="flex items-center justify-between px-8 py-4 bg-white border-b">
-          <span className="text-xl font-bold cursor-pointer" onClick={() => router.push("/dashboard")}>Costimize</span>
+      <div className="min-h-screen bg-slate-50">
+        <nav className="flex items-center px-8 py-4 bg-white border-b border-gray-100 shadow-sm">
+          <span
+            className="text-xl font-bold tracking-tight text-primary-700 cursor-pointer"
+            onClick={() => router.push("/dashboard")}
+          >
+            Costimize
+          </span>
         </nav>
         <div className="max-w-3xl mx-auto px-8 py-8">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-bold">Should-Cost Estimate</h1>
-            {result.confidence_tier && (
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                result.confidence_tier === "high" ? "bg-green-100 text-green-700" :
-                result.confidence_tier === "medium" ? "bg-yellow-100 text-yellow-700" :
-                "bg-red-100 text-red-700"
-              }`}>
-                {result.confidence_tier.toUpperCase()} confidence
-              </span>
-            )}
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">Should-Cost Estimate</h1>
+              <p className="text-gray-500 text-sm mt-1">
+                {result.material_name} &middot; {result.quantity} unit{result.quantity > 1 ? "s" : ""}
+              </p>
+            </div>
+            {confidenceBadge(result.confidence_tier)}
           </div>
 
-          <div className="bg-white rounded-xl shadow overflow-hidden mb-6">
+          {/* Summary table */}
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden mb-4">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b">
-                <tr>
-                  <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Cost Component</th>
-                  <th className="text-right px-6 py-3 text-sm font-medium text-gray-500">Amount ({result.currency})</th>
+              <thead>
+                <tr className="border-b border-gray-100 bg-gray-50/50">
+                  <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Cost Component</th>
+                  <th className="text-right px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount ({result.currency})</th>
                 </tr>
               </thead>
-              <tbody className="divide-y">
+              <tbody className="divide-y divide-gray-50">
                 <tr>
-                  <td className="px-6 py-3">Material ({result.material_name})</td>
-                  <td className="px-6 py-3 text-right font-mono">{fmt(result.material_cost)}</td>
+                  <td className="px-6 py-3.5 text-sm text-gray-700">Material ({result.material_name})</td>
+                  <td className="px-6 py-3.5 text-right font-mono text-sm font-medium">{fmt(result.material_cost)}</td>
                 </tr>
                 <tr>
-                  <td className="px-6 py-3">Machining</td>
-                  <td className="px-6 py-3 text-right font-mono">{fmt(result.total_machining_cost)}</td>
+                  <td className="px-6 py-3.5 text-sm text-gray-700">Machining</td>
+                  <td className="px-6 py-3.5 text-right font-mono text-sm font-medium">{fmt(result.total_machining_cost)}</td>
                 </tr>
                 <tr>
-                  <td className="px-6 py-3">Setup & Tooling</td>
-                  <td className="px-6 py-3 text-right font-mono">{fmt(result.total_setup_cost + result.total_tooling_cost)}</td>
+                  <td className="px-6 py-3.5 text-sm text-gray-700">Setup &amp; Tooling</td>
+                  <td className="px-6 py-3.5 text-right font-mono text-sm font-medium">{fmt(result.total_setup_cost + result.total_tooling_cost)}</td>
                 </tr>
                 <tr>
-                  <td className="px-6 py-3">Labour</td>
-                  <td className="px-6 py-3 text-right font-mono">{fmt(result.total_labour_cost)}</td>
+                  <td className="px-6 py-3.5 text-sm text-gray-700">Labour</td>
+                  <td className="px-6 py-3.5 text-right font-mono text-sm font-medium">{fmt(result.total_labour_cost)}</td>
                 </tr>
                 <tr>
-                  <td className="px-6 py-3">Power</td>
-                  <td className="px-6 py-3 text-right font-mono">{fmt(result.total_power_cost)}</td>
+                  <td className="px-6 py-3.5 text-sm text-gray-700">Power</td>
+                  <td className="px-6 py-3.5 text-right font-mono text-sm font-medium">{fmt(result.total_power_cost)}</td>
                 </tr>
                 <tr>
-                  <td className="px-6 py-3">Overhead</td>
-                  <td className="px-6 py-3 text-right font-mono">{fmt(result.overhead)}</td>
+                  <td className="px-6 py-3.5 text-sm text-gray-700">Overhead (15%)</td>
+                  <td className="px-6 py-3.5 text-right font-mono text-sm font-medium">{fmt(result.overhead)}</td>
                 </tr>
                 <tr>
-                  <td className="px-6 py-3">Profit</td>
-                  <td className="px-6 py-3 text-right font-mono">{fmt(result.profit)}</td>
+                  <td className="px-6 py-3.5 text-sm text-gray-700">Profit (20%)</td>
+                  <td className="px-6 py-3.5 text-right font-mono text-sm font-medium">{fmt(result.profit)}</td>
                 </tr>
-                <tr className="bg-blue-50 font-bold">
-                  <td className="px-6 py-4">TOTAL (per unit)</td>
-                  <td className="px-6 py-4 text-right font-mono text-lg">
+              </tbody>
+              <tfoot>
+                <tr className="bg-primary-600 text-white">
+                  <td className="px-6 py-4 font-bold text-sm">TOTAL (per unit)</td>
+                  <td className="px-6 py-4 text-right font-mono font-bold text-lg">
                     {result.currency} {fmt(result.unit_cost)}
                   </td>
                 </tr>
                 {result.quantity > 1 && (
-                  <tr className="bg-blue-50 font-bold">
-                    <td className="px-6 py-4">ORDER TOTAL ({result.quantity} units)</td>
-                    <td className="px-6 py-4 text-right font-mono text-lg">
+                  <tr className="bg-primary-700 text-white">
+                    <td className="px-6 py-4 font-bold text-sm">ORDER TOTAL ({result.quantity} units)</td>
+                    <td className="px-6 py-4 text-right font-mono font-bold text-lg">
                       {result.currency} {fmt(result.order_cost)}
                     </td>
                   </tr>
                 )}
-              </tbody>
+              </tfoot>
             </table>
           </div>
 
+          {/* Expand/collapse */}
           <button
             onClick={() => setExpanded(!expanded)}
-            className="text-blue-600 hover:underline mb-6 inline-block"
+            className="flex items-center gap-2 text-primary-600 hover:text-primary-700 text-sm font-medium mb-4 transition-colors"
           >
+            <svg
+              className={`w-4 h-4 transition-transform ${expanded ? "rotate-90" : ""}`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
             {expanded ? "Hide" : "Show"} full process breakdown
           </button>
 
           {expanded && (
-            <div className="bg-white rounded-xl shadow overflow-hidden mb-6">
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden mb-6 overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50 border-b">
-                  <tr>
-                    <th className="text-left px-4 py-2">Process</th>
-                    <th className="text-right px-4 py-2">Time</th>
-                    <th className="text-right px-4 py-2">Machine</th>
-                    <th className="text-right px-4 py-2">Setup</th>
-                    <th className="text-right px-4 py-2">Tooling</th>
-                    <th className="text-right px-4 py-2">Labour</th>
-                    <th className="text-right px-4 py-2">Power</th>
+                <thead>
+                  <tr className="border-b border-gray-100 bg-gray-50/50">
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Process</th>
+                    <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Time</th>
+                    <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Machine</th>
+                    <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Setup</th>
+                    <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Tooling</th>
+                    <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Labour</th>
+                    <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Power</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y">
+                <tbody className="divide-y divide-gray-50">
                   {result.process_lines.map((pl) => (
-                    <tr key={pl.process_id}>
-                      <td className="px-4 py-2">{pl.process_name}</td>
-                      <td className="px-4 py-2 text-right font-mono">{pl.time_min.toFixed(1)} min</td>
-                      <td className="px-4 py-2 text-right font-mono">{fmt(pl.machine_cost)}</td>
-                      <td className="px-4 py-2 text-right font-mono">{fmt(pl.setup_cost_per_unit)}</td>
-                      <td className="px-4 py-2 text-right font-mono">{fmt(pl.tooling_cost)}</td>
-                      <td className="px-4 py-2 text-right font-mono">{fmt(pl.labour_cost)}</td>
-                      <td className="px-4 py-2 text-right font-mono">{fmt(pl.power_cost)}</td>
+                    <tr key={pl.process_id} className="hover:bg-gray-50/50">
+                      <td className="px-4 py-3 font-medium text-gray-900">{pl.process_name}</td>
+                      <td className="px-4 py-3 text-right font-mono text-gray-600">{pl.time_min.toFixed(1)} min</td>
+                      <td className="px-4 py-3 text-right font-mono text-gray-600">{fmt(pl.machine_cost)}</td>
+                      <td className="px-4 py-3 text-right font-mono text-gray-600">{fmt(pl.setup_cost_per_unit)}</td>
+                      <td className="px-4 py-3 text-right font-mono text-gray-600">{fmt(pl.tooling_cost)}</td>
+                      <td className="px-4 py-3 text-right font-mono text-gray-600">{fmt(pl.labour_cost)}</td>
+                      <td className="px-4 py-3 text-right font-mono text-gray-600">{fmt(pl.power_cost)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -311,11 +391,18 @@ export default function NewEstimatePage() {
             </div>
           )}
 
-          <div className="flex gap-4">
-            <button onClick={() => router.push("/dashboard")} className="flex-1 border py-3 rounded-lg hover:bg-gray-50">
+          {/* Actions */}
+          <div className="flex gap-3 mt-6">
+            <button
+              onClick={() => router.push("/dashboard")}
+              className="flex-1 border border-gray-200 py-3.5 rounded-lg hover:bg-gray-50 text-sm font-medium text-gray-700 transition-colors"
+            >
               Back to Dashboard
             </button>
-            <button onClick={() => { setStep("upload"); setResult(null); setExtractedData(null); }} className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700">
+            <button
+              onClick={() => { setStep("upload"); setResult(null); setExtractedData(null); }}
+              className="flex-1 bg-primary-600 text-white py-3.5 rounded-lg font-semibold hover:bg-primary-700 transition-colors shadow-sm"
+            >
               New Estimate
             </button>
           </div>

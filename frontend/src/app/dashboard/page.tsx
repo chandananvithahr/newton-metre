@@ -48,86 +48,115 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-500">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-gray-500 text-sm">Loading dashboard...</p>
+        </div>
       </div>
     );
   }
 
+  const confidenceColor = (tier: string | null) => {
+    if (tier === "high") return "bg-emerald-50 text-emerald-700 border-emerald-200";
+    if (tier === "medium") return "bg-amber-50 text-amber-700 border-amber-200";
+    if (tier === "low") return "bg-red-50 text-red-700 border-red-200";
+    return "bg-gray-50 text-gray-500 border-gray-200";
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="flex items-center justify-between px-8 py-4 bg-white border-b">
-        <span className="text-xl font-bold">Costimize</span>
-        <button onClick={handleLogout} className="text-gray-500 hover:text-gray-700">
+    <div className="min-h-screen bg-slate-50">
+      {/* Nav */}
+      <nav className="flex items-center justify-between px-8 py-4 bg-white border-b border-gray-100 shadow-sm">
+        <span className="text-xl font-bold tracking-tight text-primary-700">Costimize</span>
+        <button onClick={handleLogout} className="text-gray-400 hover:text-gray-600 text-sm font-medium transition-colors">
           Log out
         </button>
       </nav>
 
       <div className="max-w-5xl mx-auto px-8 py-8">
-        <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
+        <h1 className="text-3xl font-bold mb-1 tracking-tight">Dashboard</h1>
+        <p className="text-gray-500 text-sm mb-8">Your cost estimation workspace.</p>
 
+        {/* Stats */}
         {usage && (
-          <div className="flex gap-4 mb-8">
-            <div className="bg-white rounded-lg shadow p-4 flex-1">
-              <p className="text-3xl font-bold">{usage.total_estimates}</p>
-              <p className="text-gray-500 text-sm">Estimates</p>
+          <div className="grid grid-cols-2 gap-4 mb-8">
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+              <p className="text-sm font-medium text-gray-500 mb-1">Estimates</p>
+              <p className="text-3xl font-bold text-gray-900">{usage.total_estimates}</p>
             </div>
-            <div className="bg-white rounded-lg shadow p-4 flex-1">
-              <p className="text-3xl font-bold">{usage.total_similarity}</p>
-              <p className="text-gray-500 text-sm">Similarity searches</p>
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+              <p className="text-sm font-medium text-gray-500 mb-1">Similarity Searches</p>
+              <p className="text-3xl font-bold text-gray-900">{usage.total_similarity}</p>
             </div>
           </div>
         )}
 
-        <div className="flex gap-4 mb-8">
+        {/* Actions */}
+        <div className="grid grid-cols-2 gap-4 mb-10">
           <button
             onClick={() => router.push("/estimate/new")}
-            className="bg-blue-600 text-white px-6 py-4 rounded-lg hover:bg-blue-700 text-lg flex-1"
+            className="flex items-center justify-center gap-3 bg-primary-600 text-white px-6 py-5 rounded-xl hover:bg-primary-700 transition-colors shadow-sm text-lg font-semibold"
           >
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
             New Estimate
           </button>
           <button
             onClick={() => router.push("/similar")}
-            className="bg-white border-2 border-blue-600 text-blue-600 px-6 py-4 rounded-lg hover:bg-blue-50 text-lg flex-1"
+            className="flex items-center justify-center gap-3 bg-white border-2 border-primary-600 text-primary-600 px-6 py-5 rounded-xl hover:bg-primary-50 transition-colors text-lg font-semibold"
           >
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+            </svg>
             Similar Parts
           </button>
         </div>
 
-        <h2 className="text-xl font-semibold mb-4">Recent Estimates</h2>
+        {/* Recent estimates */}
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold tracking-tight">Recent Estimates</h2>
+          <span className="text-xs text-gray-400">{estimates.length} total</span>
+        </div>
+
         {estimates.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">
-            No estimates yet. Upload your first drawing.
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-12 text-center">
+            <div className="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+              </svg>
+            </div>
+            <p className="text-gray-500 font-medium mb-1">No estimates yet</p>
+            <p className="text-gray-400 text-sm">Upload your first engineering drawing to get started.</p>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b">
-                <tr>
-                  <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Date</th>
-                  <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Type</th>
-                  <th className="text-right px-6 py-3 text-sm font-medium text-gray-500">Total Cost</th>
-                  <th className="text-center px-6 py-3 text-sm font-medium text-gray-500">Confidence</th>
+              <thead>
+                <tr className="border-b border-gray-100 bg-gray-50/50">
+                  <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
+                  <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Type</th>
+                  <th className="text-right px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Cost</th>
+                  <th className="text-center px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Confidence</th>
                 </tr>
               </thead>
-              <tbody className="divide-y">
+              <tbody className="divide-y divide-gray-50">
                 {estimates.map((est) => (
                   <tr
                     key={est.id}
                     onClick={() => router.push(`/estimate/${est.id}`)}
-                    className="hover:bg-gray-50 cursor-pointer"
+                    className="hover:bg-primary-50/30 cursor-pointer transition-colors"
                   >
-                    <td className="px-6 py-4 text-sm">{new Date(est.created_at).toLocaleDateString()}</td>
-                    <td className="px-6 py-4 text-sm capitalize">{est.part_type}</td>
-                    <td className="px-6 py-4 text-sm text-right font-mono">
+                    <td className="px-6 py-4 text-sm text-gray-600">
+                      {new Date(est.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+                    </td>
+                    <td className="px-6 py-4 text-sm capitalize font-medium text-gray-900">{est.part_type}</td>
+                    <td className="px-6 py-4 text-sm text-right font-mono font-medium text-gray-900">
                       {est.currency} {est.total_cost.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
                     </td>
-                    <td className="px-6 py-4 text-sm text-center">
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${
-                        est.confidence_tier === "high" ? "bg-green-100 text-green-700" :
-                        est.confidence_tier === "medium" ? "bg-yellow-100 text-yellow-700" :
-                        "bg-gray-100 text-gray-700"
-                      }`}>
+                    <td className="px-6 py-4 text-center">
+                      <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-semibold border ${confidenceColor(est.confidence_tier)}`}>
                         {est.confidence_tier || "—"}
                       </span>
                     </td>
