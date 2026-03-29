@@ -1,0 +1,17 @@
+frontend/
+costimize-v2/papers/
+costimize-v2/sandvik/
+costimize-v2/docs/
+costimize-v2/demos/
+costimize-v2/tests/
+costimize-v2/.git/
+costimize-v2/data/cache/
+costimize-v2/data/history/
+costimize-v2/data/validation/
+costimize-v2/data/similarity/
+**/__pycache__/
+*.pyc
+*.pdf
+.git/
+.env
+node_modules/
