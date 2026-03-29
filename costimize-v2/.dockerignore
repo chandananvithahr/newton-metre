@@ -1,0 +1,16 @@
+papers/
+sandvik/
+docs/
+demos/
+tests/
+.git/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+data/cache/
+data/history/
+data/validation/
+data/similarity/
+.env
+.env.example
+*.pdf

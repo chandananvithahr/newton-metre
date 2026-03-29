@@ -1,0 +1,13 @@
+{
+  "materials": [
+    {"name": "Aluminum 6061", "price_per_kg_inr": 280, "density_kg_per_m3": 2700, "machinability": 0.8},
+    {"name": "Mild Steel IS2062", "price_per_kg_inr": 65, "density_kg_per_m3": 7850, "machinability": 0.6},
+    {"name": "Stainless Steel 304", "price_per_kg_inr": 220, "density_kg_per_m3": 8000, "machinability": 0.4},
+    {"name": "Brass IS319", "price_per_kg_inr": 550, "density_kg_per_m3": 8500, "machinability": 0.9},
+    {"name": "EN8 Steel", "price_per_kg_inr": 75, "density_kg_per_m3": 7850, "machinability": 0.55},
+    {"name": "EN24 Steel", "price_per_kg_inr": 120, "density_kg_per_m3": 7850, "machinability": 0.45},
+    {"name": "Copper", "price_per_kg_inr": 750, "density_kg_per_m3": 8960, "machinability": 0.7},
+    {"name": "Cast Iron", "price_per_kg_inr": 55, "density_kg_per_m3": 7200, "machinability": 0.65},
+    {"name": "Titanium Grade 5", "price_per_kg_inr": 3500, "density_kg_per_m3": 4430, "machinability": 0.25}
+  ]
+}

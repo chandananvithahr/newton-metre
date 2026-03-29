@@ -1,0 +1,22 @@
+{
+  "processes": [
+    {"id": "turning", "name": "Turning", "category": "machining", "description": "Cylindrical material removal on lathe"},
+    {"id": "facing", "name": "Facing", "category": "machining", "description": "Flat surface on lathe"},
+    {"id": "boring", "name": "Boring", "category": "machining", "description": "Enlarge existing hole on lathe"},
+    {"id": "milling_face", "name": "Face Milling", "category": "machining", "description": "Flat surface on milling machine"},
+    {"id": "milling_slot", "name": "Slot Milling", "category": "machining", "description": "Cut slots/channels"},
+    {"id": "milling_pocket", "name": "Pocket Milling", "category": "machining", "description": "Cut pockets/cavities"},
+    {"id": "drilling", "name": "Drilling", "category": "machining", "description": "Create holes"},
+    {"id": "reaming", "name": "Reaming", "category": "machining", "description": "Precision hole finishing"},
+    {"id": "tapping", "name": "Tapping", "category": "machining", "description": "Internal threads"},
+    {"id": "threading", "name": "Threading", "category": "machining", "description": "External threads"},
+    {"id": "grinding_cylindrical", "name": "Cylindrical Grinding", "category": "finishing", "description": "Precision cylindrical finish"},
+    {"id": "grinding_surface", "name": "Surface Grinding", "category": "finishing", "description": "Precision flat finish"},
+    {"id": "knurling", "name": "Knurling", "category": "machining", "description": "Textured grip pattern"},
+    {"id": "broaching", "name": "Broaching", "category": "machining", "description": "Keyways, splines, shapes"},
+    {"id": "heat_treatment", "name": "Heat Treatment", "category": "treatment", "description": "Hardening, tempering, annealing"},
+    {"id": "surface_treatment_plating", "name": "Plating", "category": "treatment", "description": "Chrome, nickel, zinc plating"},
+    {"id": "surface_treatment_anodizing", "name": "Anodizing", "category": "treatment", "description": "Anodic oxide coating (aluminium)"},
+    {"id": "surface_treatment_painting", "name": "Painting", "category": "treatment", "description": "Paint/powder coating"}
+  ]
+}
