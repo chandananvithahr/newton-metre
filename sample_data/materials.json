@@ -1,0 +1,34 @@
+{
+  "materials": [
+    {
+      "name": "Aluminum 6061",
+      "price_per_kg_inr": 280,
+      "density_kg_per_m3": 2700
+    },
+    {
+      "name": "Mild Steel IS2062",
+      "price_per_kg_inr": 65,
+      "density_kg_per_m3": 7850
+    },
+    {
+      "name": "Stainless Steel 304",
+      "price_per_kg_inr": 220,
+      "density_kg_per_m3": 8000
+    },
+    {
+      "name": "Brass IS319",
+      "price_per_kg_inr": 550,
+      "density_kg_per_m3": 8500
+    },
+    {
+      "name": "EN8 Steel",
+      "price_per_kg_inr": 75,
+      "density_kg_per_m3": 7850
+    },
+    {
+      "name": "EN24 Steel",
+      "price_per_kg_inr": 120,
+      "density_kg_per_m3": 7850
+    }
+  ]
+}

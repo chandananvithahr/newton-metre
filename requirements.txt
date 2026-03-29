@@ -1,0 +1,16 @@
+streamlit
+google-generativeai
+openai
+python-dotenv
+Pillow
+requests
+beautifulsoup4
+pdf2image
+PyPDF2
+ezdxf
+trimesh
+paddlepaddle
+paddleocr
+ultralytics
+pythonocc-core
+cadquery
