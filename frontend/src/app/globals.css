@@ -16,8 +16,8 @@
   --color-teal-600: #0D6560;
 
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "DM Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  --font-label: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
 }
 
 /* Base body styles */
@@ -25,6 +25,11 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Heading font */
+h1, h2, h3 {
+  font-family: var(--font-heading);
 }
 
 /* Professional input styling */
