@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Instrument_Serif, Source_Sans_3, DM_Mono, IBM_Plex_Mono } from "next/font/google";
+import { Instrument_Serif, Source_Sans_3, DM_Mono, IBM_Plex_Mono, Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { ToastProvider } from "@/components/Toast";
 import "./globals.css";
@@ -26,6 +26,13 @@ const dmMono = DM_Mono({
   display: "swap",
 });
 
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
 const ibmPlexMono = IBM_Plex_Mono({
   subsets: ["latin"],
   weight: ["400", "500"],
@@ -46,7 +53,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${instrumentSerif.variable} ${sourceSans3.variable} ${dmMono.variable} ${ibmPlexMono.variable}`}
+      className={`${instrumentSerif.variable} ${sourceSans3.variable} ${dmMono.variable} ${ibmPlexMono.variable} ${inter.variable}`}
     >
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
