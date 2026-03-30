@@ -64,7 +64,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex flex-col">
       {/* Nav */}
       <nav className="flex items-center px-8 py-5 border-b border-gray-100 bg-white">
-        <Link href="/" className="text-xl font-bold tracking-tight text-primary-700">
+        <Link href="/" className="text-xl font-bold tracking-tight text-primary-700 py-2">
           Costimize
         </Link>
       </nav>
@@ -167,7 +167,7 @@ export default function LoginPage() {
             <div className="mt-6 text-center">
               <button
                 onClick={() => { setIsSignUp(!isSignUp); setError(""); }}
-                className="text-primary-600 hover:text-primary-700 text-sm font-medium"
+                className="text-primary-600 hover:text-primary-700 text-sm font-medium py-3 px-4"
               >
                 {isSignUp ? "Already have an account? Log in" : "Need an account? Sign up"}
               </button>

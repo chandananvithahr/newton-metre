@@ -5,7 +5,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white">
       {/* Nav */}
       <nav className="flex items-center justify-between px-4 sm:px-8 py-5 border-b border-gray-100">
-        <span className="text-xl font-bold tracking-tight text-primary-700">Costimize</span>
+        <span className="text-xl font-bold tracking-tight text-primary-700 py-2">Costimize</span>
         <Link
           href="/login"
           className="bg-primary-600 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-primary-700 transition-colors shadow-sm"
@@ -18,20 +18,20 @@ export default function LandingPage() {
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-50 via-white to-slate-50" />
         <div className="relative max-w-4xl mx-auto px-4 sm:px-8 py-16 sm:py-28 text-center">
-          <div className="inline-block mb-6 px-4 py-1.5 bg-primary-100 text-primary-700 rounded-full text-sm font-medium">
+          <div className="inline-block mb-6 px-4 py-1.5 bg-primary-100 text-primary-700 rounded-full text-sm font-medium animate-fade-in-up">
             Physics-based cost estimation
           </div>
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold mb-6 leading-tight tracking-tight text-gray-900">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold mb-6 leading-tight tracking-tight text-gray-900 animate-fade-in-up-delay-1">
             Know the real cost<br />
             <span className="text-primary-600">before you negotiate.</span>
           </h1>
-          <p className="text-xl text-gray-500 mb-10 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl text-gray-500 mb-10 max-w-2xl mx-auto leading-relaxed animate-fade-in-up-delay-2">
             AI-powered should-cost breakdowns for mechanical parts.
             Line by line. Physics-based. Accurate to ±10%.
           </p>
           <Link
             href="/login"
-            className="inline-flex items-center gap-2 bg-primary-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-primary-700 transition-colors shadow-lg shadow-primary-600/25"
+            className="inline-flex items-center gap-2 bg-primary-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-primary-700 transition-colors shadow-lg shadow-primary-600/25 animate-fade-in-up-delay-3"
           >
             Get your first estimate free
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
