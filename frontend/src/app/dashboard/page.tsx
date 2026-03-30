@@ -35,7 +35,12 @@ export default function DashboardPage() {
         setEstimates(est);
         setUsage(usg);
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Failed to load data. Please try again.");
+        const msg = e instanceof Error ? e.message : "Failed to load data. Please try again.";
+        if (msg === "Not authenticated") {
+          router.push("/login");
+          return;
+        }
+        setError(msg);
       }
       setLoading(false);
     }

@@ -20,9 +20,13 @@ async function parseErrorResponse(res: Response, fallback: string): Promise<stri
 async function getAuthHeaders(): Promise<HeadersInit> {
   const { createClient } = await import("./supabase");
   const supabase = createClient();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  let { data: { session } } = await supabase.auth.getSession();
+
+  // getSession() doesn't refresh expired tokens — try refreshing if missing
+  if (!session?.access_token) {
+    const { data: refreshed } = await supabase.auth.refreshSession();
+    session = refreshed.session;
+  }
 
   if (!session?.access_token) {
     throw new Error("Not authenticated");
