@@ -153,7 +153,7 @@ export default function LoginPage() {
                       onChange={(e) => setEmail(e.target.value)}
                       required
                       className="w-full px-4 py-3 border border-[#2A3140] rounded-lg bg-[#1C2235] outline-none text-sm text-[#E2E8F0] placeholder:text-[#475569]"
-                      placeholder="you@company.com"
+                      placeholder="your@email.com"
                       autoComplete={isSignUp ? "off" : "email"}
                     />
                   </div>
