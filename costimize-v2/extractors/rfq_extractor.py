@@ -127,11 +127,11 @@ def extract_rfq(pdf_bytes: bytes) -> dict:
         }
 
     try:
-        result = _extract_with_openai(text)
+        result = _extract_with_gemini(text)
     except Exception as e:
-        logger.warning("OpenAI RFQ extraction failed: %s — trying Gemini", e)
+        logger.warning("Gemini RFQ extraction failed: %s — trying OpenAI", e)
         try:
-            result = _extract_with_gemini(text)
+            result = _extract_with_openai(text)
         except Exception as e2:
             logger.error("Both RFQ extractors failed: %s", e2)
             return {
@@ -184,7 +184,8 @@ def _extract_with_gemini(text: str) -> dict:
     import google.generativeai as genai
 
     genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    # Use 1.5-pro for RFQ extraction — better at long structured tables than flash
+    model = genai.GenerativeModel("gemini-1.5-pro")
     prompt = _RFQ_EXTRACTION_PROMPT.format(text=text)
     response = model.generate_content(prompt, generation_config={"max_output_tokens": 4000})
     return _parse_rfq(response.text.strip())

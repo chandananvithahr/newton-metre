@@ -4,7 +4,7 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 
 from api.deps import get_current_user_id, get_supabase_admin
-from api.cost_tracker import check_budget, log_usage
+from api.cost_tracker import check_budget, check_user_budget, log_usage
 from api.schemas import SimilarityEmbedResponse, SimilaritySearchResponse, SimilarityMatch
 
 router = APIRouter()
@@ -22,6 +22,12 @@ async def embed_drawing(
 ):
     if not check_budget():
         raise HTTPException(status_code=429, detail="Service temporarily at capacity.")
+
+    if not check_user_budget(user_id):
+        raise HTTPException(
+            status_code=429,
+            detail="You've used your $0.50 credit for this period. Credits refresh every 48 hours.",
+        )
 
     image_bytes = await file.read()
     if len(image_bytes) > 10 * 1024 * 1024:
@@ -64,6 +70,12 @@ async def search_similar(
 ):
     if not check_budget():
         raise HTTPException(status_code=429, detail="Service temporarily at capacity.")
+
+    if not check_user_budget(user_id):
+        raise HTTPException(
+            status_code=429,
+            detail="You've used your $0.50 credit for this period. Credits refresh every 48 hours.",
+        )
 
     image_bytes = await file.read()
     if len(image_bytes) > MAX_FILE_SIZE_BYTES:

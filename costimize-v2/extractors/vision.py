@@ -109,16 +109,16 @@ Return ONLY the JSON object, no markdown fences or extra text."""
 
 
 def analyze_drawing(image_bytes: bytes, filename: str = "drawing.png") -> dict:
-    if OPENAI_API_KEY:
-        try:
-            return _analyze_with_openai(image_bytes)
-        except Exception as e:
-            if GEMINI_API_KEY:
-                return _analyze_with_gemini(image_bytes)
-            raise RuntimeError(f"OpenAI failed and no Gemini fallback: {e}")
     if GEMINI_API_KEY:
-        return _analyze_with_gemini(image_bytes)
-    raise RuntimeError("No API key configured. Set OPENAI_API_KEY or GEMINI_API_KEY in .env")
+        try:
+            return _analyze_with_gemini(image_bytes)
+        except Exception as e:
+            if OPENAI_API_KEY:
+                return _analyze_with_openai(image_bytes)
+            raise RuntimeError(f"Gemini failed and no OpenAI fallback: {e}")
+    if OPENAI_API_KEY:
+        return _analyze_with_openai(image_bytes)
+    raise RuntimeError("No API key configured. Set GEMINI_API_KEY or OPENAI_API_KEY in .env")
 
 
 def _analyze_with_openai(image_bytes: bytes) -> dict:

@@ -51,11 +51,11 @@ def classify_pdf(pdf_bytes: bytes) -> dict:
         return {"document_type": "other", "confidence": "low", "reason": "No extractable text found"}
 
     try:
-        return _classify_with_openai(text)
+        return _classify_with_gemini(text)
     except Exception as e:
-        logger.warning("OpenAI classify failed: %s — trying Gemini", e)
+        logger.warning("Gemini classify failed: %s — trying OpenAI", e)
         try:
-            return _classify_with_gemini(text)
+            return _classify_with_openai(text)
         except Exception as e2:
             logger.error("Both classifiers failed: %s", e2)
             return {"document_type": "other", "confidence": "low", "reason": "Classification failed"}

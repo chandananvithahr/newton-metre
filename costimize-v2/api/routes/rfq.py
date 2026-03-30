@@ -6,7 +6,7 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 
 from api.deps import get_current_user_id
-from api.cost_tracker import check_budget, log_usage
+from api.cost_tracker import check_budget, check_user_budget, log_usage
 from api.schemas import (
     RFQExtractResponse,
     RFQLineItemResult,
@@ -33,6 +33,12 @@ async def extract_rfq(
         raise HTTPException(
             status_code=429,
             detail="Service temporarily at capacity. Please try again tomorrow.",
+        )
+
+    if not check_user_budget(user_id):
+        raise HTTPException(
+            status_code=429,
+            detail="You've used your $0.50 credit for this period. Credits refresh every 48 hours.",
         )
 
     if file.content_type and file.content_type != "application/pdf":
@@ -64,7 +70,7 @@ async def extract_rfq(
             detail="Failed to extract RFQ data. Please ensure the PDF is readable.",
         )
 
-    log_usage(user_id, "rfq_extract", 0.05, {"filename": file.filename, "pages": rfq_data.get("page_count", 0)})
+    log_usage(user_id, "rfq_extract", 0.01, {"filename": file.filename, "pages": rfq_data.get("page_count", 0)})
 
     line_items = [
         RFQLineItemResult(
@@ -104,6 +110,12 @@ async def estimate_rfq(
         raise HTTPException(
             status_code=429,
             detail="Service temporarily at capacity. Please try again tomorrow.",
+        )
+
+    if not check_user_budget(user_id):
+        raise HTTPException(
+            status_code=429,
+            detail="You've used your $0.50 credit for this period. Credits refresh every 48 hours.",
         )
 
     if not body.line_items:
