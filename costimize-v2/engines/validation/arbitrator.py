@@ -115,7 +115,10 @@ def arbitrate(
     )
 
     try:
-        response = model.generate_content([prompt])
+        response = model.generate_content(
+            [prompt],
+            generation_config={"max_output_tokens": 2000},
+        )
         text = response.text.strip()
         if text.startswith("```"):
             text = text.split("\n", 1)[1].rsplit("```", 1)[0].strip()

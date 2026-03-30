@@ -1,10 +1,14 @@
 """GET /api/estimates -- user's estimate history."""
+import re
+
 from fastapi import APIRouter, Depends, HTTPException
 
 from api.deps import get_current_user_id, get_supabase_admin
 from api.schemas import EstimateHistoryItem
 
 router = APIRouter()
+
+_UUID_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", re.I)
 
 
 @router.get("/estimates", response_model=list[EstimateHistoryItem])
@@ -39,6 +43,9 @@ async def get_estimate(
     estimate_id: str,
     user_id: str = Depends(get_current_user_id),
 ):
+    if not _UUID_RE.match(estimate_id):
+        raise HTTPException(status_code=400, detail="Invalid estimate ID format")
+
     sb = get_supabase_admin()
     result = (
         sb.table("estimates")

@@ -82,10 +82,10 @@ def _analyze_with_gemini(image_bytes: bytes) -> dict:
     import google.generativeai as genai
     genai.configure(api_key=GEMINI_API_KEY)
     model = genai.GenerativeModel("gemini-1.5-flash")
-    response = model.generate_content([
-        EXTRACTION_PROMPT,
-        {"mime_type": "image/png", "data": image_bytes},
-    ])
+    response = model.generate_content(
+        [EXTRACTION_PROMPT, {"mime_type": "image/png", "data": image_bytes}],
+        generation_config={"max_output_tokens": 2000},
+    )
     text = response.text.strip()
     if text.startswith("```"):
         text = text.split("\n", 1)[1].rsplit("```", 1)[0].strip()

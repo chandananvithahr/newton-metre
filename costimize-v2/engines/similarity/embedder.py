@@ -97,10 +97,10 @@ def _embed_with_gemini(image: Image.Image) -> np.ndarray:
     image.save(buf, format="PNG")
     img_bytes = buf.getvalue()
 
-    response = model.generate_content([
-        _GEMINI_EMBED_PROMPT,
-        {"mime_type": "image/png", "data": img_bytes},
-    ])
+    response = model.generate_content(
+        [_GEMINI_EMBED_PROMPT, {"mime_type": "image/png", "data": img_bytes}],
+        generation_config={"max_output_tokens": 200},
+    )
 
     description = response.text.strip().lower()
     return _text_to_vector(description)

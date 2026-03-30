@@ -64,10 +64,10 @@ def _extract_gemini(pdf_bytes: bytes) -> list[dict]:
     import google.generativeai as genai
     genai.configure(api_key=GEMINI_API_KEY)
     model = genai.GenerativeModel("gemini-1.5-flash")
-    response = model.generate_content([
-        BOM_PROMPT,
-        {"mime_type": "application/pdf", "data": pdf_bytes},
-    ])
+    response = model.generate_content(
+        [BOM_PROMPT, {"mime_type": "application/pdf", "data": pdf_bytes}],
+        generation_config={"max_output_tokens": 4000},
+    )
     text = response.text.strip()
     if text.startswith("```"):
         text = text.split("\n", 1)[1].rsplit("```", 1)[0].strip()

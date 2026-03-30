@@ -2,9 +2,9 @@
 import os
 from datetime import date
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException
 
-from api.deps import get_current_user_id, get_supabase_admin
+from api.deps import get_current_user_id, get_supabase_admin, get_supabase_client
 from api.schemas import UsageResponse, AdminUsageResponse
 
 router = APIRouter()
@@ -49,8 +49,10 @@ async def get_user_usage(
 
 
 @router.get("/admin/usage", response_model=AdminUsageResponse)
-async def get_admin_usage(secret: str = ""):
-    if not ADMIN_SECRET or secret != ADMIN_SECRET:
+async def get_admin_usage(authorization: str = Header(default="")):
+    """Admin usage stats. Requires ADMIN_SECRET in Authorization header."""
+    expected = f"Bearer {ADMIN_SECRET}"
+    if not ADMIN_SECRET or authorization != expected:
         raise HTTPException(status_code=403, detail="Forbidden")
 
     sb = get_supabase_admin()

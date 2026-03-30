@@ -1,17 +1,27 @@
 """POST /api/extract -- upload drawing, AI extracts dimensions + processes."""
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 from api.deps import get_current_user_id
 from api.cost_tracker import check_budget, log_usage
 from api.schemas import ExtractionResponse
 
 router = APIRouter()
+limiter = Limiter(key_func=get_remote_address)
 
 MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024  # 10 MB
 
+ALLOWED_CONTENT_TYPES = {
+    "image/png", "image/jpeg", "image/jpg", "image/webp",
+    "application/pdf", "image/tiff",
+}
+
 
 @router.post("/extract", response_model=ExtractionResponse)
+@limiter.limit("10/minute")
 async def extract_drawing(
+    request: Request,
     file: UploadFile = File(...),
     user_id: str = Depends(get_current_user_id),
 ) -> ExtractionResponse:
@@ -19,6 +29,12 @@ async def extract_drawing(
         raise HTTPException(
             status_code=429,
             detail="Service temporarily at capacity. Please try again tomorrow.",
+        )
+
+    if file.content_type and file.content_type not in ALLOWED_CONTENT_TYPES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported file type '{file.content_type}'. Accepted: PDF, PNG, JPEG, TIFF, WebP.",
         )
 
     image_bytes = await file.read()

@@ -100,10 +100,10 @@ def estimate_cost_from_drawing(
         material_hint=hint_text,
     )
 
-    response = model.generate_content([
-        prompt,
-        {"mime_type": "image/png", "data": image_bytes},
-    ])
+    response = model.generate_content(
+        [prompt, {"mime_type": "image/png", "data": image_bytes}],
+        generation_config={"max_output_tokens": 2000},
+    )
 
     text = response.text.strip()
     # Strip markdown code fences if present

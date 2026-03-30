@@ -1,15 +1,22 @@
 """Similarity search routes -- embed drawings + find matches."""
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 from api.deps import get_current_user_id, get_supabase_admin
 from api.cost_tracker import check_budget, log_usage
 from api.schemas import SimilarityEmbedResponse, SimilaritySearchResponse, SimilarityMatch
 
 router = APIRouter()
+limiter = Limiter(key_func=get_remote_address)
+
+MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024  # 10 MB
 
 
 @router.post("/similarity/embed", response_model=SimilarityEmbedResponse)
+@limiter.limit("15/minute")
 async def embed_drawing(
+    request: Request,
     file: UploadFile = File(...),
     user_id: str = Depends(get_current_user_id),
 ):
@@ -49,7 +56,9 @@ async def embed_drawing(
 
 
 @router.post("/similarity/search", response_model=SimilaritySearchResponse)
+@limiter.limit("15/minute")
 async def search_similar(
+    request: Request,
     file: UploadFile = File(...),
     user_id: str = Depends(get_current_user_id),
 ):
@@ -57,6 +66,8 @@ async def search_similar(
         raise HTTPException(status_code=429, detail="Service temporarily at capacity.")
 
     image_bytes = await file.read()
+    if len(image_bytes) > MAX_FILE_SIZE_BYTES:
+        raise HTTPException(status_code=400, detail="File too large. Maximum 10MB.")
 
     try:
         from engines.similarity.preprocessor import preprocess_drawing

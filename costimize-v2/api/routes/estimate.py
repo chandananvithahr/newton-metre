@@ -1,15 +1,39 @@
 """POST /api/estimate -- run physics engine + validation, return cost breakdown."""
-from fastapi import APIRouter, Depends, HTTPException
+import logging
+
+from fastapi import APIRouter, Depends, HTTPException, Request
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 from api.deps import get_current_user_id, get_supabase_admin
 from api.cost_tracker import check_budget, log_usage
 from api.schemas import EstimateRequest, EstimateResponse
+from engines.mechanical.material_db import list_material_names
 
 router = APIRouter()
+limiter = Limiter(key_func=get_remote_address)
+logger = logging.getLogger("costimize")
+
+ALLOWED_MATERIALS = list_material_names()
+_MATERIAL_SET = set(ALLOWED_MATERIALS)
+
+
+def _resolve_material(name: str) -> str | None:
+    """Match material name exactly or by prefix. Returns canonical name or None."""
+    if name in _MATERIAL_SET:
+        return name
+    # Try case-insensitive prefix match (e.g. "Mild Steel" → "Mild Steel IS2062")
+    name_lower = name.lower()
+    for mat in ALLOWED_MATERIALS:
+        if mat.lower().startswith(name_lower) or name_lower.startswith(mat.lower()):
+            return mat
+    return None
 
 
 @router.post("/estimate", response_model=EstimateResponse)
+@limiter.limit("20/minute")
 async def create_estimate(
+    request: Request,
     body: EstimateRequest,
     user_id: str = Depends(get_current_user_id),
 ) -> EstimateResponse:
@@ -21,9 +45,18 @@ async def create_estimate(
 
     extracted = body.extracted_data
     dims = extracted.get("dimensions", {})
-    material = extracted.get("material", "Mild Steel")
+    raw_material = extracted.get("material", "Mild Steel IS2062")
     processes = extracted.get("suggested_processes", ["turning"])
     has_tight = extracted.get("tolerances", {}).get("has_tight_tolerances", False)
+
+    # Validate material against known allowlist to prevent prompt injection
+    material = _resolve_material(raw_material)
+    if material is None:
+        logger.warning("Unknown material rejected: %s (user: %s)", raw_material, user_id)
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unknown material '{raw_material}'. Allowed: {', '.join(sorted(ALLOWED_MATERIALS))}",
+        )
 
     try:
         from engines.validation.orchestrator import orchestrate
