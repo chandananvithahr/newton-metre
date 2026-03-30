@@ -1,9 +1,9 @@
-"""API cost tracking — global $20/day cap + per-user $0.50/48-hour cap."""
+"""API cost tracking — global $2/day cap + per-user $0.50/48-hour cap."""
 from datetime import date, datetime, timezone, timedelta
 
 from api.deps import get_supabase_admin
 
-DAILY_BUDGET_USD = 20.0          # global hard cap
+DAILY_BUDGET_USD = 2.0           # global hard cap (~$20 per 10 days for 300 users)
 USER_BUDGET_USD = 0.50           # per user per 48 hours
 USER_BUDGET_WINDOW_HOURS = 48
 
