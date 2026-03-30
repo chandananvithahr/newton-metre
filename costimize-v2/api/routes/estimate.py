@@ -18,15 +18,34 @@ ALLOWED_MATERIALS = list_material_names()
 _MATERIAL_SET = set(ALLOWED_MATERIALS)
 
 
+# Keyword aliases → canonical name. AI often returns variations like "AL6061", "SS 304", "MS".
+_MATERIAL_ALIASES: list[tuple[list[str], str]] = [
+    (["al6061", "al 6061", "al-6061", "6061", "aluminum alloy", "aluminium alloy", "aluminum", "aluminium", "alloy al"], "Aluminum 6061"),
+    (["mild steel", "ms ", " ms", "is2062", "is 2062", "low carbon steel", "carbon steel"], "Mild Steel IS2062"),
+    (["en8", "en 8", "carbon steel en8", "080m40"], "EN8 Steel"),
+    (["en24", "en 24", "817m40", "alloy steel en24"], "EN24 Steel"),
+    (["stainless steel", "ss304", "ss 304", "304", "aisi 304", "aisi304", "inox"], "Stainless Steel 304"),
+    (["brass", "is319", "is 319", "cu zn", "cuzn"], "Brass IS319"),
+    (["cast iron", "grey iron", "gray iron", "ci "], "Cast Iron"),
+    (["copper", "cu ", " cu", "electrolytic copper"], "Copper"),
+    (["titanium", "ti ", " ti", "grade 5", "gr5", "gr.5", "ti-6al-4v", "ti6al4v"], "Titanium Grade 5"),
+]
+
+
 def _resolve_material(name: str) -> str | None:
-    """Match material name exactly or by prefix. Returns canonical name or None."""
+    """Match material name exactly, by prefix, or by keyword alias. Returns canonical name or None."""
     if name in _MATERIAL_SET:
         return name
-    # Try case-insensitive prefix match (e.g. "Mild Steel" → "Mild Steel IS2062")
-    name_lower = name.lower()
+    name_lower = name.lower().strip()
+    # Prefix match (e.g. "Mild Steel" → "Mild Steel IS2062")
     for mat in ALLOWED_MATERIALS:
         if mat.lower().startswith(name_lower) or name_lower.startswith(mat.lower()):
             return mat
+    # Keyword alias match (e.g. "Aluminum Alloy AL6061" → "Aluminum 6061")
+    for keywords, canonical in _MATERIAL_ALIASES:
+        for kw in keywords:
+            if kw in name_lower:
+                return canonical
     return None
 
 
