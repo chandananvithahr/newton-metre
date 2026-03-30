@@ -508,9 +508,18 @@ export default function NewEstimatePage() {
             <div className="flex items-center gap-4 mb-6">
               <label className="text-sm font-medium text-[#94A3B8]">Quantity:</label>
               <input
-                type="number" min={1} value={quantity}
-                onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                className="w-24 px-3 py-2.5 border border-[#2A3140] rounded-lg bg-[#1C2235] outline-none text-sm text-[#E2E8F0]"
+                type="number" min={1} value={quantity || ""}
+                onChange={(e) => {
+                  const n = parseInt(e.target.value);
+                  if (!isNaN(n) && n >= 1) setQuantity(n);
+                  else if (e.target.value === "") setQuantity(1);
+                }}
+                onBlur={(e) => {
+                  const n = parseInt(e.target.value);
+                  setQuantity(isNaN(n) || n < 1 ? 1 : n);
+                }}
+                placeholder="e.g. 500"
+                className="w-28 px-3 py-2.5 border border-[#2A3140] rounded-lg bg-[#1C2235] outline-none text-sm text-[#E2E8F0] placeholder-[#475569]"
                 style={{ fontFamily: "var(--font-mono)" }}
               />
             </div>
