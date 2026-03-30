@@ -69,7 +69,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-slate-50">
       {/* Nav */}
       <nav className="flex items-center justify-between px-8 py-4 bg-white border-b border-gray-100 shadow-sm">
-        <span className="text-xl font-bold tracking-tight text-primary-700">Costimize</span>
+        <span className="text-xl font-bold tracking-tight text-primary-700">Costrich</span>
         <button onClick={handleLogout} className="text-gray-400 hover:text-gray-600 text-sm font-medium transition-colors">
           Log out
         </button>

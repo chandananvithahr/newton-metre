@@ -5,7 +5,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white">
       {/* Nav */}
       <nav className="flex items-center justify-between px-4 sm:px-8 py-5 border-b border-gray-100">
-        <span className="text-xl font-bold tracking-tight text-primary-700 py-2">Costimize</span>
+        <span className="text-xl font-bold tracking-tight text-primary-700 py-2">Costrich</span>
         <Link
           href="/login"
           className="bg-primary-600 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-primary-700 transition-colors shadow-sm"
@@ -122,7 +122,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t border-gray-100 py-8 text-center text-sm text-gray-400">
-        <p>&copy; 2026 Costimize. Should-cost intelligence for manufacturing.</p>
+        <p>&copy; 2026 Costrich. Should-cost intelligence for manufacturing.</p>
       </footer>
     </div>
   );

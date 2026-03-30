@@ -3,7 +3,7 @@ import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Costimize — Should-Cost Intelligence",
+  title: "Costrich — Should-Cost Intelligence",
   description: "AI-powered should-cost breakdowns for mechanical parts. Physics-based, line-by-line, accurate to ±10%.",
 };
 

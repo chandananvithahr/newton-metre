@@ -65,7 +65,7 @@ export default function LoginPage() {
       {/* Nav */}
       <nav className="flex items-center px-8 py-5 border-b border-gray-100 bg-white">
         <Link href="/" className="text-xl font-bold tracking-tight text-primary-700 py-2">
-          Costimize
+          Costrich
         </Link>
       </nav>
 
