@@ -123,6 +123,15 @@ CABLE_TIME_LABELLING_MIN = 0.5
 OVERHEAD_PCT = 15  # %
 PROFIT_PCT = 20  # %
 
+# --- Accuracy calibration ---
+# Real shops run at 65-85% of catalog cutting speeds (Practical Machining Data research).
+# 0.75 is the midpoint — parts take longer than catalog predicts.
+SHOP_FLOOR_EFFICIENCY = 0.75
+
+# Uncertainty band shown to users: ±15% for known materials, ±25% for dynamic AI-fetched materials.
+ESTIMATE_UNCERTAINTY_PCT = 10
+DYNAMIC_MATERIAL_UNCERTAINTY_PCT = 15
+
 # --- Scraper ---
 CACHE_DURATION_SEC = 86400  # 24 hours
 SCRAPE_DELAY_RANGE = (2, 5)  # random seconds between requests

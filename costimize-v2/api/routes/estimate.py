@@ -63,9 +63,14 @@ async def create_estimate(
         )
 
     extracted = body.extracted_data
-    dims = extracted.get("dimensions", {})
+    raw_dims = extracted.get("dimensions", {})
+    # Coerce all dimension values to float — AI sometimes returns strings
+    dims = {k: float(v) for k, v in raw_dims.items() if v is not None and v != ""}
     raw_material = extracted.get("material", "Mild Steel IS2062")
     processes = extracted.get("suggested_processes", ["turning"])
+    # Ensure processes is a list, not a string
+    if isinstance(processes, str):
+        processes = [processes]
     has_tight = extracted.get("tolerances", {}).get("has_tight_tolerances", False)
 
     # Resolve material: exact/alias match first, then dynamic AI lookup
@@ -95,8 +100,10 @@ async def create_estimate(
             quantity=body.quantity,
             has_tight_tolerances=has_tight,
             material_override=dynamic_material_obj,
+            is_dynamic_material=dynamic_material_obj is not None,
         )
-    except Exception:
+    except Exception as e:
+        logger.exception("orchestrate() failed for user %s: %s", user_id, e)
         raise HTTPException(
             status_code=500, detail="Cost calculation failed. Please verify the extracted data.",
         )
@@ -137,6 +144,10 @@ async def create_estimate(
                 "subtotal": breakdown.subtotal,
                 "overhead": breakdown.overhead,
                 "profit": breakdown.profit,
+                "unit_cost_low": breakdown.unit_cost_low,
+                "unit_cost_high": breakdown.unit_cost_high,
+                "uncertainty_pct": breakdown.uncertainty_pct,
+                "supplier_quote": body.supplier_quote,
             },
             "total_cost": breakdown.unit_cost,
             "confidence_tier": confidence,
@@ -160,6 +171,9 @@ async def create_estimate(
         overhead=breakdown.overhead,
         profit=breakdown.profit,
         unit_cost=breakdown.unit_cost,
+        unit_cost_low=breakdown.unit_cost_low,
+        unit_cost_high=breakdown.unit_cost_high,
+        uncertainty_pct=breakdown.uncertainty_pct,
         order_cost=breakdown.order_cost,
         quantity=breakdown.quantity,
         confidence_tier=confidence,

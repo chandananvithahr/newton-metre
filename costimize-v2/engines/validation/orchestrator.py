@@ -57,6 +57,7 @@ def orchestrate(
     user_answers: dict | None = None,
     round_number: int = 1,
     material_override=None,
+    is_dynamic_material: bool = False,
 ) -> ValidationResult:
     """The brain. Runs physics + Gemini in parallel, compares, routes to sub-agents.
 
@@ -94,6 +95,7 @@ def orchestrate(
             quantity=quantity,
             has_tight_tolerances=has_tight_tolerances,
             material_override=material_override,
+            is_dynamic_material=is_dynamic_material,
         )
         ai_result = None
 

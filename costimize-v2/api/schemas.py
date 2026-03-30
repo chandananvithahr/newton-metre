@@ -21,6 +21,7 @@ class MaterialPriceResponse(BaseModel):
 class EstimateRequest(BaseModel):
     extracted_data: dict
     quantity: int = 1
+    supplier_quote: float | None = None  # actual quote from supplier, for calibration tracking
 
 
 class ProcessLine(BaseModel):
@@ -47,6 +48,9 @@ class EstimateResponse(BaseModel):
     overhead: float
     profit: float
     unit_cost: float
+    unit_cost_low: float
+    unit_cost_high: float
+    uncertainty_pct: int
     order_cost: float
     quantity: int
     confidence_tier: str | None

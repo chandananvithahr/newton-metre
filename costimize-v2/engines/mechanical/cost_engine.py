@@ -17,6 +17,9 @@ from config import (
     TIGHT_TOLERANCE_SURCHARGE_PCT,
     OVERHEAD_PCT,
     PROFIT_PCT,
+    SHOP_FLOOR_EFFICIENCY,
+    ESTIMATE_UNCERTAINTY_PCT,
+    DYNAMIC_MATERIAL_UNCERTAINTY_PCT,
 )
 from engines.mechanical.material_db import get_material, Material
 from engines.mechanical.process_db import load_processes, estimate_process_time_min, ProcessInfo
@@ -61,6 +64,9 @@ class MechanicalCostBreakdown:
     overhead: float
     profit: float
     unit_cost: float
+    unit_cost_low: float   # lower bound of uncertainty band
+    unit_cost_high: float  # upper bound of uncertainty band
+    uncertainty_pct: int   # % used for band (15 or 25)
     order_cost: float
     quantity: int
 
@@ -72,6 +78,7 @@ def calculate_mechanical_cost(
     quantity: int,
     has_tight_tolerances: bool = False,
     material_override: "Material | None" = None,
+    is_dynamic_material: bool = False,
 ) -> MechanicalCostBreakdown:
     material = material_override if material_override is not None else get_material(material_name)
     all_processes = load_processes()
@@ -109,9 +116,12 @@ def calculate_mechanical_cost(
         proc = all_processes[pid]
 
         # Physics-based time estimation (passes material_name for exact cutting data)
-        time_min = estimate_process_time_min(
+        catalog_time_min = estimate_process_time_min(
             pid, dimensions, material.machinability, material_name=material_name,
         )
+        # Apply shop floor derating: real shops run at 65-85% of catalog cutting speeds.
+        # Dividing by efficiency converts catalog time → realistic shop time.
+        time_min = catalog_time_min / SHOP_FLOOR_EFFICIENCY
         time_hr = time_min / 60
 
         # Machine cost (time × rate)
@@ -163,6 +173,11 @@ def calculate_mechanical_cost(
     rounded_unit_cost = round(subtotal + overhead + profit, 2)
     order_cost = round(rounded_unit_cost * quantity, 2)
 
+    # Uncertainty band: wider for dynamic/unknown materials
+    uncertainty_pct = DYNAMIC_MATERIAL_UNCERTAINTY_PCT if is_dynamic_material else ESTIMATE_UNCERTAINTY_PCT
+    unit_cost_low = round(rounded_unit_cost * (1 - uncertainty_pct / 100), 2)
+    unit_cost_high = round(rounded_unit_cost * (1 + uncertainty_pct / 100), 2)
+
     return MechanicalCostBreakdown(
         material_name=material_name,
         raw_weight_kg=round(raw_weight_kg, 3),
@@ -178,6 +193,9 @@ def calculate_mechanical_cost(
         overhead=round(overhead, 2),
         profit=round(profit, 2),
         unit_cost=rounded_unit_cost,
+        unit_cost_low=unit_cost_low,
+        unit_cost_high=unit_cost_high,
+        uncertainty_pct=uncertainty_pct,
         order_cost=order_cost,
         quantity=quantity,
     )
