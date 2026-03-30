@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { embedDrawing, searchSimilar } from "@/lib/api";
 
 interface Match {
@@ -45,12 +46,9 @@ export default function SimilarPartsPage() {
     return (
       <div className="min-h-screen bg-slate-50">
         <nav className="flex items-center px-8 py-4 bg-white border-b border-gray-100 shadow-sm">
-          <span
-            className="text-xl font-bold tracking-tight text-primary-700 cursor-pointer"
-            onClick={() => router.push("/dashboard")}
-          >
+          <Link href="/dashboard" className="text-xl font-bold tracking-tight text-primary-700 py-2">
             Costimize
-          </span>
+          </Link>
         </nav>
         <div className="max-w-2xl mx-auto px-8 py-12">
           <h1 className="text-3xl font-bold mb-2 tracking-tight">Similar Parts Search</h1>

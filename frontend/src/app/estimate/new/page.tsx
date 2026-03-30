@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { extractDrawing, createEstimate } from "@/lib/api";
 
 type Step = "upload" | "extracting" | "review" | "calculating" | "result";
@@ -100,12 +101,9 @@ export default function NewEstimatePage() {
     return (
       <div className="min-h-screen bg-slate-50">
         <nav className="flex items-center px-8 py-4 bg-white border-b border-gray-100 shadow-sm">
-          <span
-            className="text-xl font-bold tracking-tight text-primary-700 cursor-pointer"
-            onClick={() => router.push("/dashboard")}
-          >
+          <Link href="/dashboard" className="text-xl font-bold tracking-tight text-primary-700 py-2">
             Costimize
-          </span>
+          </Link>
         </nav>
         <div className="max-w-2xl mx-auto px-8 py-12">
           <h1 className="text-3xl font-bold mb-2 tracking-tight">New Estimate</h1>
@@ -267,12 +265,9 @@ export default function NewEstimatePage() {
     return (
       <div className="min-h-screen bg-slate-50">
         <nav className="flex items-center px-8 py-4 bg-white border-b border-gray-100 shadow-sm">
-          <span
-            className="text-xl font-bold tracking-tight text-primary-700 cursor-pointer"
-            onClick={() => router.push("/dashboard")}
-          >
+          <Link href="/dashboard" className="text-xl font-bold tracking-tight text-primary-700 py-2">
             Costimize
-          </span>
+          </Link>
         </nav>
         <div className="max-w-3xl mx-auto px-8 py-8">
           <div className="flex items-center justify-between mb-6">
