@@ -90,11 +90,11 @@ export default function DashboardPage() {
         {/* Stats */}
         {usage && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-            <div className="bg-[#161B27] rounded-xl border border-[#2A3140] p-6">
+            <div className="animate-fade-in-up stagger-1 bg-[#161B27] rounded-xl border border-[#2A3140] p-6">
               <p className="text-xs font-medium text-[#64748B] uppercase tracking-wider mb-2" style={{ fontFamily: "var(--font-mono)" }}>Estimates</p>
               <p className="text-3xl font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{usage.total_estimates}</p>
             </div>
-            <div className="bg-[#161B27] rounded-xl border border-[#2A3140] p-6">
+            <div className="animate-fade-in-up stagger-2 bg-[#161B27] rounded-xl border border-[#2A3140] p-6">
               <p className="text-xs font-medium text-[#64748B] uppercase tracking-wider mb-2" style={{ fontFamily: "var(--font-mono)" }}>Similarity Searches</p>
               <p className="text-3xl font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{usage.total_similarity}</p>
             </div>
@@ -102,7 +102,7 @@ export default function DashboardPage() {
         )}
 
         {/* Actions */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10 animate-fade-in-up stagger-3">
           <button
             onClick={() => router.push("/estimate/new")}
             className="flex items-center justify-center gap-3 bg-[#22D3EE] text-[#0F1117] px-6 py-5 rounded-xl hover:bg-[#06B6D4] transition-colors text-base font-semibold"

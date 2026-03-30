@@ -30,6 +30,13 @@
   --font-code:    "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
+/* ── Easing curves (stronger than browser defaults) ── */
+:root {
+  --ease-out:    cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
 /* ── Base ── */
 body {
   font-family: var(--font-sans);
@@ -68,8 +75,13 @@ tr {
 }
 
 /* ── Buttons ── */
+button:not(:disabled) {
+  transition-property: transform, background-color, border-color, color, opacity;
+  transition-duration: 160ms;
+  transition-timing-function: var(--ease-out);
+}
 button:active:not(:disabled) {
-  transform: scale(0.98);
+  transform: scale(0.97);
 }
 
 /* ── Animations ── */
@@ -77,25 +89,49 @@ button:active:not(:disabled) {
   to { transform: rotate(360deg); }
 }
 .animate-spin {
-  animation: spin 1s linear infinite;
+  /* 0.7s feels faster than 1s — perceived performance improvement */
+  animation: spin 0.7s linear infinite;
 }
 
 @keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.animate-fade-in-up              { animation: fade-in-up 0.6s ease-out both; }
-.animate-fade-in-up-delay-1      { animation: fade-in-up 0.6s ease-out 0.1s both; }
-.animate-fade-in-up-delay-2      { animation: fade-in-up 0.6s ease-out 0.2s both; }
-.animate-fade-in-up-delay-3      { animation: fade-in-up 0.6s ease-out 0.3s both; }
+/* 8px travel + 0.35s: refined, professional. 20px/0.6s felt heavy for a B2B tool. */
+.animate-fade-in-up              { animation: fade-in-up 0.35s var(--ease-out) both; }
+.animate-fade-in-up-delay-1      { animation: fade-in-up 0.35s var(--ease-out) 0.05s both; }
+.animate-fade-in-up-delay-2      { animation: fade-in-up 0.35s var(--ease-out) 0.1s both; }
+.animate-fade-in-up-delay-3      { animation: fade-in-up 0.35s var(--ease-out) 0.15s both; }
+
+/* Opacity-only fade — for elements that should appear without moving */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.animate-fade-in { animation: fade-in 0.25s var(--ease-out) both; }
+
+/* Stagger utilities — combine with animate-fade-in-up */
+.stagger-1 { animation-delay: 0ms; }
+.stagger-2 { animation-delay: 50ms; }
+.stagger-3 { animation-delay: 100ms; }
+.stagger-4 { animation-delay: 150ms; }
+.stagger-5 { animation-delay: 200ms; }
+.stagger-6 { animation-delay: 250ms; }
+
+/* Scale-in — for cards/modals entering. Start from 0.97, not 0.  */
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.animate-scale-in { animation: scale-in 0.2s var(--ease-out) both; }
 
 /* Mission intake log */
 @keyframes log-slide-in {
   from { opacity: 0; transform: translateX(-6px); }
   to   { opacity: 1; transform: translateX(0); }
 }
-.log-line-done   { animation: log-slide-in 0.3s ease both; }
-.log-line-active { animation: log-slide-in 0.3s ease both; }
+.log-line-done   { animation: log-slide-in 0.25s var(--ease-out) both; }
+.log-line-active { animation: log-slide-in 0.25s var(--ease-out) both; }
 
 @keyframes cursor-blink {
   0%, 100% { opacity: 1; }
@@ -114,7 +150,11 @@ button:active:not(:disabled) {
   .animate-fade-in-up,
   .animate-fade-in-up-delay-1,
   .animate-fade-in-up-delay-2,
-  .animate-fade-in-up-delay-3 {
+  .animate-fade-in-up-delay-3,
+  .animate-fade-in,
+  .animate-scale-in {
     animation: none;
+    opacity: 1;
+    transform: none;
   }
 }

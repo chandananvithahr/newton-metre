@@ -242,13 +242,18 @@ export default function RFQNewPage() {
           ) : (
             <div className="space-y-3 mb-6">
               {lineItems.map((item, index) => (
-                <ReviewLineItem
+                <div
                   key={item.line_number}
-                  item={item}
-                  index={index}
-                  onChange={updateItem}
-                  onRemove={removeItem}
-                />
+                  className="animate-fade-in-up"
+                  style={{ animationDelay: `${Math.min(index * 40, 300)}ms` }}
+                >
+                  <ReviewLineItem
+                    item={item}
+                    index={index}
+                    onChange={updateItem}
+                    onRemove={removeItem}
+                  />
+                </div>
               ))}
             </div>
           )}
@@ -316,7 +321,7 @@ export default function RFQNewPage() {
           </div>
 
           {/* Quote table */}
-          <div className="bg-[#161B27] rounded-xl border border-[#2A3140] overflow-hidden overflow-x-auto mb-6">
+          <div className="animate-scale-in bg-[#161B27] rounded-xl border border-[#2A3140] overflow-hidden overflow-x-auto mb-6">
             <table className="w-full min-w-[700px]">
               <thead>
                 <tr className="border-b border-[#2A3140] bg-[#1C2235]">
