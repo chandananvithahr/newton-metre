@@ -22,10 +22,15 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
-          cache-dependency-path: costimize-v2/api/requirements.txt
+          cache-dependency-path: |
+            costimize-v2/requirements.txt
+            costimize-v2/api/requirements.txt
 
       - name: Install dependencies
-        run: pip install -r api/requirements.txt
+        run: |
+          pip install pytest pytest-mock
+          pip install -r requirements.txt
+          pip install -r api/requirements.txt
 
       - name: Run tests
         run: python -m pytest tests/ -q --tb=short
