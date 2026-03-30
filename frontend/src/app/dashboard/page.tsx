@@ -59,12 +59,14 @@ export default function DashboardPage() {
     );
   }
 
-  const confidenceColor = (tier: string | null) => {
-    if (tier === "high")   return "bg-emerald-950/60 text-emerald-400 border-emerald-800";
-    if (tier === "medium") return "bg-amber-950/60 text-amber-400 border-amber-800";
-    if (tier === "low")    return "bg-red-950/60 text-red-400 border-red-800";
-    return "bg-[#1C2235] text-[#64748B] border-[#2A3140]";
+  // oat Skill #13 — lookup map replaces branching className function
+  const CONFIDENCE_CLASS: Record<string, string> = {
+    high:   "bg-emerald-950/60 text-emerald-400 border-emerald-800",
+    medium: "bg-amber-950/60 text-amber-400 border-amber-800",
+    low:    "bg-red-950/60 text-red-400 border-red-800",
   };
+  const confidenceColor = (tier: string | null) =>
+    CONFIDENCE_CLASS[tier ?? ""] ?? "bg-[#1C2235] text-[#64748B] border-[#2A3140]";
 
   return (
     <div className="min-h-screen bg-[#0F1117]">
@@ -82,7 +84,7 @@ export default function DashboardPage() {
         <p className="text-[#64748B] text-sm mb-8">Your cost estimation workspace.</p>
 
         {error && (
-          <div className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-6">
+          <div role="alert" className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-6">
             {error}
           </div>
         )}

@@ -120,7 +120,7 @@ export default function RFQNewPage() {
           <p className="text-[#64748B] text-sm mb-8">Upload a customer RFQ PDF — extract all line items and get should-cost for each part in seconds.</p>
 
           {error && (
-            <div className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-6">
+            <div role="alert" className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-6">
               {error}
             </div>
           )}
@@ -223,7 +223,7 @@ export default function RFQNewPage() {
           </div>
 
           {error && (
-            <div className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-6">
+            <div role="alert" className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-6">
               {error}
             </div>
           )}
