@@ -116,8 +116,8 @@ export default function RFQNewPage() {
           </button>
         </AppNav>
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-12">
-          <h1 className="text-3xl font-semibold tracking-tight mb-1">RFQ Extractor</h1>
-          <p className="text-[#64748B] text-sm mb-8">Upload a customer RFQ PDF — extract all line items and get should-cost for each part in seconds.</p>
+          <h1 className="text-3xl font-semibold tracking-tight mb-1">PDF Extractor</h1>
+          <p className="text-[#64748B] text-sm mb-8">Upload a PDF — extract all line items and get should-cost for each part in seconds.</p>
 
           {error && (
             <div role="alert" className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-6">
