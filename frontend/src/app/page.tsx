@@ -29,7 +29,7 @@ export default function LandingPage() {
             className="text-white px-4 py-2 rounded font-bold hover:opacity-90 active:scale-95 transition-all text-xs uppercase tracking-wider"
             style={{ backgroundColor: PRIMARY }}
           >
-            Launch Terminal
+            Get started
           </Link>
         </div>
       </nav>
@@ -52,18 +52,18 @@ export default function LandingPage() {
               className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-white text-[10px] font-black uppercase tracking-[0.2em]"
               style={{ backgroundColor: PRIMARY }}
             >
-              <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
-              Live Intelligence Active
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              Physics-based · ±5–10% accuracy
             </div>
 
             <h1 className="text-6xl md:text-8xl font-black tracking-tighter text-slate-900 leading-none uppercase">
-              Kill the markup.<br />
-              <span style={{ color: PRIMARY }}>Own the margin.</span>
+              Know what it<br />
+              <span style={{ color: PRIMARY }}>should cost.</span>
             </h1>
 
             <p className="max-w-2xl mx-auto text-xl text-slate-600 font-medium">
-              AI-powered should-cost intelligence that strips away supplier hidden costs.
-              Stop asking for a price — know it.
+              AI-powered should-cost breakdowns for mechanical parts.
+              Line-by-line, physics-based, built for Indian manufacturing economics.
             </p>
 
             <div className="flex flex-col md:flex-row items-center justify-center gap-4 pt-4">
@@ -72,13 +72,13 @@ export default function LandingPage() {
                 className="w-full md:w-auto px-8 py-4 text-white font-black text-lg uppercase tracking-tighter rounded-lg shadow-xl hover:-translate-y-0.5 transition-transform"
                 style={{ backgroundColor: PRIMARY }}
               >
-                Start your first estimate
+                Get my first estimate
               </Link>
               <a
                 href="#demo"
                 className="w-full md:w-auto px-8 py-4 bg-white border-2 border-slate-200 text-slate-900 font-black text-lg uppercase tracking-tighter rounded-lg hover:bg-slate-50 transition-colors"
               >
-                View sample output
+                See a sample breakdown
               </a>
             </div>
 
@@ -125,12 +125,12 @@ export default function LandingPage() {
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
               <div className="space-y-4">
                 <h2 className="text-5xl font-black tracking-tighter uppercase italic" style={{ color: PRIMARY }}>
-                  Zero Hidden Margins
+                  How it works
                 </h2>
                 <div className="h-1 w-24 rounded" style={{ backgroundColor: PRIMARY }} />
               </div>
               <p className="max-w-md text-slate-600">
-                The era of asymmetrical information is over. We provide physics-based evidence to dismantle supplier quotes.
+                From drawing to negotiation-ready cost breakdown in under 60 seconds. Physics-based math, Indian manufacturing rates.
               </p>
             </div>
 
@@ -138,20 +138,20 @@ export default function LandingPage() {
               {[
                 {
                   n: "01",
-                  title: "Interrogation",
-                  desc: "Upload your drawing, BOM, or historical quote. Our AI reads every technical specification to understand the component.",
+                  title: "Upload",
+                  desc: "Upload your engineering drawing, BOM, or RFQ document. Our AI extracts dimensions, material, and process requirements automatically.",
                   points: ["PDF & image support", "Any CAD format"],
                 },
                 {
                   n: "02",
-                  title: "Deep Dissection",
-                  desc: "Physics-based math applied to manufacturing. Cycle times, tool wear, machine rates from real Indian job-shop data.",
+                  title: "Calculate",
+                  desc: "Physics-based cost modelling: cycle times, tool wear, machine rates from real Indian job-shop data. No guesswork.",
                   points: ["Should-cost modelling", "Indian labour indexing"],
                 },
                 {
                   n: "03",
-                  title: "Execution",
-                  desc: "Take the data to the negotiation table. Know exactly where margin is hidden — material, machining, overhead, profit.",
+                  title: "Negotiate",
+                  desc: "Receive a line-by-line cost breakdown — material, machining, overhead, and margin — ready to use in any supplier conversation.",
                   points: ["Line-by-line breakdown", "Copy any value instantly"],
                 },
               ].map((s, i) => (
@@ -215,14 +215,14 @@ export default function LandingPage() {
           <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-12 items-center">
             <div className="flex-1 space-y-6">
               <h2 className="text-4xl font-black tracking-tight text-slate-900 leading-tight uppercase">
-                Stop overpaying for<br />
+                Make every purchase order<br />
                 <span className="pl-4" style={{ color: PRIMARY, borderLeft: `4px solid ${PRIMARY}` }}>
-                  industrial inertia.
+                  count.
                 </span>
               </h2>
               <p className="text-lg text-slate-600">
-                Suppliers rely on your lack of data. Costrich gives you the tactical advantage
-                to recapture up to 18% margin on every purchase order.
+                When you know what a part should cost, you negotiate from facts.
+                Costrich gives procurement teams the data to close better deals — every time.
               </p>
               <div className="flex gap-4 pt-2">
                 <Link
@@ -327,10 +327,10 @@ export default function LandingPage() {
         <section className="py-24 px-6" style={{ backgroundColor: PRIMARY }}>
           <div className="max-w-3xl mx-auto text-center text-white">
             <h2 className="text-5xl font-black tracking-tighter uppercase leading-tight mb-5">
-              Stop negotiating blind.
+              Your first estimate is free.
             </h2>
             <p className="text-blue-200 mb-10 text-lg">
-              Your first estimate is free. Upload a drawing and see what it should cost in under 60 seconds.
+              Upload a drawing and get a full should-cost breakdown in under 60 seconds. No credit card, no setup.
             </p>
             <Link
               href="/login"

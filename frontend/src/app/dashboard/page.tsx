@@ -181,7 +181,7 @@ export default function DashboardPage() {
         <div className="flex items-center gap-8">
           <div className="text-2xl font-black tracking-tighter text-blue-800">Costrich</div>
           <nav className="hidden md:flex items-center gap-6 text-sm font-semibold tracking-tight">
-            <span className="text-blue-700 border-b-2 border-blue-700 pb-1">Command Center</span>
+            <span className="text-blue-700 border-b-2 border-blue-700 pb-1">Dashboard</span>
             <button onClick={() => router.push("/estimate/new")} className="text-slate-500 hover:text-blue-700 transition-colors">New Analysis</button>
             <button onClick={() => router.push("/rfq/new")} className="text-slate-500 hover:text-blue-700 transition-colors">PDF Extractor</button>
             <button onClick={() => router.push("/similar")} className="text-slate-500 hover:text-blue-700 transition-colors">Similar Parts</button>
@@ -218,28 +218,28 @@ export default function DashboardPage() {
         <nav className="flex-1 px-3 space-y-0.5 text-xs font-mono uppercase tracking-widest">
           <div className="flex items-center gap-3 px-3 py-3 bg-blue-50 text-blue-700 border-r-4 border-blue-700 font-bold">
             <IconDashboard />
-            Command Center
+            Dashboard
           </div>
           <button
             onClick={() => router.push("/estimate/new")}
             className="w-full flex items-center gap-3 px-3 py-3 text-slate-500 hover:bg-slate-100 hover:translate-x-1 transition-transform duration-200"
           >
             <IconTrending />
-            Margin Attack
+            Cost Analysis
           </button>
           <button
             onClick={() => router.push("/similar")}
             className="w-full flex items-center gap-3 px-3 py-3 text-slate-500 hover:bg-slate-100 hover:translate-x-1 transition-transform duration-200"
           >
             <IconSearch />
-            Supplier Leverage
+            Similar Parts
           </button>
           <button
             onClick={() => router.push("/rfq/new")}
             className="w-full flex items-center gap-3 px-3 py-3 text-slate-500 hover:bg-slate-100 hover:translate-x-1 transition-transform duration-200"
           >
             <IconDoc />
-            Should-Cost Labs
+            PDF Extractor
           </button>
         </nav>
 
@@ -270,10 +270,10 @@ export default function DashboardPage() {
                 className="text-4xl font-black tracking-tighter text-slate-900 mb-1"
                 style={{ fontFamily: "var(--font-inter)" }}
               >
-                MARGIN ATTACK DASHBOARD
+                COST INTELLIGENCE DASHBOARD
               </h1>
               <p className="text-slate-500 font-mono text-sm tracking-tight">
-                &gt; Strategic Command Center for aggressive margin recovery.
+                &gt; Your should-cost analysis workspace.
               </p>
             </div>
             <div className="flex gap-3 mt-4 sm:mt-0">
@@ -282,14 +282,14 @@ export default function DashboardPage() {
                 className="bg-blue-800 text-white px-5 py-3 rounded font-bold uppercase tracking-widest text-xs flex items-center gap-2 shadow-lg shadow-blue-900/20 hover:scale-[1.02] transition-transform"
               >
                 <IconBolt />
-                Execute Cost Attack
+                Analyse a Part
               </button>
               <button
                 onClick={() => router.push("/rfq/new")}
                 className="bg-white border-2 border-slate-900 text-slate-900 px-5 py-3 rounded font-bold uppercase tracking-widest text-xs flex items-center gap-2 hover:bg-slate-50 transition-colors"
               >
                 <IconAnalytics />
-                Extract Should-Cost
+                Extract from PDF
               </button>
             </div>
           </div>
@@ -378,10 +378,10 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between px-2">
                 <h2 className="font-black text-lg tracking-tight flex items-center gap-2" style={{ fontFamily: "var(--font-inter)" }}>
                   <span className="w-2 h-6 bg-blue-800 rounded-full" />
-                  ACTIVE INTELLIGENCE FEEDS
+                  RECENT ANALYSES
                 </h2>
                 <span className="text-[10px] font-mono text-blue-600 bg-blue-50 px-2 py-1 rounded animate-pulse">
-                  LIVE CONNECTED
+                  LIVE
                 </span>
               </div>
 
@@ -396,7 +396,7 @@ export default function DashboardPage() {
                     onClick={() => router.push("/estimate/new")}
                     className="bg-blue-800 text-white px-6 py-2.5 rounded font-bold uppercase tracking-widest text-xs hover:bg-blue-900 transition-colors"
                   >
-                    Execute First Analysis
+                    Upload your first drawing
                   </button>
                 </div>
               ) : (
@@ -468,13 +468,13 @@ export default function DashboardPage() {
             <div className="space-y-6">
               <h2 className="font-black text-lg tracking-tight flex items-center gap-2 px-2" style={{ fontFamily: "var(--font-inter)" }}>
                 <span className="w-2 h-6 bg-slate-400 rounded-full" />
-                ATTACK PRIORITY
+                YOUR SUMMARY
               </h2>
 
               {/* Dark priority card */}
               <div className="bg-slate-900 text-white p-6 rounded-lg shadow-xl">
                 <div className="mb-6">
-                  <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-blue-400 mb-2">Mission Status</div>
+                  <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-blue-400 mb-2">Your Progress</div>
                   <h4 className="text-xl font-black mb-1" style={{ fontFamily: "var(--font-inter)" }}>
                     {estimates.length > 0 ? "Analysis Active" : "Ready to Deploy"}
                   </h4>
@@ -516,7 +516,7 @@ export default function DashboardPage() {
                   onClick={() => router.push("/estimate/new")}
                   className="w-full mt-8 border border-blue-400 text-blue-400 py-3 rounded font-mono text-xs font-bold uppercase tracking-widest hover:bg-blue-400 hover:text-slate-900 transition-colors"
                 >
-                  Initialize Attack Phase
+                  Start an Analysis
                 </button>
               </div>
 
