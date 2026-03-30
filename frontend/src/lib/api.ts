@@ -55,6 +55,24 @@ export async function extractDrawing(file: File) {
   return res.json();
 }
 
+export async function extractMultiViewDrawing(files: File[]) {
+  const headers = await getAuthHeaders();
+  const formData = new FormData();
+  files.forEach((f) => formData.append("files", f));
+
+  const res = await safeFetch(`${API_URL}/api/extract/multi`, {
+    method: "POST",
+    headers,
+    body: formData,
+  });
+
+  if (!res.ok) {
+    throw new Error(await parseErrorResponse(res, "Multi-view extraction failed. Please try again."));
+  }
+
+  return res.json();
+}
+
 export async function createEstimate(extractedData: Record<string, unknown>, quantity = 1) {
   const headers = await getAuthHeaders();
 

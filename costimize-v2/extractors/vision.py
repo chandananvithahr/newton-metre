@@ -108,6 +108,84 @@ CRITICAL:
 Return ONLY the JSON object, no markdown fences or extra text."""
 
 
+MULTI_VIEW_PROMPT_PREFIX = """You are an expert mechanical engineer analyzing MULTIPLE SHEETS of an engineering drawing for the SAME part.
+These sheets show different views (front view, side view, section view, detail view, isometric) of a single manufactured part.
+
+CRITICAL FIRST STEP — check if all sheets belong to the SAME part:
+- Look for part numbers, drawing numbers, title blocks on each sheet
+- Check if geometries are compatible (a shaft shown in two views vs two completely different parts)
+- If the sheets appear to show DIFFERENT, UNRELATED parts, respond ONLY with:
+  {"mismatch": true, "reason": "<brief explanation of why they differ>"}
+
+If all sheets show the SAME part, extract COMPLETE information by combining all views.
+Use each view to fill in dimensions that may not be visible in other views.
+
+""" + EXTRACTION_PROMPT
+
+
+def analyze_multi_view_drawing(images: list[bytes]) -> dict:
+    """Analyze multiple drawing sheets for the same part. Raises ValueError on mismatch."""
+    if len(images) == 1:
+        return analyze_drawing(images[0])
+
+    if GEMINI_API_KEY:
+        try:
+            return _analyze_multi_with_gemini(images)
+        except ValueError:
+            raise  # re-raise mismatch errors
+        except Exception as e:
+            if OPENAI_API_KEY:
+                return _analyze_multi_with_openai(images)
+            raise RuntimeError(f"Gemini failed and no OpenAI fallback: {e}")
+    if OPENAI_API_KEY:
+        return _analyze_multi_with_openai(images)
+    raise RuntimeError("No API key configured.")
+
+
+def _analyze_multi_with_gemini(images: list[bytes]) -> dict:
+    import google.generativeai as genai
+    genai.configure(api_key=GEMINI_API_KEY)
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    parts = [MULTI_VIEW_PROMPT_PREFIX]
+    for i, img in enumerate(images):
+        parts.append(f"\n--- Sheet {i + 1} of {len(images)} ---\n")
+        parts.append({"mime_type": "image/png", "data": img})
+    response = model.generate_content(parts, generation_config={"max_output_tokens": 2000})
+    text = response.text.strip()
+    return _check_mismatch_and_parse(text)
+
+
+def _analyze_multi_with_openai(images: list[bytes]) -> dict:
+    import openai
+    client = openai.OpenAI(api_key=OPENAI_API_KEY)
+    content = [{"type": "text", "text": MULTI_VIEW_PROMPT_PREFIX}]
+    for i, img in enumerate(images):
+        b64 = base64.b64encode(img).decode("utf-8")
+        content.append({"type": "text", "text": f"\n--- Sheet {i + 1} of {len(images)} ---"})
+        content.append({"type": "image_url", "image_url": {"url": f"data:image/png;base64,{b64}"}})
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "user", "content": content}],
+        max_tokens=2000,
+    )
+    text = response.choices[0].message.content.strip()
+    return _check_mismatch_and_parse(text)
+
+
+def _check_mismatch_and_parse(text: str) -> dict:
+    """Detect mismatch response or parse normal extraction."""
+    if text.startswith("```"):
+        text = text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+    try:
+        raw = json.loads(text)
+    except json.JSONDecodeError:
+        raise RuntimeError("Invalid JSON from AI")
+    if raw.get("mismatch"):
+        raise ValueError(f"Drawing mismatch: {raw.get('reason', 'Sheets appear to be from different parts.')}")
+    validated = _ExtractionResult.model_validate(raw)
+    return validated.model_dump()
+
+
 def analyze_drawing(image_bytes: bytes, filename: str = "drawing.png") -> dict:
     if GEMINI_API_KEY:
         try:

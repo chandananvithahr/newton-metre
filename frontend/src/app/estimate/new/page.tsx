@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   extractDrawing,
+  extractMultiViewDrawing,
   createEstimate,
   createAssemblyEstimate,
   getMaterialPrice,
@@ -142,6 +143,7 @@ export default function NewEstimatePage() {
 
   // Single-part state
   const [file, setFile] = useState<File | null>(null);
+  const [extraSheets, setExtraSheets] = useState<File[]>([]); // additional views/sheets of the same part
   const [extractedData, setExtractedData] = useState<Record<string, unknown> | null>(null);
   const [result, setResult] = useState<EstimateResult | null>(null);
   const [expanded, setExpanded] = useState(false);
@@ -208,7 +210,10 @@ export default function NewEstimatePage() {
     setError("");
     setStep("extracting");
     try {
-      const data = await extractDrawing(file);
+      const allSheets = [file, ...extraSheets];
+      const data = allSheets.length > 1
+        ? await extractMultiViewDrawing(allSheets)
+        : await extractDrawing(file);
       setExtractedData(data);
       setMaterialOverride("");
       setCustomMaterial("");
@@ -422,11 +427,16 @@ export default function NewEstimatePage() {
             Change type
           </button>
           <h1 className="text-3xl mb-2 tracking-tight">Single Part</h1>
-          <p className="text-[#64748B] mb-8 text-sm">Upload one engineering drawing.</p>
+          <p className="text-[#64748B] mb-8 text-sm">Upload one or more sheets of the same part drawing.</p>
 
           <div className="bg-[#161B27] rounded-2xl border border-[#2A3140] p-8">
+
+            {/* Sheet 1 — primary drawing */}
+            <p className="text-xs font-medium text-[#64748B] uppercase tracking-wider mb-2" style={{ fontFamily: "var(--font-mono)" }}>
+              Sheet 1 {extraSheets.length === 0 ? "(required)" : ""}
+            </p>
             <div
-              className="border-2 border-dashed border-[#2A3140] rounded-xl p-10 text-center mb-6 hover:border-[#22D3EE]/50 hover:bg-[#22D3EE]/5 transition-colors cursor-pointer"
+              className="border-2 border-dashed border-[#2A3140] rounded-xl p-8 text-center mb-4 hover:border-[#22D3EE]/50 hover:bg-[#22D3EE]/5 transition-colors cursor-pointer"
               role="button"
               tabIndex={0}
               onClick={() => document.getElementById("file-input")?.click()}
@@ -435,11 +445,6 @@ export default function NewEstimatePage() {
               onDragLeave={(e) => { e.currentTarget.classList.remove("border-[#22D3EE]", "bg-[#22D3EE]/5"); }}
               onDrop={(e) => { e.preventDefault(); e.currentTarget.classList.remove("border-[#22D3EE]", "bg-[#22D3EE]/5"); const f = e.dataTransfer.files[0]; if (f) setFile(f); }}
             >
-              <div className="w-12 h-12 bg-[#22D3EE]/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <svg className="w-6 h-6 text-[#22D3EE]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
-                </svg>
-              </div>
               {file ? (
                 <p className="text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{file.name}</p>
               ) : (
@@ -450,6 +455,55 @@ export default function NewEstimatePage() {
               )}
               <input id="file-input" type="file" accept=".pdf,.png,.jpg,.jpeg" onChange={(e) => setFile(e.target.files?.[0] || null)} className="hidden" />
             </div>
+
+            {/* Extra sheets */}
+            {extraSheets.map((sheet, idx) => (
+              <div key={idx} className="flex items-center gap-3 bg-[#1C2235] border border-[#2A3140] rounded-lg px-4 py-3 mb-2">
+                <svg className="w-4 h-4 text-[#475569] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5" />
+                </svg>
+                <span className="text-xs text-[#64748B] font-medium shrink-0" style={{ fontFamily: "var(--font-mono)" }}>Sheet {idx + 2}</span>
+                <span className="text-sm text-[#E2E8F0] truncate flex-1" style={{ fontFamily: "var(--font-mono)" }}>{sheet.name}</span>
+                <button
+                  onClick={() => setExtraSheets((prev) => prev.filter((_, i) => i !== idx))}
+                  className="text-[#475569] hover:text-red-400 transition-colors shrink-0"
+                  aria-label="Remove sheet"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            ))}
+
+            {/* Add sheet button */}
+            {file && extraSheets.length < 4 && (
+              <div className="mb-4">
+                <button
+                  onClick={() => document.getElementById("extra-sheet-input")?.click()}
+                  className="flex items-center gap-2 text-[#22D3EE] text-sm hover:text-[#06B6D4] transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                  </svg>
+                  Add another view / sheet
+                </button>
+                <input
+                  id="extra-sheet-input"
+                  type="file"
+                  accept=".pdf,.png,.jpg,.jpeg"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) setExtraSheets((prev) => [...prev, f]);
+                    e.target.value = "";
+                  }}
+                />
+                {extraSheets.length > 0 && (
+                  <p className="text-xs text-[#475569] mt-1">All sheets must be views of the same part — mismatched drawings will be rejected.</p>
+                )}
+              </div>
+            )}
 
             <div className="flex items-center gap-4 mb-6">
               <label className="text-sm font-medium text-[#94A3B8]">Quantity:</label>
@@ -468,7 +522,7 @@ export default function NewEstimatePage() {
               disabled={!file}
               className="w-full bg-[#22D3EE] text-[#0F1117] py-3.5 rounded-lg font-semibold hover:bg-[#06B6D4] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
-              Analyze Drawing
+              {extraSheets.length > 0 ? `Analyze ${extraSheets.length + 1} Sheets` : "Analyze Drawing"}
             </button>
           </div>
         </div>

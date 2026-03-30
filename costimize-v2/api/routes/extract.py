@@ -1,4 +1,5 @@
 """POST /api/extract -- upload drawing, AI extracts dimensions + processes."""
+from typing import List
 from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
 from slowapi import Limiter
 from slowapi.util import get_remote_address
@@ -11,6 +12,7 @@ router = APIRouter()
 limiter = Limiter(key_func=get_remote_address)
 
 MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024  # 10 MB
+MAX_SHEETS = 5
 
 ALLOWED_CONTENT_TYPES = {
     "image/png", "image/jpeg", "image/jpg", "image/webp",
@@ -60,7 +62,60 @@ async def extract_drawing(
 
     material = result.get("material")
     overall_confidence = result.get("confidence", "low")
-    # Material confidence is "low" if not detected at all; otherwise follows drawing confidence
+    material_confidence = "low" if material is None else overall_confidence
+
+    return ExtractionResponse(
+        dimensions=result.get("dimensions", {}),
+        material=material,
+        material_confidence=material_confidence,
+        tolerances=result.get("tolerances", {}),
+        suggested_processes=result.get("suggested_processes", []),
+        confidence=overall_confidence,
+        notes=result.get("notes", ""),
+    )
+
+
+@router.post("/extract/multi", response_model=ExtractionResponse)
+@limiter.limit("5/minute")
+async def extract_multi_view_drawing(
+    request: Request,
+    files: List[UploadFile] = File(...),
+    user_id: str = Depends(get_current_user_id),
+) -> ExtractionResponse:
+    """Accept 2-5 sheets of the same part drawing and return a combined extraction.
+    Returns HTTP 422 if sheets appear to be from different parts."""
+
+    if not check_budget():
+        raise HTTPException(status_code=429, detail="Service temporarily at capacity. Please try again tomorrow.")
+    if not check_user_budget(user_id):
+        raise HTTPException(status_code=429, detail="You've used your $0.50 credit for this period. Credits refresh every 48 hours.")
+    if len(files) < 2:
+        raise HTTPException(status_code=400, detail="Upload at least 2 sheets for multi-view extraction.")
+    if len(files) > MAX_SHEETS:
+        raise HTTPException(status_code=400, detail=f"Maximum {MAX_SHEETS} sheets per part.")
+
+    images: list[bytes] = []
+    for f in files:
+        if f.content_type and f.content_type not in ALLOWED_CONTENT_TYPES:
+            raise HTTPException(status_code=400, detail=f"Unsupported file type '{f.content_type}' in {f.filename}.")
+        data = await f.read()
+        if len(data) > MAX_FILE_SIZE_BYTES:
+            raise HTTPException(status_code=400, detail=f"{f.filename} exceeds 10MB limit.")
+        images.append(data)
+
+    try:
+        from extractors.vision import analyze_multi_view_drawing
+        result = analyze_multi_view_drawing(images)
+    except ValueError as e:
+        # Drawing mismatch detected by AI
+        raise HTTPException(status_code=422, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to analyze drawings. Please try clearer images.")
+
+    log_usage(user_id, "extract_multi", 0.004, {"sheet_count": len(files)})
+
+    material = result.get("material")
+    overall_confidence = result.get("confidence", "low")
     material_confidence = "low" if material is None else overall_confidence
 
     return ExtractionResponse(
