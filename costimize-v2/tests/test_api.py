@@ -77,7 +77,7 @@ def test_estimate_returns_breakdown(mock_orch, mock_sb, mock_log, mock_budget):
 
     mock_orch.return_value = MagicMock(
         physics_result=MechanicalCostBreakdown(
-            material_name="Mild Steel",
+            material_name="Mild Steel IS2062",
             raw_weight_kg=0.5,
             wastage_weight_kg=0.075,
             material_cost=50.0,
@@ -109,7 +109,7 @@ def test_estimate_returns_breakdown(mock_orch, mock_sb, mock_log, mock_budget):
         json={
             "extracted_data": {
                 "dimensions": {"outer_diameter_mm": 50, "length_mm": 100},
-                "material": "Mild Steel",
+                "material": "Mild Steel IS2062",
                 "suggested_processes": ["turning"],
                 "tolerances": {"has_tight_tolerances": False},
             },

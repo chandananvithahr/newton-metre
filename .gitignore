@@ -61,3 +61,4 @@ sandvik/
 # Research data cache
 data/cache/
 data/similarity/
+.gstack/
