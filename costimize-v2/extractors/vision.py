@@ -1,7 +1,68 @@
 """AI vision extraction — sends engineering drawings to GPT-4o/Gemini, returns structured data."""
 import json
 import base64
+import logging
+from typing import Literal, Optional
+from pydantic import BaseModel, Field, field_validator
 from config import OPENAI_API_KEY, GEMINI_API_KEY
+
+logger = logging.getLogger("costimize")
+
+_VALID_PROCESSES = frozenset({
+    "turning", "facing", "boring", "milling_face", "milling_slot", "milling_pocket",
+    "drilling", "reaming", "tapping", "threading", "grinding_cylindrical",
+    "grinding_surface", "knurling", "broaching", "heat_treatment",
+    "surface_treatment_plating", "surface_treatment_anodizing", "surface_treatment_painting",
+})
+
+
+class _Dimensions(BaseModel):
+    outer_diameter_mm: Optional[float] = None
+    inner_diameter_mm: Optional[float] = None
+    length_mm: Optional[float] = None
+    width_mm: Optional[float] = None
+    height_mm: Optional[float] = None
+    hole_diameter_mm: Optional[float] = None
+    hole_count: Optional[int] = None
+    thread_count: Optional[int] = None
+    thread_length_mm: Optional[float] = None
+    groove_count: Optional[int] = None
+    surface_area_cm2: Optional[float] = None
+
+
+class _Tolerances(BaseModel):
+    has_tight_tolerances: bool = False
+    tightest_tolerance_mm: Optional[float] = None
+
+
+class _ExtractionResult(BaseModel):
+    part_type: Literal["turning", "milling", "general"] = "general"
+    dimensions: _Dimensions = Field(default_factory=_Dimensions)
+    material: Optional[str] = None
+    tolerances: _Tolerances = Field(default_factory=_Tolerances)
+    surface_finish: Optional[str] = None
+    suggested_processes: list[str] = Field(default_factory=list)
+    confidence: Literal["high", "medium", "low"] = "low"
+    notes: Optional[str] = None
+
+    @field_validator("suggested_processes")
+    @classmethod
+    def _filter_processes(cls, v: list[str]) -> list[str]:
+        valid = [p for p in v if p in _VALID_PROCESSES]
+        invalid = set(v) - _VALID_PROCESSES
+        if invalid:
+            logger.warning("LLM returned unknown processes (stripped): %s", invalid)
+        return valid
+
+
+def _parse_and_validate(text: str) -> dict:
+    """Strip markdown fences, parse JSON, validate schema. Returns plain dict."""
+    if text.startswith("```"):
+        text = text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+    raw = json.loads(text)
+    validated = _ExtractionResult.model_validate(raw)
+    return validated.model_dump()
+
 
 EXTRACTION_PROMPT = """You are an expert mechanical engineer analyzing an engineering drawing.
 Extract the following with EXTREME PRECISION. Only extract what you can clearly see.
@@ -73,9 +134,7 @@ def _analyze_with_openai(image_bytes: bytes) -> dict:
         max_tokens=2000,
     )
     text = response.choices[0].message.content.strip()
-    if text.startswith("```"):
-        text = text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
-    return json.loads(text)
+    return _parse_and_validate(text)
 
 
 def _analyze_with_gemini(image_bytes: bytes) -> dict:
@@ -87,6 +146,4 @@ def _analyze_with_gemini(image_bytes: bytes) -> dict:
         generation_config={"max_output_tokens": 2000},
     )
     text = response.text.strip()
-    if text.startswith("```"):
-        text = text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
-    return json.loads(text)
+    return _parse_and_validate(text)
