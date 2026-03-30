@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getEstimate } from "@/lib/api";
 import { AppNav } from "@/components/app-nav";
+import { CopyValue } from "@/components/landing/CopyValue";
 
 export default function ViewEstimatePage() {
   const { id } = useParams();
@@ -69,21 +70,38 @@ export default function ViewEstimatePage() {
           )}
         </div>
 
-        <div className="bg-[#161B27] rounded-xl border border-[#2A3140] p-6 mb-4">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <div>
-              <p className="text-xs font-medium text-[#64748B] uppercase tracking-wider mb-1" style={{ fontFamily: "var(--font-mono)" }}>Created</p>
-              <p className="text-sm font-medium text-[#E2E8F0]">{new Date(data.created_at as string).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}</p>
-            </div>
-            <div>
-              <p className="text-xs font-medium text-[#64748B] uppercase tracking-wider mb-1" style={{ fontFamily: "var(--font-mono)" }}>Total Cost</p>
-              <p className="text-lg font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{data.currency as string} {Number(data.total_cost).toLocaleString("en-IN", { maximumFractionDigits: 0 })}</p>
-            </div>
-            <div>
-              <p className="text-xs font-medium text-[#64748B] uppercase tracking-wider mb-1" style={{ fontFamily: "var(--font-mono)" }}>Type</p>
-              <p className="text-sm font-medium capitalize text-[#E2E8F0]">{(data.part_type as string) || "mechanical"}</p>
-            </div>
-          </div>
+        {/* Meta table — Kailash Nadh pattern: dl/table beats 3-column grid for labelled values */}
+        <div className="bg-[#161B27] rounded-xl border border-[#2A3140] overflow-hidden mb-4">
+          <table className="w-full text-sm">
+            <tbody className="divide-y divide-[#2A3140]">
+              <tr>
+                <td className="px-5 py-3 text-[#64748B] w-36" style={{ fontFamily: "var(--font-mono)" }}>Created</td>
+                <td className="px-5 py-3 text-[#E2E8F0] font-medium">
+                  {new Date(data.created_at as string).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+                </td>
+              </tr>
+              <tr>
+                <td className="px-5 py-3 text-[#64748B]" style={{ fontFamily: "var(--font-mono)" }}>Part type</td>
+                <td className="px-5 py-3 text-[#E2E8F0] font-medium capitalize">
+                  {(data.part_type as string) || "mechanical"}
+                </td>
+              </tr>
+              <tr>
+                <td className="px-5 py-3 text-[#64748B]" style={{ fontFamily: "var(--font-mono)" }}>Total cost</td>
+                <td className="px-5 py-3">
+                  {/* click-to-copy — Skill #2 from skills.md */}
+                  <CopyValue
+                    value={`${data.currency} ${Number(data.total_cost).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`}
+                    className="text-lg font-medium text-[#E2E8F0] rounded px-1 -mx-1"
+                  >
+                    <span style={{ fontFamily: "var(--font-mono)" }}>
+                      {data.currency as string} {Number(data.total_cost).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+                    </span>
+                  </CopyValue>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         {hasBreakdownRows && (
@@ -142,9 +160,16 @@ export default function ViewEstimatePage() {
               <tfoot>
                 <tr className="bg-[#22D3EE] text-[#0F1117]">
                   <td className="px-6 py-4 font-bold text-sm" style={{ fontFamily: "var(--font-mono)" }}>TOTAL (per unit)</td>
-                  <td className="px-6 py-4 text-right font-bold text-lg" style={{ fontFamily: "var(--font-mono)" }}>
-                    {currency} {fmt(breakdown.unit_cost ?? data.total_cost)}
-                  </td>
+                  {/* click-to-copy on total — Skill #2 from skills.md */}
+                  <CopyValue
+                    as="td"
+                    value={`${currency} ${fmt(breakdown.unit_cost ?? data.total_cost)}`}
+                    className="px-6 py-4 text-right font-bold text-lg rounded"
+                  >
+                    <span style={{ fontFamily: "var(--font-mono)" }}>
+                      {currency} {fmt(breakdown.unit_cost ?? data.total_cost)}
+                    </span>
+                  </CopyValue>
                 </tr>
               </tfoot>
             </table>

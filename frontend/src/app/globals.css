@@ -146,15 +146,79 @@ button:active:not(:disabled) {
   animation: cursor-blink 0.9s step-start infinite;
 }
 
+/* oat pattern: universal reduced-motion override — kills ALL transitions/animations */
 @media (prefers-reduced-motion: reduce) {
-  .animate-fade-in-up,
-  .animate-fade-in-up-delay-1,
-  .animate-fade-in-up-delay-2,
-  .animate-fade-in-up-delay-3,
-  .animate-fade-in,
-  .animate-scale-in {
-    animation: none;
-    opacity: 1;
-    transform: none;
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
+}
+
+/* ── Skeleton loading — oat [role="status"].skeleton pattern ── */
+/* Usage: <div role="status" className="skeleton line" /> */
+@keyframes skeleton-sweep {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+[role="status"].skeleton {
+  display: block;
+  border-radius: 4px;
+  background-color: #1C2235;
+  background-image: linear-gradient(
+    90deg,
+    #1C2235 0%,
+    #2A3140 50%,
+    #1C2235 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-sweep 1.6s ease-in-out infinite;
+  margin-bottom: 0.75rem;
+}
+[role="status"].skeleton:last-child { margin-bottom: 0; }
+[role="status"].skeleton.line  { height: 1rem;  width: 100%; }
+[role="status"].skeleton.line-sm { height: 0.75rem; width: 60%; }
+[role="status"].skeleton.line-xs { height: 0.625rem; width: 40%; }
+[role="status"].skeleton.box   { width: 4rem;   height: 4rem; }
+
+/* ── Toast — oat popover-based toast container ── */
+.toast-container {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: none;
+  z-index: 9999;
+  padding: 1rem;
+}
+.toast-container[data-placement="top-right"]    { top: 0; right: 0; }
+.toast-container[data-placement="bottom-center"] {
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  flex-direction: column-reverse;
+}
+
+.toast {
+  pointer-events: auto;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #2A3140;
+  border-left-width: 3px;
+  background-color: #161B27;
+  color: #E2E8F0;
+  font-size: 0.875rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  min-width: 220px;
+  max-width: 360px;
+  animation: toast-in 0.2s ease-out both;
+}
+.toast[data-variant="success"] { border-left-color: #34d399; color: #6ee7b7; }
+.toast[data-variant="danger"]  { border-left-color: #f87171; color: #fca5a5; }
+.toast[data-variant="warning"] { border-left-color: #fbbf24; color: #fcd34d; }
+.toast[data-variant="info"]    { border-left-color: #22D3EE; color: #67e8f9; }
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }

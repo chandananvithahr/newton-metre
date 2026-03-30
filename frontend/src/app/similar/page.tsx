@@ -90,7 +90,7 @@ export default function SimilarPartsPage() {
             )}
 
             {error && (
-              <div className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-4">
+              <div role="alert" className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-4">
                 {error}
               </div>
             )}

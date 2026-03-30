@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Instrument_Serif, Source_Sans_3, DM_Mono, IBM_Plex_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
+import { ToastProvider } from "@/components/Toast";
 import "./globals.css";
 
 const instrumentSerif = Instrument_Serif({
@@ -51,7 +52,9 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </head>
       <body className="min-h-screen antialiased">
-        {children}
+        <ToastProvider>
+          {children}
+        </ToastProvider>
         <Analytics />
       </body>
     </html>

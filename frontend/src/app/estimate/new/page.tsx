@@ -461,7 +461,7 @@ export default function NewEstimatePage() {
               />
             </div>
 
-            {error && <div className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-4">{error}</div>}
+            {error && <div role="alert" className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-4">{error}</div>}
 
             <button
               onClick={handleUpload}
@@ -563,7 +563,7 @@ export default function NewEstimatePage() {
             </div>
           </div>
 
-          {error && <div className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-4">{error}</div>}
+          {error && <div role="alert" className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-4">{error}</div>}
 
           <div className="flex gap-3">
             <button onClick={handleCalculate} disabled={needsMaterialInput && !activeMaterial} className="flex-1 bg-[#22D3EE] text-[#0F1117] py-3.5 rounded-lg font-semibold hover:bg-[#06B6D4] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
@@ -756,7 +756,7 @@ export default function NewEstimatePage() {
           {!canAnalyze && asmComponents.length > 0 && (
             <p className="text-amber-400 text-sm mb-4">Add at least one more component to proceed.</p>
           )}
-          {error && <div className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-4">{error}</div>}
+          {error && <div role="alert" className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-4">{error}</div>}
 
           <button
             onClick={handleAsmExtractAll}
@@ -920,7 +920,7 @@ export default function NewEstimatePage() {
               Some components failed extraction. Go back to re-upload those drawings.
             </div>
           )}
-          {error && <div className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-4">{error}</div>}
+          {error && <div role="alert" className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-4">{error}</div>}
 
           <div className="flex gap-3">
             <button
@@ -1006,7 +1006,7 @@ export default function NewEstimatePage() {
             </div>
           </div>
 
-          {error && <div className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-4">{error}</div>}
+          {error && <div role="alert" className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-4">{error}</div>}
 
           <div className="flex gap-3">
             <button
