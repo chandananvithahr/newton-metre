@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { getEstimate } from "@/lib/api";
 
 export default function ViewEstimatePage() {
@@ -50,15 +51,15 @@ export default function ViewEstimatePage() {
     confidenceTier === "low" ? "bg-red-50 text-red-700 border-red-200" :
     "bg-gray-50 text-gray-500 border-gray-200";
 
+  const fmt = (v: unknown) => Number(v || 0).toLocaleString("en-IN", { maximumFractionDigits: 0 });
+  const currency = (data.currency as string) || "INR";
+
   return (
     <div className="min-h-screen bg-slate-50">
       <nav className="flex items-center px-8 py-4 bg-white border-b border-gray-100 shadow-sm">
-        <span
-          className="text-xl font-bold tracking-tight text-primary-700 cursor-pointer"
-          onClick={() => router.push("/dashboard")}
-        >
+        <Link href="/dashboard" className="text-xl font-bold tracking-tight text-primary-700 py-2">
           Costimize
-        </span>
+        </Link>
       </nav>
 
       <div className="max-w-3xl mx-auto px-8 py-8">
@@ -89,11 +90,67 @@ export default function ViewEstimatePage() {
         </div>
 
         {breakdown && (
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-6">
-            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Cost Breakdown</h2>
-            <pre className="text-xs font-mono bg-slate-50 border border-gray-100 p-4 rounded-lg overflow-auto max-h-96 text-gray-700">
-              {JSON.stringify(breakdown, null, 2)}
-            </pre>
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden mb-6">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-100 bg-gray-50/50">
+                  <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Cost Component</th>
+                  <th className="text-right px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount ({currency})</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {breakdown.material_cost != null && (
+                  <tr>
+                    <td className="px-6 py-3.5 text-sm text-gray-700">Material</td>
+                    <td className="px-6 py-3.5 text-right font-mono text-sm font-medium">{fmt(breakdown.material_cost)}</td>
+                  </tr>
+                )}
+                {breakdown.total_machining_cost != null && (
+                  <tr>
+                    <td className="px-6 py-3.5 text-sm text-gray-700">Machining</td>
+                    <td className="px-6 py-3.5 text-right font-mono text-sm font-medium">{fmt(breakdown.total_machining_cost)}</td>
+                  </tr>
+                )}
+                {(breakdown.total_setup_cost != null || breakdown.total_tooling_cost != null) && (
+                  <tr>
+                    <td className="px-6 py-3.5 text-sm text-gray-700">Setup & Tooling</td>
+                    <td className="px-6 py-3.5 text-right font-mono text-sm font-medium">{fmt(Number(breakdown.total_setup_cost || 0) + Number(breakdown.total_tooling_cost || 0))}</td>
+                  </tr>
+                )}
+                {breakdown.total_labour_cost != null && (
+                  <tr>
+                    <td className="px-6 py-3.5 text-sm text-gray-700">Labour</td>
+                    <td className="px-6 py-3.5 text-right font-mono text-sm font-medium">{fmt(breakdown.total_labour_cost)}</td>
+                  </tr>
+                )}
+                {breakdown.total_power_cost != null && (
+                  <tr>
+                    <td className="px-6 py-3.5 text-sm text-gray-700">Power</td>
+                    <td className="px-6 py-3.5 text-right font-mono text-sm font-medium">{fmt(breakdown.total_power_cost)}</td>
+                  </tr>
+                )}
+                {breakdown.overhead != null && (
+                  <tr>
+                    <td className="px-6 py-3.5 text-sm text-gray-700">Overhead</td>
+                    <td className="px-6 py-3.5 text-right font-mono text-sm font-medium">{fmt(breakdown.overhead)}</td>
+                  </tr>
+                )}
+                {breakdown.profit != null && (
+                  <tr>
+                    <td className="px-6 py-3.5 text-sm text-gray-700">Profit</td>
+                    <td className="px-6 py-3.5 text-right font-mono text-sm font-medium">{fmt(breakdown.profit)}</td>
+                  </tr>
+                )}
+              </tbody>
+              <tfoot>
+                <tr className="bg-primary-600 text-white">
+                  <td className="px-6 py-4 font-bold text-sm">TOTAL (per unit)</td>
+                  <td className="px-6 py-4 text-right font-mono font-bold text-lg">
+                    {currency} {fmt(breakdown.unit_cost || data.total_cost)}
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
           </div>
         )}
 
