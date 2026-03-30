@@ -71,10 +71,12 @@ def calculate_mechanical_cost(
     selected_processes: list[str],
     quantity: int,
     has_tight_tolerances: bool = False,
+    material_override: "Material | None" = None,
 ) -> MechanicalCostBreakdown:
-    material = get_material(material_name)
+    material = material_override if material_override is not None else get_material(material_name)
     all_processes = load_processes()
-    cd = get_cutting_data(material_name)
+    # For dynamic materials not in cutting DB, machinability-based fallback kicks in automatically
+    cd = get_cutting_data(material_name, machinability=material.machinability)
 
     # --- Raw Material Cost ---
     od = dimensions.get("outer_diameter_mm", 0)

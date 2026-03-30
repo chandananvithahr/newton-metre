@@ -74,13 +74,29 @@ _MECHANICAL_PROPERTIES: dict[str, dict] = {
 }
 
 
+DYNAMIC_PROPS_FILE = Path(__file__).parent.parent.parent / "data" / "dynamic_materials.json"
+
+
+def _load_dynamic_props() -> dict:
+    """Load mechanical properties for AI-fetched materials."""
+    if not DYNAMIC_PROPS_FILE.exists():
+        return {}
+    try:
+        return json.loads(DYNAMIC_PROPS_FILE.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
 def load_materials() -> dict[str, Material]:
     with open(DATA_FILE, "r", encoding="utf-8") as f:
         data = json.load(f)
+    dynamic_props = _load_dynamic_props()
+    # Merge built-in + dynamic properties — built-in takes precedence
+    all_props = {**dynamic_props, **_MECHANICAL_PROPERTIES}
     result = {}
     for m in data["materials"]:
         name = m["name"]
-        props = _MECHANICAL_PROPERTIES.get(name, {})
+        props = all_props.get(name, {})
         result[name] = Material(
             name=name,
             price_per_kg_inr=m["price_per_kg_inr"],

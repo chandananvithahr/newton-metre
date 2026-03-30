@@ -68,14 +68,21 @@ async def create_estimate(
     processes = extracted.get("suggested_processes", ["turning"])
     has_tight = extracted.get("tolerances", {}).get("has_tight_tolerances", False)
 
-    # Validate material against known allowlist to prevent prompt injection
+    # Resolve material: exact/alias match first, then dynamic AI lookup
     material = _resolve_material(raw_material)
+    dynamic_material_obj = None
     if material is None:
-        logger.warning("Unknown material rejected: %s (user: %s)", raw_material, user_id)
-        raise HTTPException(
-            status_code=400,
-            detail=f"Unknown material '{raw_material}'. Allowed: {', '.join(sorted(ALLOWED_MATERIALS))}",
-        )
+        logger.info("Unknown material '%s' — attempting dynamic lookup (user: %s)", raw_material, user_id)
+        try:
+            from engines.mechanical.material_fetcher import fetch_material_from_ai
+            dynamic_material_obj = fetch_material_from_ai(raw_material)
+            material = dynamic_material_obj.name  # use the original name
+        except Exception as e:
+            logger.warning("Dynamic material lookup failed for '%s': %s", raw_material, e)
+            raise HTTPException(
+                status_code=400,
+                detail=f"Unknown material '{raw_material}' and automatic lookup failed. Please select a material manually.",
+            )
 
     try:
         from engines.validation.orchestrator import orchestrate
@@ -87,6 +94,7 @@ async def create_estimate(
             selected_processes=processes,
             quantity=body.quantity,
             has_tight_tolerances=has_tight,
+            material_override=dynamic_material_obj,
         )
     except Exception:
         raise HTTPException(
