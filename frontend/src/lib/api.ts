@@ -73,13 +73,21 @@ export async function extractMultiViewDrawing(files: File[]) {
   return res.json();
 }
 
-export async function createEstimate(extractedData: Record<string, unknown>, quantity = 1) {
+export async function createEstimate(
+  extractedData: Record<string, unknown>,
+  quantity = 1,
+  supplierQuote?: number,
+) {
   const headers = await getAuthHeaders();
 
   const res = await safeFetch(`${API_URL}/api/estimate`, {
     method: "POST",
     headers: { ...headers, "Content-Type": "application/json" },
-    body: JSON.stringify({ extracted_data: extractedData, quantity }),
+    body: JSON.stringify({
+      extracted_data: extractedData,
+      quantity,
+      supplier_quote: supplierQuote ?? null,
+    }),
   });
 
   if (!res.ok) {

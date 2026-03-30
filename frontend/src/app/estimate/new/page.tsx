@@ -71,6 +71,9 @@ interface EstimateResult {
   overhead: number;
   profit: number;
   unit_cost: number;
+  unit_cost_low: number;
+  unit_cost_high: number;
+  uncertainty_pct: number;
   order_cost: number;
   quantity: number;
   confidence_tier: string | null;
@@ -151,6 +154,8 @@ export default function NewEstimatePage() {
   const [customMaterial, setCustomMaterial] = useState("");
   const [materialPrice, setMaterialPrice] = useState<{ price_inr: number; source: string } | null>(null);
   const [fetchingPrice, setFetchingPrice] = useState(false);
+  const [supplierQuoteStr, setSupplierQuoteStr] = useState("");
+  const [supplierQuoteSaved, setSupplierQuoteSaved] = useState(false);
 
   // Assembly state
   const [asmComponents, setAsmComponents] = useState<AssemblyComponent[]>([]);
@@ -252,9 +257,11 @@ export default function NewEstimatePage() {
     const dataToSend = effectiveMaterial
       ? { ...extractedData, material: effectiveMaterial }
       : extractedData;
+    const parsedQuote = supplierQuoteStr ? parseFloat(supplierQuoteStr) : undefined;
     try {
-      const est = await createEstimate(dataToSend, quantity);
+      const est = await createEstimate(dataToSend, quantity, parsedQuote);
       setResult(est);
+      setSupplierQuoteSaved(!!parsedQuote);
       setStep("result");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Calculation failed");
@@ -658,6 +665,26 @@ export default function NewEstimatePage() {
             {confidenceBadge(result.confidence_tier)}
           </div>
 
+          {/* Uncertainty band callout */}
+          <div className="bg-[#161B27] border border-[#2A3140] rounded-xl px-6 py-5 mb-4">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <p className="text-xs text-[#64748B] uppercase tracking-wider mb-1" style={{ fontFamily: "var(--font-mono)" }}>Should-Cost Range (±{result.uncertainty_pct}%)</p>
+                <p className="text-2xl font-bold text-[#22D3EE]" style={{ fontFamily: "var(--font-mono)" }}>
+                  {result.currency} {fmt(result.unit_cost_low)} – {fmt(result.unit_cost_high)}
+                </p>
+                <p className="text-sm text-[#475569] mt-1">Physics estimate: <span className="text-[#94A3B8] font-medium">{result.currency} {fmt(result.unit_cost)}</span> per unit</p>
+              </div>
+              {result.quantity > 1 && (
+                <div className="text-right">
+                  <p className="text-xs text-[#64748B] uppercase tracking-wider mb-1" style={{ fontFamily: "var(--font-mono)" }}>Order ({result.quantity} units)</p>
+                  <p className="text-xl font-bold text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{result.currency} {fmt(result.order_cost)}</p>
+                </div>
+              )}
+            </div>
+            <p className="text-xs text-[#475569] mt-3">Use the lower bound as your negotiation target. Supplier price above the upper bound = overpriced.</p>
+          </div>
+
           <div className="bg-[#161B27] rounded-xl border border-[#2A3140] overflow-hidden mb-4">
             <table className="w-full">
               <thead>
@@ -682,19 +709,44 @@ export default function NewEstimatePage() {
                   </tr>
                 ))}
               </tbody>
-              <tfoot>
-                <tr className="bg-[#22D3EE] text-[#0F1117]">
-                  <td className="px-6 py-4 font-bold text-sm" style={{ fontFamily: "var(--font-mono)" }}>TOTAL (per unit)</td>
-                  <td className="px-6 py-4 text-right font-bold text-lg" style={{ fontFamily: "var(--font-mono)" }}>{result.currency} {fmt(result.unit_cost)}</td>
-                </tr>
-                {result.quantity > 1 && (
-                  <tr className="bg-[#06B6D4] text-[#0F1117]">
-                    <td className="px-6 py-4 font-bold text-sm" style={{ fontFamily: "var(--font-mono)" }}>ORDER TOTAL ({result.quantity} units)</td>
-                    <td className="px-6 py-4 text-right font-bold text-lg" style={{ fontFamily: "var(--font-mono)" }}>{result.currency} {fmt(result.order_cost)}</td>
-                  </tr>
-                )}
-              </tfoot>
             </table>
+          </div>
+
+          {/* Supplier quote capture */}
+          <div className="bg-[#161B27] border border-[#2A3140] rounded-xl px-6 py-5 mb-4">
+            <p className="text-sm font-medium text-[#E2E8F0] mb-1">What did the supplier actually quote?</p>
+            <p className="text-xs text-[#475569] mb-3">Optional — helps us calibrate accuracy over time.</p>
+            {supplierQuoteSaved ? (
+              <p className="text-sm text-emerald-400 font-medium">✓ Quote saved. Thank you — this helps improve future estimates.</p>
+            ) : (
+              <div className="flex gap-3">
+                <div className="relative flex-1">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#475569]">₹</span>
+                  <input
+                    type="number"
+                    min="0"
+                    placeholder="e.g. 3800"
+                    value={supplierQuoteStr}
+                    onChange={(e) => setSupplierQuoteStr(e.target.value)}
+                    className="w-full pl-7 pr-3 py-2.5 border border-[#2A3140] rounded-lg bg-[#1C2235] text-sm text-[#E2E8F0] outline-none focus:border-[#22D3EE] transition-colors"
+                  />
+                </div>
+                <button
+                  onClick={async () => {
+                    const q = parseFloat(supplierQuoteStr);
+                    if (!q || !result) return;
+                    try {
+                      await createEstimate(extractedData!, quantity, q);
+                      setSupplierQuoteSaved(true);
+                    } catch { /* non-critical */ }
+                  }}
+                  disabled={!supplierQuoteStr || !parseFloat(supplierQuoteStr)}
+                  className="px-5 py-2.5 bg-[#22D3EE] text-[#0F1117] rounded-lg text-sm font-semibold hover:bg-[#06B6D4] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  Save
+                </button>
+              </div>
+            )}
           </div>
 
           <button onClick={() => setExpanded(!expanded)} className="flex items-center gap-2 text-[#22D3EE] hover:text-[#06B6D4] text-sm font-medium mb-4 transition-colors">
@@ -735,7 +787,7 @@ export default function NewEstimatePage() {
             <button onClick={() => router.push("/dashboard")} className="flex-1 border border-[#2A3140] py-3.5 rounded-lg hover:bg-[#1C2235] text-sm font-medium text-[#94A3B8] transition-colors">
               Back to Dashboard
             </button>
-            <button onClick={() => { setStep("type"); setResult(null); setExtractedData(null); setFile(null); }} className="flex-1 bg-[#22D3EE] text-[#0F1117] py-3.5 rounded-lg font-semibold hover:bg-[#06B6D4] transition-colors">
+            <button onClick={() => { setStep("type"); setResult(null); setExtractedData(null); setFile(null); setSupplierQuoteStr(""); setSupplierQuoteSaved(false); }} className="flex-1 bg-[#22D3EE] text-[#0F1117] py-3.5 rounded-lg font-semibold hover:bg-[#06B6D4] transition-colors">
               New Estimate
             </button>
           </div>
