@@ -384,6 +384,7 @@ interface ReviewLineItemProps {
 
 function ReviewLineItem({ item, index, onChange, onRemove }: ReviewLineItemProps) {
   const [open, setOpen] = useState(false);
+  const [qtyStr, setQtyStr] = useState(String(item.quantity));
 
   function dimSummary() {
     const d = item.dimensions || {};
@@ -445,8 +446,18 @@ function ReviewLineItem({ item, index, onChange, onRemove }: ReviewLineItemProps
               <input
                 type="number"
                 min={1}
-                value={item.quantity}
-                onChange={(e) => onChange(index, "quantity", Math.max(1, parseInt(e.target.value) || 1))}
+                value={qtyStr}
+                onChange={(e) => {
+                  setQtyStr(e.target.value);
+                  const n = parseInt(e.target.value);
+                  if (!isNaN(n) && n >= 1) onChange(index, "quantity", n);
+                }}
+                onBlur={() => {
+                  const n = parseInt(qtyStr);
+                  const valid = isNaN(n) || n < 1 ? 1 : n;
+                  setQtyStr(String(valid));
+                  onChange(index, "quantity", valid);
+                }}
                 className="w-full bg-[#0F1117] border border-[#2A3140] rounded-lg px-3 py-2 text-sm text-[#E2E8F0] focus:outline-none focus:border-[#22D3EE]"
                 style={{ fontFamily: "var(--font-mono)" }}
               />
