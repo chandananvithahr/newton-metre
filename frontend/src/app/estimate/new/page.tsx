@@ -49,6 +49,22 @@ interface EstimateResult {
   currency: string;
 }
 
+const EXTRACT_LOG = [
+  "Reading drawing file...",
+  "Identifying part geometry...",
+  "Extracting dimensions and tolerances...",
+  "Detecting material specifications...",
+  "Analyzing manufacturing processes...",
+];
+
+const CALC_LOG = [
+  "Loading material database...",
+  "Running MRR calculations...",
+  "Computing tool life (Taylor model)...",
+  "Applying overhead and profit margins...",
+  "Generating line-by-line breakdown...",
+];
+
 export default function NewEstimatePage() {
   const router = useRouter();
   const [step, setStep] = useState<Step>("upload");
@@ -87,8 +103,8 @@ export default function NewEstimatePage() {
     setFetchingPrice(true);
     setMaterialPrice(null);
     try {
-      const result = await getMaterialPrice(name);
-      setMaterialPrice({ price_inr: result.price_inr, source: result.source });
+      const res = await getMaterialPrice(name);
+      setMaterialPrice({ price_inr: res.price_inr, source: res.source });
     } catch {
       // non-critical — price lookup is best-effort
     } finally {
@@ -126,50 +142,83 @@ export default function NewEstimatePage() {
 
   const confidenceBadge = (tier: string | null) => {
     if (!tier) return null;
-    const styles = {
-      high: "bg-emerald-50 text-emerald-700 border-emerald-200",
-      medium: "bg-amber-50 text-amber-700 border-amber-200",
-      low: "bg-red-50 text-red-700 border-red-200",
-      insufficient: "bg-gray-100 text-gray-500 border-gray-200",
+    const styles: Record<string, string> = {
+      high:        "bg-emerald-950/60 text-emerald-400 border-emerald-800",
+      medium:      "bg-amber-950/60 text-amber-400 border-amber-800",
+      low:         "bg-red-950/60 text-red-400 border-red-800",
+      insufficient:"bg-[#1C2235] text-[#64748B] border-[#2A3140]",
     };
     return (
-      <span className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${styles[tier as keyof typeof styles] || styles.insufficient}`}>
+      <span className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${styles[tier] ?? styles.insufficient}`} style={{ fontFamily: "var(--font-mono)" }}>
         {tier.toUpperCase()} confidence
       </span>
     );
   };
 
+  // Mission intake log UI (shared between extracting + calculating)
+  function MissionLog({ lines }: { lines: string[] }) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0F1117]">
+        <div className="w-full max-w-md px-8">
+          <p className="text-xs font-medium text-[#475569] uppercase tracking-widest mb-5" style={{ fontFamily: "var(--font-mono)" }}>
+            MISSION INTAKE
+          </p>
+          <div className="space-y-3">
+            {lines.map((line, i) => {
+              const isLast = i === lines.length - 1;
+              return (
+                <div
+                  key={line}
+                  className={`flex items-center gap-3 text-sm ${isLast ? "log-line-active" : "log-line-done"}`}
+                  style={{ animationDelay: `${i * 0.35}s`, fontFamily: "var(--font-mono)" }}
+                >
+                  {isLast ? (
+                    <span className="text-[#22D3EE] text-base leading-none">›</span>
+                  ) : (
+                    <span className="text-emerald-400 text-base leading-none">✓</span>
+                  )}
+                  <span className={isLast ? "text-[#E2E8F0]" : "text-[#475569]"}>{line}</span>
+                  {isLast && <span className="cursor-blink" />}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Upload step
   if (step === "upload") {
     return (
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen bg-[#0F1117]">
         <AppNav />
-        <div className="max-w-2xl mx-auto px-8 py-12">
-          <h1 className="text-3xl font-bold mb-2 tracking-tight">New Estimate</h1>
-          <p className="text-gray-500 mb-8">Upload an engineering drawing to get a should-cost breakdown.</p>
+        <div className="max-w-2xl mx-auto px-4 sm:px-8 py-12">
+          <h1 className="text-3xl mb-2 tracking-tight">New Estimate</h1>
+          <p className="text-[#64748B] mb-8 text-sm">Upload an engineering drawing to get a should-cost breakdown.</p>
 
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+          <div className="bg-[#161B27] rounded-2xl border border-[#2A3140] p-8">
             <div
-              className="border-2 border-dashed border-gray-200 rounded-xl p-10 text-center mb-6 hover:border-primary-300 hover:bg-primary-50/30 transition-colors cursor-pointer"
+              className="border-2 border-dashed border-[#2A3140] rounded-xl p-10 text-center mb-6 hover:border-[#22D3EE]/50 hover:bg-[#22D3EE]/5 transition-colors cursor-pointer"
               role="button"
               tabIndex={0}
               onClick={() => document.getElementById("file-input")?.click()}
               onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); document.getElementById("file-input")?.click(); } }}
-              onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-primary-400", "bg-primary-50/50"); }}
-              onDragLeave={(e) => { e.currentTarget.classList.remove("border-primary-400", "bg-primary-50/50"); }}
-              onDrop={(e) => { e.preventDefault(); e.currentTarget.classList.remove("border-primary-400", "bg-primary-50/50"); const f = e.dataTransfer.files[0]; if (f) setFile(f); }}
+              onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-[#22D3EE]", "bg-[#22D3EE]/5"); }}
+              onDragLeave={(e) => { e.currentTarget.classList.remove("border-[#22D3EE]", "bg-[#22D3EE]/5"); }}
+              onDrop={(e) => { e.preventDefault(); e.currentTarget.classList.remove("border-[#22D3EE]", "bg-[#22D3EE]/5"); const f = e.dataTransfer.files[0]; if (f) setFile(f); }}
             >
-              <div className="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <svg className="w-6 h-6 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <div className="w-12 h-12 bg-[#22D3EE]/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 h-6 text-[#22D3EE]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
                 </svg>
               </div>
               {file ? (
-                <p className="text-sm font-medium text-gray-900">{file.name}</p>
+                <p className="text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{file.name}</p>
               ) : (
                 <>
-                  <p className="text-sm font-medium text-gray-700 mb-1">Click to upload or drag and drop</p>
-                  <p className="text-xs text-gray-400">PDF, PNG, or JPG (max 10MB)</p>
+                  <p className="text-sm font-medium text-[#94A3B8] mb-1">Click to upload or drag and drop</p>
+                  <p className="text-xs text-[#475569]">PDF, PNG, or JPG (max 10MB)</p>
                 </>
               )}
               <input
@@ -182,18 +231,19 @@ export default function NewEstimatePage() {
             </div>
 
             <div className="flex items-center gap-4 mb-6">
-              <label className="text-sm font-medium text-gray-700">Quantity:</label>
+              <label className="text-sm font-medium text-[#94A3B8]">Quantity:</label>
               <input
                 type="number"
                 min={1}
                 value={quantity}
                 onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                className="w-24 px-3 py-2.5 border border-gray-200 rounded-lg bg-gray-50/50 outline-none text-sm font-mono"
+                className="w-24 px-3 py-2.5 border border-[#2A3140] rounded-lg bg-[#1C2235] outline-none text-sm text-[#E2E8F0]"
+                style={{ fontFamily: "var(--font-mono)" }}
               />
             </div>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-red-700 text-sm mb-4">
+              <div className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-4">
                 {error}
               </div>
             )}
@@ -201,7 +251,7 @@ export default function NewEstimatePage() {
             <button
               onClick={handleUpload}
               disabled={!file}
-              className="w-full bg-primary-600 text-white py-3.5 rounded-lg font-semibold hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
+              className="w-full bg-[#22D3EE] text-[#0F1117] py-3.5 rounded-lg font-semibold hover:bg-[#06B6D4] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               Analyze Drawing
             </button>
@@ -211,17 +261,9 @@ export default function NewEstimatePage() {
     );
   }
 
-  // Extracting step
+  // Extracting step — mission intake log
   if (step === "extracting") {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-center">
-          <div className="w-12 h-12 border-3 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-5" />
-          <h1 className="text-2xl font-bold mb-2 tracking-tight">Analyzing Drawing...</h1>
-          <p className="text-gray-500">AI is extracting dimensions, tolerances, and processes.</p>
-        </div>
-      </div>
-    );
+    return <MissionLog lines={EXTRACT_LOG} />;
   }
 
   // Review step
@@ -236,21 +278,21 @@ export default function NewEstimatePage() {
         : materialOverride || detectedMaterial;
 
     return (
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen bg-[#0F1117]">
         <AppNav />
-        <div className="max-w-2xl mx-auto px-8 py-8">
-          <h1 className="text-3xl font-bold mb-2 tracking-tight">Review Extracted Data</h1>
-          <p className="text-gray-500 text-sm mb-6">Verify the AI-extracted data before calculating costs.</p>
+        <div className="max-w-2xl mx-auto px-4 sm:px-8 py-8">
+          <h1 className="text-3xl mb-2 tracking-tight">Review Extracted Data</h1>
+          <p className="text-[#64748B] text-sm mb-6">Verify the AI-extracted data before calculating costs.</p>
 
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-4">
-            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Dimensions</h2>
+          <div className="bg-[#161B27] rounded-xl border border-[#2A3140] p-6 mb-4">
+            <h2 className="text-xs font-medium text-[#64748B] uppercase tracking-wider mb-4" style={{ fontFamily: "var(--font-mono)" }}>Dimensions</h2>
             <table className="w-full">
               <tbody>
                 {Object.entries(dims).map(([key, val]) =>
                   val != null ? (
-                    <tr key={key} className="border-b border-gray-50 last:border-0">
-                      <td className="py-2.5 text-sm text-gray-600 capitalize">{key.replace(/_/g, " ")}</td>
-                      <td className="py-2.5 text-right font-mono text-sm font-medium text-gray-900">{String(val)}</td>
+                    <tr key={key} className="border-b border-[#2A3140] last:border-0">
+                      <td className="py-2.5 text-sm text-[#64748B] capitalize">{key.replace(/_/g, " ")}</td>
+                      <td className="py-2.5 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{String(val)}</td>
                     </tr>
                   ) : null
                 )}
@@ -258,18 +300,18 @@ export default function NewEstimatePage() {
             </table>
           </div>
 
-          {/* Material section — editable if missing or low confidence */}
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-4">
+          {/* Material section */}
+          <div className="bg-[#161B27] rounded-xl border border-[#2A3140] p-6 mb-4">
             <div className="flex items-start justify-between mb-3">
-              <span className="text-sm font-semibold text-gray-700">Material</span>
+              <span className="text-sm font-medium text-[#94A3B8]">Material</span>
               {detectedMaterial !== null && matConfidence === "high" ? (
-                <span className="text-sm font-medium text-gray-900">{detectedMaterial}</span>
+                <span className="text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{detectedMaterial}</span>
               ) : (
                 <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                   detectedMaterial === null
-                    ? "bg-amber-100 text-amber-700"
-                    : "bg-yellow-50 text-yellow-700"
-                }`}>
+                    ? "bg-amber-950/60 text-amber-400 border border-amber-800"
+                    : "bg-amber-950/40 text-amber-400 border border-amber-900"
+                }`} style={{ fontFamily: "var(--font-mono)" }}>
                   {detectedMaterial === null ? "Not detected" : "Low confidence"}
                 </span>
               )}
@@ -277,7 +319,7 @@ export default function NewEstimatePage() {
 
             {needsMaterialInput ? (
               <div className="space-y-3">
-                <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5 text-amber-800 text-sm">
+                <div className="bg-amber-950/30 border border-amber-900/50 rounded-lg px-3 py-2.5 text-amber-400 text-sm">
                   {detectedMaterial === null
                     ? "Material not found in the drawing. Select from the list or enter manually."
                     : `AI detected "${detectedMaterial}" with low confidence. Please confirm or correct it.`}
@@ -285,11 +327,8 @@ export default function NewEstimatePage() {
 
                 <select
                   value={materialOverride}
-                  onChange={(e) => {
-                    setMaterialOverride(e.target.value);
-                    setMaterialPrice(null);
-                  }}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-sm outline-none focus:border-primary-500"
+                  onChange={(e) => { setMaterialOverride(e.target.value); setMaterialPrice(null); }}
+                  className="w-full px-3 py-2.5 border border-[#2A3140] rounded-lg bg-[#1C2235] text-sm text-[#E2E8F0] outline-none"
                 >
                   <option value="">
                     {detectedMaterial !== null ? `Keep detected: ${detectedMaterial}` : "— Select material —"}
@@ -300,67 +339,63 @@ export default function NewEstimatePage() {
                   <option value="__custom__">Other (enter manually)…</option>
                 </select>
 
-                {materialOverride === "__custom__" ? (
+                {materialOverride === "__custom__" && (
                   <input
                     type="text"
                     placeholder="e.g. EN31 Steel, Bronze, AISI 4140"
                     value={customMaterial}
-                    onChange={(e) => {
-                      setCustomMaterial(e.target.value);
-                      setMaterialPrice(null);
-                    }}
-                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-sm outline-none focus:border-primary-500"
+                    onChange={(e) => { setCustomMaterial(e.target.value); setMaterialPrice(null); }}
+                    className="w-full px-3 py-2.5 border border-[#2A3140] rounded-lg bg-[#1C2235] text-sm text-[#E2E8F0] outline-none"
                   />
-                ) : null}
+                )}
 
-                {/* Price lookup */}
                 <div className="flex items-center gap-3">
                   <button
                     onClick={handleFetchPrice}
                     disabled={!activeMaterial || fetchingPrice}
-                    className="text-sm text-primary-600 hover:text-primary-700 font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    className="text-sm text-[#22D3EE] hover:text-[#06B6D4] font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                   >
                     {fetchingPrice ? "Fetching…" : "Look up market price (INR/kg)"}
                   </button>
-                  {materialPrice !== null ? (
-                    <span className="text-sm font-mono font-medium text-gray-900">
+                  {materialPrice !== null && (
+                    <span className="text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>
                       ₹{materialPrice.price_inr.toLocaleString("en-IN")}/kg
-                      <span className="text-xs text-gray-400 font-sans ml-1">({materialPrice.source})</span>
+                      <span className="text-xs text-[#475569] ml-1">({materialPrice.source})</span>
                     </span>
-                  ) : null}
+                  )}
                 </div>
               </div>
             ) : null}
           </div>
 
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-6 space-y-2">
+          <div className="bg-[#161B27] rounded-xl border border-[#2A3140] p-6 mb-6 space-y-2">
             <div className="flex justify-between">
-              <span className="text-sm text-gray-500">Processes</span>
-              <span className="text-sm font-medium">{(extractedData.suggested_processes as string[] || []).join(", ")}</span>
+              <span className="text-sm text-[#64748B]">Processes</span>
+              <span className="text-sm font-medium text-[#E2E8F0]">{(extractedData.suggested_processes as string[] || []).join(", ")}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-sm text-gray-500">AI Confidence</span>
-              <span className="text-sm font-medium capitalize">{String(extractedData.confidence || "—")}</span>
+              <span className="text-sm text-[#64748B]">AI Confidence</span>
+              <span className="text-sm font-medium text-[#E2E8F0] capitalize">{String(extractedData.confidence || "—")}</span>
             </div>
           </div>
 
-          {error ? (
-            <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-red-700 text-sm mb-4">
+          {error && (
+            <div className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-4">
               {error}
             </div>
-          ) : null}
+          )}
 
           <div className="flex gap-3">
             <button
               onClick={handleCalculate}
               disabled={needsMaterialInput && !activeMaterial}
-              className="flex-1 bg-primary-600 text-white py-3.5 rounded-lg font-semibold hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
+              className="flex-1 bg-[#22D3EE] text-[#0F1117] py-3.5 rounded-lg font-semibold hover:bg-[#06B6D4] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               Calculate Cost
             </button>
             <button
               onClick={() => setStep("upload")}
-              className="px-6 py-3.5 border border-gray-200 rounded-lg hover:bg-gray-50 text-sm font-medium text-gray-700 transition-colors"
+              className="px-6 py-3.5 border border-[#2A3140] rounded-lg hover:bg-[#1C2235] text-sm font-medium text-[#94A3B8] transition-colors"
             >
               Re-upload
             </button>
@@ -370,29 +405,21 @@ export default function NewEstimatePage() {
     );
   }
 
-  // Calculating step
+  // Calculating step — mission intake log
   if (step === "calculating") {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-center">
-          <div className="w-12 h-12 border-3 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-5" />
-          <h1 className="text-2xl font-bold mb-2 tracking-tight">Calculating Cost...</h1>
-          <p className="text-gray-500">Physics engine computing line-by-line breakdown.</p>
-        </div>
-      </div>
-    );
+    return <MissionLog lines={CALC_LOG} />;
   }
 
   // Result step
   if (step === "result" && result) {
     return (
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen bg-[#0F1117]">
         <AppNav />
-        <div className="max-w-3xl mx-auto px-8 py-8">
+        <div className="max-w-3xl mx-auto px-4 sm:px-8 py-8">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">Should-Cost Estimate</h1>
-              <p className="text-gray-500 text-sm mt-1">
+              <h1 className="text-3xl tracking-tight">Should-Cost Estimate</h1>
+              <p className="text-[#64748B] text-sm mt-1">
                 {result.material_name} &middot; {result.quantity} unit{result.quantity > 1 ? "s" : ""}
               </p>
             </div>
@@ -400,55 +427,55 @@ export default function NewEstimatePage() {
           </div>
 
           {/* Summary table */}
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden mb-4">
+          <div className="bg-[#161B27] rounded-xl border border-[#2A3140] overflow-hidden mb-4">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-100 bg-gray-50/50">
-                  <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Cost Component</th>
-                  <th className="text-right px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount ({result.currency})</th>
+                <tr className="border-b border-[#2A3140] bg-[#1C2235]">
+                  <th className="text-left px-6 py-3.5 text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Cost Component</th>
+                  <th className="text-right px-6 py-3.5 text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Amount ({result.currency})</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-[#2A3140]">
                 <tr>
-                  <td className="px-6 py-3.5 text-sm text-gray-700">Material ({result.material_name})</td>
-                  <td className="px-6 py-3.5 text-right font-mono text-sm font-medium">{fmt(result.material_cost)}</td>
+                  <td className="px-6 py-3.5 text-sm text-[#94A3B8]">Material ({result.material_name})</td>
+                  <td className="px-6 py-3.5 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(result.material_cost)}</td>
                 </tr>
                 <tr>
-                  <td className="px-6 py-3.5 text-sm text-gray-700">Machining</td>
-                  <td className="px-6 py-3.5 text-right font-mono text-sm font-medium">{fmt(result.total_machining_cost)}</td>
+                  <td className="px-6 py-3.5 text-sm text-[#94A3B8]">Machining</td>
+                  <td className="px-6 py-3.5 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(result.total_machining_cost)}</td>
                 </tr>
                 <tr>
-                  <td className="px-6 py-3.5 text-sm text-gray-700">Setup &amp; Tooling</td>
-                  <td className="px-6 py-3.5 text-right font-mono text-sm font-medium">{fmt(result.total_setup_cost + result.total_tooling_cost)}</td>
+                  <td className="px-6 py-3.5 text-sm text-[#94A3B8]">Setup & Tooling</td>
+                  <td className="px-6 py-3.5 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(result.total_setup_cost + result.total_tooling_cost)}</td>
                 </tr>
                 <tr>
-                  <td className="px-6 py-3.5 text-sm text-gray-700">Labour</td>
-                  <td className="px-6 py-3.5 text-right font-mono text-sm font-medium">{fmt(result.total_labour_cost)}</td>
+                  <td className="px-6 py-3.5 text-sm text-[#94A3B8]">Labour</td>
+                  <td className="px-6 py-3.5 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(result.total_labour_cost)}</td>
                 </tr>
                 <tr>
-                  <td className="px-6 py-3.5 text-sm text-gray-700">Power</td>
-                  <td className="px-6 py-3.5 text-right font-mono text-sm font-medium">{fmt(result.total_power_cost)}</td>
+                  <td className="px-6 py-3.5 text-sm text-[#94A3B8]">Power</td>
+                  <td className="px-6 py-3.5 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(result.total_power_cost)}</td>
                 </tr>
                 <tr>
-                  <td className="px-6 py-3.5 text-sm text-gray-700">Overhead (15%)</td>
-                  <td className="px-6 py-3.5 text-right font-mono text-sm font-medium">{fmt(result.overhead)}</td>
+                  <td className="px-6 py-3.5 text-sm text-[#94A3B8]">Overhead (15%)</td>
+                  <td className="px-6 py-3.5 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(result.overhead)}</td>
                 </tr>
                 <tr>
-                  <td className="px-6 py-3.5 text-sm text-gray-700">Profit (20%)</td>
-                  <td className="px-6 py-3.5 text-right font-mono text-sm font-medium">{fmt(result.profit)}</td>
+                  <td className="px-6 py-3.5 text-sm text-[#94A3B8]">Profit (20%)</td>
+                  <td className="px-6 py-3.5 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(result.profit)}</td>
                 </tr>
               </tbody>
               <tfoot>
-                <tr className="bg-primary-600 text-white">
-                  <td className="px-6 py-4 font-bold text-sm">TOTAL (per unit)</td>
-                  <td className="px-6 py-4 text-right font-mono font-bold text-lg">
+                <tr className="bg-[#22D3EE] text-[#0F1117]">
+                  <td className="px-6 py-4 font-bold text-sm" style={{ fontFamily: "var(--font-mono)" }}>TOTAL (per unit)</td>
+                  <td className="px-6 py-4 text-right font-bold text-lg" style={{ fontFamily: "var(--font-mono)" }}>
                     {result.currency} {fmt(result.unit_cost)}
                   </td>
                 </tr>
                 {result.quantity > 1 && (
-                  <tr className="bg-primary-700 text-white">
-                    <td className="px-6 py-4 font-bold text-sm">ORDER TOTAL ({result.quantity} units)</td>
-                    <td className="px-6 py-4 text-right font-mono font-bold text-lg">
+                  <tr className="bg-[#06B6D4] text-[#0F1117]">
+                    <td className="px-6 py-4 font-bold text-sm" style={{ fontFamily: "var(--font-mono)" }}>ORDER TOTAL ({result.quantity} units)</td>
+                    <td className="px-6 py-4 text-right font-bold text-lg" style={{ fontFamily: "var(--font-mono)" }}>
                       {result.currency} {fmt(result.order_cost)}
                     </td>
                   </tr>
@@ -457,10 +484,10 @@ export default function NewEstimatePage() {
             </table>
           </div>
 
-          {/* Expand/collapse */}
+          {/* Expand/collapse process detail */}
           <button
             onClick={() => setExpanded(!expanded)}
-            className="flex items-center gap-2 text-primary-600 hover:text-primary-700 text-sm font-medium mb-4 transition-colors"
+            className="flex items-center gap-2 text-[#22D3EE] hover:text-[#06B6D4] text-sm font-medium mb-4 transition-colors"
           >
             <svg
               className={`w-4 h-4 transition-transform ${expanded ? "rotate-90" : ""}`}
@@ -475,29 +502,29 @@ export default function NewEstimatePage() {
           </button>
 
           {expanded && (
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden mb-6 overflow-x-auto">
+            <div className="bg-[#161B27] rounded-xl border border-[#2A3140] overflow-hidden mb-6 overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-gray-100 bg-gray-50/50">
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Process</th>
-                    <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Time</th>
-                    <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Machine</th>
-                    <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Setup</th>
-                    <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Tooling</th>
-                    <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Labour</th>
-                    <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Power</th>
+                  <tr className="border-b border-[#2A3140] bg-[#1C2235]">
+                    <th className="text-left px-4 py-3 text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Process</th>
+                    <th className="text-right px-4 py-3 text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Time</th>
+                    <th className="text-right px-4 py-3 text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Machine</th>
+                    <th className="text-right px-4 py-3 text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Setup</th>
+                    <th className="text-right px-4 py-3 text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Tooling</th>
+                    <th className="text-right px-4 py-3 text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Labour</th>
+                    <th className="text-right px-4 py-3 text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Power</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-[#2A3140]">
                   {result.process_lines.map((pl) => (
-                    <tr key={pl.process_id} className="hover:bg-gray-50/50">
-                      <td className="px-4 py-3 font-medium text-gray-900">{pl.process_name}</td>
-                      <td className="px-4 py-3 text-right font-mono text-gray-600">{pl.time_min.toFixed(1)} min</td>
-                      <td className="px-4 py-3 text-right font-mono text-gray-600">{fmt(pl.machine_cost)}</td>
-                      <td className="px-4 py-3 text-right font-mono text-gray-600">{fmt(pl.setup_cost_per_unit)}</td>
-                      <td className="px-4 py-3 text-right font-mono text-gray-600">{fmt(pl.tooling_cost)}</td>
-                      <td className="px-4 py-3 text-right font-mono text-gray-600">{fmt(pl.labour_cost)}</td>
-                      <td className="px-4 py-3 text-right font-mono text-gray-600">{fmt(pl.power_cost)}</td>
+                    <tr key={pl.process_id} className="hover:bg-[#1C2235] transition-colors">
+                      <td className="px-4 py-3 font-medium text-[#E2E8F0]">{pl.process_name}</td>
+                      <td className="px-4 py-3 text-right text-[#64748B]" style={{ fontFamily: "var(--font-mono)" }}>{pl.time_min.toFixed(1)} min</td>
+                      <td className="px-4 py-3 text-right text-[#64748B]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(pl.machine_cost)}</td>
+                      <td className="px-4 py-3 text-right text-[#64748B]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(pl.setup_cost_per_unit)}</td>
+                      <td className="px-4 py-3 text-right text-[#64748B]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(pl.tooling_cost)}</td>
+                      <td className="px-4 py-3 text-right text-[#64748B]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(pl.labour_cost)}</td>
+                      <td className="px-4 py-3 text-right text-[#64748B]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(pl.power_cost)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -509,13 +536,13 @@ export default function NewEstimatePage() {
           <div className="flex gap-3 mt-6">
             <button
               onClick={() => router.push("/dashboard")}
-              className="flex-1 border border-gray-200 py-3.5 rounded-lg hover:bg-gray-50 text-sm font-medium text-gray-700 transition-colors"
+              className="flex-1 border border-[#2A3140] py-3.5 rounded-lg hover:bg-[#1C2235] text-sm font-medium text-[#94A3B8] transition-colors"
             >
               Back to Dashboard
             </button>
             <button
               onClick={() => { setStep("upload"); setResult(null); setExtractedData(null); }}
-              className="flex-1 bg-primary-600 text-white py-3.5 rounded-lg font-semibold hover:bg-primary-700 transition-colors shadow-sm"
+              className="flex-1 bg-[#22D3EE] text-[#0F1117] py-3.5 rounded-lg font-semibold hover:bg-[#06B6D4] transition-colors"
             >
               New Estimate
             </button>

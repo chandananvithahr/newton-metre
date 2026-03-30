@@ -50,36 +50,39 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-[#0F1117]">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-gray-500 text-sm">Loading dashboard...</p>
+          <div className="w-8 h-8 border-2 border-[#2A3140] border-t-[#22D3EE] rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-[#64748B] text-sm">Loading dashboard...</p>
         </div>
       </div>
     );
   }
 
   const confidenceColor = (tier: string | null) => {
-    if (tier === "high") return "bg-emerald-50 text-emerald-700 border-emerald-200";
-    if (tier === "medium") return "bg-amber-50 text-amber-700 border-amber-200";
-    if (tier === "low") return "bg-red-50 text-red-700 border-red-200";
-    return "bg-gray-50 text-gray-500 border-gray-200";
+    if (tier === "high")   return "bg-emerald-950/60 text-emerald-400 border-emerald-800";
+    if (tier === "medium") return "bg-amber-950/60 text-amber-400 border-amber-800";
+    if (tier === "low")    return "bg-red-950/60 text-red-400 border-red-800";
+    return "bg-[#1C2235] text-[#64748B] border-[#2A3140]";
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-[#0F1117]">
       <AppNav>
-        <button onClick={handleLogout} className="text-gray-400 hover:text-gray-600 text-sm font-medium transition-colors py-2 px-3">
+        <button
+          onClick={handleLogout}
+          className="text-[#64748B] hover:text-[#94A3B8] text-sm font-medium transition-colors py-2 px-3"
+        >
           Log out
         </button>
       </AppNav>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-8 py-8">
-        <h1 className="text-3xl font-bold mb-1 tracking-tight">Dashboard</h1>
-        <p className="text-gray-500 text-sm mb-8">Your cost estimation workspace.</p>
+        <h1 className="text-3xl mb-1 tracking-tight">Dashboard</h1>
+        <p className="text-[#64748B] text-sm mb-8">Your cost estimation workspace.</p>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-red-700 text-sm mb-6">
+          <div className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-6">
             {error}
           </div>
         )}
@@ -87,13 +90,13 @@ export default function DashboardPage() {
         {/* Stats */}
         {usage && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-              <p className="text-sm font-medium text-gray-500 mb-1">Estimates</p>
-              <p className="text-3xl font-bold text-gray-900">{usage.total_estimates}</p>
+            <div className="bg-[#161B27] rounded-xl border border-[#2A3140] p-6">
+              <p className="text-xs font-medium text-[#64748B] uppercase tracking-wider mb-2" style={{ fontFamily: "var(--font-mono)" }}>Estimates</p>
+              <p className="text-3xl font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{usage.total_estimates}</p>
             </div>
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-              <p className="text-sm font-medium text-gray-500 mb-1">Similarity Searches</p>
-              <p className="text-3xl font-bold text-gray-900">{usage.total_similarity}</p>
+            <div className="bg-[#161B27] rounded-xl border border-[#2A3140] p-6">
+              <p className="text-xs font-medium text-[#64748B] uppercase tracking-wider mb-2" style={{ fontFamily: "var(--font-mono)" }}>Similarity Searches</p>
+              <p className="text-3xl font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{usage.total_similarity}</p>
             </div>
           </div>
         )}
@@ -102,7 +105,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
           <button
             onClick={() => router.push("/estimate/new")}
-            className="flex items-center justify-center gap-3 bg-primary-600 text-white px-6 py-5 rounded-xl hover:bg-primary-700 transition-colors shadow-sm text-lg font-semibold"
+            className="flex items-center justify-center gap-3 bg-[#22D3EE] text-[#0F1117] px-6 py-5 rounded-xl hover:bg-[#06B6D4] transition-colors text-lg font-semibold"
           >
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -111,7 +114,7 @@ export default function DashboardPage() {
           </button>
           <button
             onClick={() => router.push("/similar")}
-            className="flex items-center justify-center gap-3 bg-white border-2 border-primary-600 text-primary-600 px-6 py-5 rounded-xl hover:bg-primary-50 transition-colors text-lg font-semibold"
+            className="flex items-center justify-center gap-3 bg-[#161B27] border-2 border-[#22D3EE] text-[#22D3EE] px-6 py-5 rounded-xl hover:bg-[#22D3EE]/10 transition-colors text-lg font-semibold"
           >
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
@@ -122,32 +125,32 @@ export default function DashboardPage() {
 
         {/* Recent estimates */}
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold tracking-tight">Recent Estimates</h2>
-          <span className="text-xs text-gray-400">{estimates.length} total</span>
+          <h2 className="text-lg font-semibold tracking-tight text-[#E2E8F0]">Recent Estimates</h2>
+          <span className="text-xs text-[#475569]" style={{ fontFamily: "var(--font-mono)" }}>{estimates.length} total</span>
         </div>
 
         {estimates.length === 0 ? (
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-12 text-center">
-            <div className="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center mx-auto mb-4">
-              <svg className="w-6 h-6 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <div className="bg-[#161B27] rounded-xl border border-[#2A3140] p-12 text-center">
+            <div className="w-12 h-12 bg-[#22D3EE]/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-[#22D3EE]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
               </svg>
             </div>
-            <p className="text-gray-500 font-medium mb-1">No estimates yet</p>
-            <p className="text-gray-400 text-sm">Upload your first engineering drawing to get started.</p>
+            <p className="text-[#94A3B8] font-medium mb-1">No estimates yet</p>
+            <p className="text-[#475569] text-sm">Upload your first engineering drawing to get started.</p>
           </div>
         ) : (
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden overflow-x-auto">
+          <div className="bg-[#161B27] rounded-xl border border-[#2A3140] overflow-hidden overflow-x-auto">
             <table className="w-full min-w-[500px]">
               <thead>
-                <tr className="border-b border-gray-100 bg-gray-50/50">
-                  <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
-                  <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Type</th>
-                  <th className="text-right px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Cost</th>
-                  <th className="text-center px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Confidence</th>
+                <tr className="border-b border-[#2A3140] bg-[#1C2235]">
+                  <th className="text-left px-6 py-3.5 text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Date</th>
+                  <th className="text-left px-6 py-3.5 text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Type</th>
+                  <th className="text-right px-6 py-3.5 text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Total Cost</th>
+                  <th className="text-center px-6 py-3.5 text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Confidence</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-[#2A3140]">
                 {estimates.map((est) => (
                   <tr
                     key={est.id}
@@ -155,17 +158,17 @@ export default function DashboardPage() {
                     tabIndex={0}
                     onClick={() => router.push(`/estimate/${est.id}`)}
                     onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); router.push(`/estimate/${est.id}`); } }}
-                    className="hover:bg-primary-50/30 cursor-pointer transition-colors focus:outline-none focus:bg-primary-50/50"
+                    className="hover:bg-[#1C2235] cursor-pointer transition-colors focus:outline-none focus:bg-[#1C2235]"
                   >
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-6 py-4 text-sm text-[#64748B]" style={{ fontFamily: "var(--font-mono)" }}>
                       {new Date(est.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
                     </td>
-                    <td className="px-6 py-4 text-sm capitalize font-medium text-gray-900">{est.part_type}</td>
-                    <td className="px-6 py-4 text-sm text-right font-mono font-medium text-gray-900">
+                    <td className="px-6 py-4 text-sm capitalize font-medium text-[#E2E8F0]">{est.part_type}</td>
+                    <td className="px-6 py-4 text-sm text-right font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)", fontVariantNumeric: "tabular-nums" }}>
                       {est.currency} {est.total_cost.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-semibold border ${confidenceColor(est.confidence_tier)}`}>
+                      <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-semibold border ${confidenceColor(est.confidence_tier)}`} style={{ fontFamily: "var(--font-mono)" }}>
                         {est.confidence_tier || "—"}
                       </span>
                     </td>
