@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { extractDrawing, createEstimate, getMaterialPrice } from "@/lib/api";
+import {
+  extractDrawing,
+  createEstimate,
+  createAssemblyEstimate,
+  getMaterialPrice,
+} from "@/lib/api";
 import { AppNav } from "@/components/app-nav";
 
 const KNOWN_MATERIALS = [
@@ -17,7 +22,29 @@ const KNOWN_MATERIALS = [
   "Titanium Grade 5",
 ];
 
-type Step = "upload" | "extracting" | "review" | "calculating" | "result";
+const JOINING_METHODS = [
+  { id: "mig_welding",  label: "MIG Welding" },
+  { id: "tig_welding",  label: "TIG Welding" },
+  { id: "spot_welding", label: "Spot Welding" },
+  { id: "bolting",      label: "Bolting (Nut & Bolt)" },
+  { id: "riveting",     label: "Riveting" },
+  { id: "press_fit",    label: "Press Fit / Interference Fit" },
+];
+
+type DrawingType = "single" | "assembly";
+
+type Step =
+  | "type"
+  | "upload"
+  | "extracting"
+  | "review"
+  | "calculating"
+  | "result"
+  | "assembly-upload"
+  | "assembly-extracting"
+  | "assembly-review"
+  | "assembly-joining"
+  | "assembly-result";
 
 interface ProcessLine {
   process_id: string;
@@ -49,6 +76,45 @@ interface EstimateResult {
   currency: string;
 }
 
+interface AssemblyComponent {
+  id: string;
+  file: File;
+  name: string;
+  extractedData: Record<string, unknown> | null;
+  materialOverride: string;
+  customMaterial: string;
+  error: string;
+}
+
+interface ComponentCostResult {
+  name: string;
+  material_name: string;
+  material_cost: number;
+  machining_cost: number;
+  setup_cost: number;
+  tooling_cost: number;
+  labour_cost: number;
+  power_cost: number;
+  subtotal: number;
+  unit_cost: number;
+}
+
+interface AssemblyResult {
+  components: ComponentCostResult[];
+  joining_cost: number;
+  joining_method_label: string;
+  joining_material_cost: number;
+  joining_machine_cost: number;
+  joining_labour_cost: number;
+  assembly_subtotal: number;
+  overhead: number;
+  profit: number;
+  unit_cost: number;
+  order_cost: number;
+  quantity: number;
+  currency: string;
+}
+
 const EXTRACT_LOG = [
   "Reading drawing file...",
   "Identifying part geometry...",
@@ -67,23 +133,80 @@ const CALC_LOG = [
 
 export default function NewEstimatePage() {
   const router = useRouter();
-  const [step, setStep] = useState<Step>("upload");
+
+  // Shared
+  const [step, setStep] = useState<Step>("type");
+  const [drawingType, setDrawingType] = useState<DrawingType>("single");
+  const [quantity, setQuantity] = useState(1);
+  const [error, setError] = useState("");
+
+  // Single-part state
   const [file, setFile] = useState<File | null>(null);
   const [extractedData, setExtractedData] = useState<Record<string, unknown> | null>(null);
   const [result, setResult] = useState<EstimateResult | null>(null);
-  const [quantity, setQuantity] = useState(1);
-  const [error, setError] = useState("");
   const [expanded, setExpanded] = useState(false);
-  const [materialOverride, setMaterialOverride] = useState<string>("");
-  const [customMaterial, setCustomMaterial] = useState<string>("");
+  const [materialOverride, setMaterialOverride] = useState("");
+  const [customMaterial, setCustomMaterial] = useState("");
   const [materialPrice, setMaterialPrice] = useState<{ price_inr: number; source: string } | null>(null);
   const [fetchingPrice, setFetchingPrice] = useState(false);
+
+  // Assembly state
+  const [asmComponents, setAsmComponents] = useState<AssemblyComponent[]>([]);
+  const [currentExtractingIdx, setCurrentExtractingIdx] = useState(0);
+  const [joiningMethod, setJoiningMethod] = useState("mig_welding");
+  const [numJoints, setNumJoints] = useState(4);
+  const [assemblyResult, setAssemblyResult] = useState<AssemblyResult | null>(null);
+  const [expandedComponent, setExpandedComponent] = useState<string | null>(null);
+
+  // ─── Helpers ──────────────────────────────────────────────────────────────
+
+  function fmt(n: number) {
+    return n.toLocaleString("en-IN", { maximumFractionDigits: 0 });
+  }
+
+  function confidenceBadge(tier: string | null) {
+    if (!tier) return null;
+    const styles: Record<string, string> = {
+      high:         "bg-emerald-950/60 text-emerald-400 border-emerald-800",
+      medium:       "bg-amber-950/60 text-amber-400 border-amber-800",
+      low:          "bg-red-950/60 text-red-400 border-red-800",
+      insufficient: "bg-[#1C2235] text-[#64748B] border-[#2A3140]",
+    };
+    return (
+      <span
+        className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${styles[tier] ?? styles.insufficient}`}
+        style={{ fontFamily: "var(--font-mono)" }}
+      >
+        {tier.toUpperCase()} confidence
+      </span>
+    );
+  }
+
+  function newAsmComponent(file: File): AssemblyComponent {
+    const stem = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ").trim();
+    return {
+      id: Math.random().toString(36).slice(2),
+      file,
+      name: stem || `Component ${asmComponents.length + 1}`,
+      extractedData: null,
+      materialOverride: "",
+      customMaterial: "",
+      error: "",
+    };
+  }
+
+  function updateAsmComponent(id: string, patch: Partial<AssemblyComponent>) {
+    setAsmComponents((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, ...patch } : c))
+    );
+  }
+
+  // ─── Single-part handlers ─────────────────────────────────────────────────
 
   async function handleUpload() {
     if (!file) return;
     setError("");
     setStep("extracting");
-
     try {
       const data = await extractDrawing(file);
       setExtractedData(data);
@@ -98,7 +221,8 @@ export default function NewEstimatePage() {
   }
 
   async function handleFetchPrice() {
-    const name = materialOverride === "__custom__" ? customMaterial.trim() : materialOverride;
+    const name =
+      materialOverride === "__custom__" ? customMaterial.trim() : materialOverride;
     if (!name) return;
     setFetchingPrice(true);
     setMaterialPrice(null);
@@ -106,7 +230,7 @@ export default function NewEstimatePage() {
       const res = await getMaterialPrice(name);
       setMaterialPrice({ price_inr: res.price_inr, source: res.source });
     } catch {
-      // non-critical — price lookup is best-effort
+      // non-critical
     } finally {
       setFetchingPrice(false);
     }
@@ -116,16 +240,13 @@ export default function NewEstimatePage() {
     if (!extractedData) return;
     setError("");
     setStep("calculating");
-
     const effectiveMaterial =
       materialOverride === "__custom__"
         ? customMaterial.trim() || null
         : materialOverride || extractedData.material;
-
     const dataToSend = effectiveMaterial
       ? { ...extractedData, material: effectiveMaterial }
       : extractedData;
-
     try {
       const est = await createEstimate(dataToSend, quantity);
       setResult(est);
@@ -136,31 +257,80 @@ export default function NewEstimatePage() {
     }
   }
 
-  function fmt(n: number) {
-    return n.toLocaleString("en-IN", { maximumFractionDigits: 0 });
+  // ─── Assembly handlers ────────────────────────────────────────────────────
+
+  function handleAsmFilesAdded(files: FileList | null) {
+    if (!files) return;
+    const next = Array.from(files).map(newAsmComponent);
+    setAsmComponents((prev) => [...prev, ...next]);
   }
 
-  const confidenceBadge = (tier: string | null) => {
-    if (!tier) return null;
-    const styles: Record<string, string> = {
-      high:        "bg-emerald-950/60 text-emerald-400 border-emerald-800",
-      medium:      "bg-amber-950/60 text-amber-400 border-amber-800",
-      low:         "bg-red-950/60 text-red-400 border-red-800",
-      insufficient:"bg-[#1C2235] text-[#64748B] border-[#2A3140]",
-    };
-    return (
-      <span className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${styles[tier] ?? styles.insufficient}`} style={{ fontFamily: "var(--font-mono)" }}>
-        {tier.toUpperCase()} confidence
-      </span>
-    );
-  };
+  function handleAsmRemoveComponent(id: string) {
+    setAsmComponents((prev) => prev.filter((c) => c.id !== id));
+  }
 
-  // Mission intake log UI (shared between extracting + calculating)
+  async function handleAsmExtractAll() {
+    setError("");
+    setCurrentExtractingIdx(0);
+    setStep("assembly-extracting");
+
+    const updated = [...asmComponents];
+    for (let i = 0; i < updated.length; i++) {
+      setCurrentExtractingIdx(i);
+      try {
+        const data = await extractDrawing(updated[i].file);
+        updated[i] = { ...updated[i], extractedData: data, error: "" };
+      } catch (e) {
+        updated[i] = {
+          ...updated[i],
+          extractedData: null,
+          error: e instanceof Error ? e.message : "Extraction failed",
+        };
+      }
+      setAsmComponents([...updated]);
+    }
+    setStep("assembly-review");
+  }
+
+  async function handleAsmCalculate() {
+    setError("");
+    setStep("calculating");
+
+    const components = asmComponents.map((c) => {
+      const extracted = { ...c.extractedData } as Record<string, unknown>;
+      const effectiveMaterial =
+        c.materialOverride === "__custom__"
+          ? c.customMaterial.trim() || null
+          : c.materialOverride || (extracted.material as string | null);
+      if (effectiveMaterial) extracted.material = effectiveMaterial;
+      return { name: c.name, extracted_data: extracted };
+    });
+
+    try {
+      const res = await createAssemblyEstimate(
+        components,
+        joiningMethod,
+        numJoints,
+        quantity,
+      );
+      setAssemblyResult(res);
+      setStep("assembly-result");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Assembly calculation failed");
+      setStep("assembly-joining");
+    }
+  }
+
+  // ─── Shared UI ────────────────────────────────────────────────────────────
+
   function MissionLog({ lines }: { lines: string[] }) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#0F1117]">
         <div className="w-full max-w-md px-8">
-          <p className="text-xs font-medium text-[#475569] uppercase tracking-widest mb-5" style={{ fontFamily: "var(--font-mono)" }}>
+          <p
+            className="text-xs font-medium text-[#475569] uppercase tracking-widest mb-5"
+            style={{ fontFamily: "var(--font-mono)" }}
+          >
             MISSION INTAKE
           </p>
           <div className="space-y-3">
@@ -188,14 +358,71 @@ export default function NewEstimatePage() {
     );
   }
 
-  // Upload step
-  if (step === "upload") {
+  // ─── Step: type selection ─────────────────────────────────────────────────
+
+  if (step === "type") {
     return (
       <div className="min-h-screen bg-[#0F1117]">
         <AppNav />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-12">
           <h1 className="text-3xl mb-2 tracking-tight">New Estimate</h1>
-          <p className="text-[#64748B] mb-8 text-sm">Upload an engineering drawing to get a should-cost breakdown.</p>
+          <p className="text-[#64748B] mb-8 text-sm">
+            What type of drawing are you uploading?
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <button
+              onClick={() => { setDrawingType("single"); setStep("upload"); }}
+              className="bg-[#161B27] border border-[#2A3140] rounded-2xl p-8 text-left hover:border-[#22D3EE]/60 hover:bg-[#22D3EE]/5 transition-colors group"
+            >
+              <div className="w-12 h-12 bg-[#22D3EE]/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-[#22D3EE]/20 transition-colors">
+                <svg className="w-6 h-6 text-[#22D3EE]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                </svg>
+              </div>
+              <h2 className="text-lg font-semibold text-[#E2E8F0] mb-2">Single Part</h2>
+              <p className="text-sm text-[#64748B]">
+                One drawing, one component — turned shaft, milled housing, sheet metal bracket, etc.
+              </p>
+            </button>
+
+            <button
+              onClick={() => { setDrawingType("assembly"); setStep("assembly-upload"); }}
+              className="bg-[#161B27] border border-[#2A3140] rounded-2xl p-8 text-left hover:border-[#22D3EE]/60 hover:bg-[#22D3EE]/5 transition-colors group"
+            >
+              <div className="w-12 h-12 bg-[#22D3EE]/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-[#22D3EE]/20 transition-colors">
+                <svg className="w-6 h-6 text-[#22D3EE]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+                </svg>
+              </div>
+              <h2 className="text-lg font-semibold text-[#E2E8F0] mb-2">Assembly</h2>
+              <p className="text-sm text-[#64748B]">
+                Multiple component drawings joined by welding, bolting, riveting, or press fit.
+              </p>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Step: single-part upload ─────────────────────────────────────────────
+
+  if (step === "upload") {
+    return (
+      <div className="min-h-screen bg-[#0F1117]">
+        <AppNav />
+        <div className="max-w-2xl mx-auto px-4 sm:px-8 py-12">
+          <button
+            onClick={() => setStep("type")}
+            className="flex items-center gap-2 text-[#64748B] hover:text-[#94A3B8] text-sm mb-6 transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            Change type
+          </button>
+          <h1 className="text-3xl mb-2 tracking-tight">Single Part</h1>
+          <p className="text-[#64748B] mb-8 text-sm">Upload one engineering drawing.</p>
 
           <div className="bg-[#161B27] rounded-2xl border border-[#2A3140] p-8">
             <div
@@ -221,32 +448,20 @@ export default function NewEstimatePage() {
                   <p className="text-xs text-[#475569]">PDF, PNG, or JPG (max 10MB)</p>
                 </>
               )}
-              <input
-                id="file-input"
-                type="file"
-                accept=".pdf,.png,.jpg,.jpeg"
-                onChange={(e) => setFile(e.target.files?.[0] || null)}
-                className="hidden"
-              />
+              <input id="file-input" type="file" accept=".pdf,.png,.jpg,.jpeg" onChange={(e) => setFile(e.target.files?.[0] || null)} className="hidden" />
             </div>
 
             <div className="flex items-center gap-4 mb-6">
               <label className="text-sm font-medium text-[#94A3B8]">Quantity:</label>
               <input
-                type="number"
-                min={1}
-                value={quantity}
+                type="number" min={1} value={quantity}
                 onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
                 className="w-24 px-3 py-2.5 border border-[#2A3140] rounded-lg bg-[#1C2235] outline-none text-sm text-[#E2E8F0]"
                 style={{ fontFamily: "var(--font-mono)" }}
               />
             </div>
 
-            {error && (
-              <div className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-4">
-                {error}
-              </div>
-            )}
+            {error && <div className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-4">{error}</div>}
 
             <button
               onClick={handleUpload}
@@ -261,12 +476,10 @@ export default function NewEstimatePage() {
     );
   }
 
-  // Extracting step — mission intake log
-  if (step === "extracting") {
-    return <MissionLog lines={EXTRACT_LOG} />;
-  }
+  if (step === "extracting") return <MissionLog lines={EXTRACT_LOG} />;
 
-  // Review step
+  // ─── Step: single-part review ─────────────────────────────────────────────
+
   if (step === "review" && extractedData) {
     const dims = (extractedData.dimensions as Record<string, unknown>) || {};
     const detectedMaterial = extractedData.material as string | null;
@@ -282,7 +495,7 @@ export default function NewEstimatePage() {
         <AppNav />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-8">
           <h1 className="text-3xl mb-2 tracking-tight">Review Extracted Data</h1>
-          <p className="text-[#64748B] text-sm mb-6">Verify the AI-extracted data before calculating costs.</p>
+          <p className="text-[#64748B] text-sm mb-6">Verify AI-extracted data before calculating costs.</p>
 
           <div className="bg-[#161B27] rounded-xl border border-[#2A3140] p-6 mb-4">
             <h2 className="text-xs font-medium text-[#64748B] uppercase tracking-wider mb-4" style={{ fontFamily: "var(--font-mono)" }}>Dimensions</h2>
@@ -300,61 +513,32 @@ export default function NewEstimatePage() {
             </table>
           </div>
 
-          {/* Material section */}
           <div className="bg-[#161B27] rounded-xl border border-[#2A3140] p-6 mb-4">
             <div className="flex items-start justify-between mb-3">
               <span className="text-sm font-medium text-[#94A3B8]">Material</span>
               {detectedMaterial !== null && matConfidence === "high" ? (
                 <span className="text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{detectedMaterial}</span>
               ) : (
-                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                  detectedMaterial === null
-                    ? "bg-amber-950/60 text-amber-400 border border-amber-800"
-                    : "bg-amber-950/40 text-amber-400 border border-amber-900"
-                }`} style={{ fontFamily: "var(--font-mono)" }}>
+                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${detectedMaterial === null ? "bg-amber-950/60 text-amber-400 border border-amber-800" : "bg-amber-950/40 text-amber-400 border border-amber-900"}`} style={{ fontFamily: "var(--font-mono)" }}>
                   {detectedMaterial === null ? "Not detected" : "Low confidence"}
                 </span>
               )}
             </div>
-
-            {needsMaterialInput ? (
+            {needsMaterialInput && (
               <div className="space-y-3">
                 <div className="bg-amber-950/30 border border-amber-900/50 rounded-lg px-3 py-2.5 text-amber-400 text-sm">
-                  {detectedMaterial === null
-                    ? "Material not found in the drawing. Select from the list or enter manually."
-                    : `AI detected "${detectedMaterial}" with low confidence. Please confirm or correct it.`}
+                  {detectedMaterial === null ? "Material not found in the drawing. Select from the list or enter manually." : `AI detected "${detectedMaterial}" with low confidence. Please confirm or correct it.`}
                 </div>
-
-                <select
-                  value={materialOverride}
-                  onChange={(e) => { setMaterialOverride(e.target.value); setMaterialPrice(null); }}
-                  className="w-full px-3 py-2.5 border border-[#2A3140] rounded-lg bg-[#1C2235] text-sm text-[#E2E8F0] outline-none"
-                >
-                  <option value="">
-                    {detectedMaterial !== null ? `Keep detected: ${detectedMaterial}` : "— Select material —"}
-                  </option>
-                  {KNOWN_MATERIALS.map((m) => (
-                    <option key={m} value={m}>{m}</option>
-                  ))}
+                <select value={materialOverride} onChange={(e) => { setMaterialOverride(e.target.value); setMaterialPrice(null); }} className="w-full px-3 py-2.5 border border-[#2A3140] rounded-lg bg-[#1C2235] text-sm text-[#E2E8F0] outline-none">
+                  <option value="">{detectedMaterial !== null ? `Keep detected: ${detectedMaterial}` : "— Select material —"}</option>
+                  {KNOWN_MATERIALS.map((m) => <option key={m} value={m}>{m}</option>)}
                   <option value="__custom__">Other (enter manually)…</option>
                 </select>
-
                 {materialOverride === "__custom__" && (
-                  <input
-                    type="text"
-                    placeholder="e.g. EN31 Steel, Bronze, AISI 4140"
-                    value={customMaterial}
-                    onChange={(e) => { setCustomMaterial(e.target.value); setMaterialPrice(null); }}
-                    className="w-full px-3 py-2.5 border border-[#2A3140] rounded-lg bg-[#1C2235] text-sm text-[#E2E8F0] outline-none"
-                  />
+                  <input type="text" placeholder="e.g. EN31 Steel, Bronze, AISI 4140" value={customMaterial} onChange={(e) => { setCustomMaterial(e.target.value); setMaterialPrice(null); }} className="w-full px-3 py-2.5 border border-[#2A3140] rounded-lg bg-[#1C2235] text-sm text-[#E2E8F0] outline-none" />
                 )}
-
                 <div className="flex items-center gap-3">
-                  <button
-                    onClick={handleFetchPrice}
-                    disabled={!activeMaterial || fetchingPrice}
-                    className="text-sm text-[#22D3EE] hover:text-[#06B6D4] font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                  >
+                  <button onClick={handleFetchPrice} disabled={!activeMaterial || fetchingPrice} className="text-sm text-[#22D3EE] hover:text-[#06B6D4] font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
                     {fetchingPrice ? "Fetching…" : "Look up market price (INR/kg)"}
                   </button>
                   {materialPrice !== null && (
@@ -365,7 +549,7 @@ export default function NewEstimatePage() {
                   )}
                 </div>
               </div>
-            ) : null}
+            )}
           </div>
 
           <div className="bg-[#161B27] rounded-xl border border-[#2A3140] p-6 mb-6 space-y-2">
@@ -379,24 +563,13 @@ export default function NewEstimatePage() {
             </div>
           </div>
 
-          {error && (
-            <div className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-4">
-              {error}
-            </div>
-          )}
+          {error && <div className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-4">{error}</div>}
 
           <div className="flex gap-3">
-            <button
-              onClick={handleCalculate}
-              disabled={needsMaterialInput && !activeMaterial}
-              className="flex-1 bg-[#22D3EE] text-[#0F1117] py-3.5 rounded-lg font-semibold hover:bg-[#06B6D4] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-            >
+            <button onClick={handleCalculate} disabled={needsMaterialInput && !activeMaterial} className="flex-1 bg-[#22D3EE] text-[#0F1117] py-3.5 rounded-lg font-semibold hover:bg-[#06B6D4] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
               Calculate Cost
             </button>
-            <button
-              onClick={() => setStep("upload")}
-              className="px-6 py-3.5 border border-[#2A3140] rounded-lg hover:bg-[#1C2235] text-sm font-medium text-[#94A3B8] transition-colors"
-            >
+            <button onClick={() => setStep("upload")} className="px-6 py-3.5 border border-[#2A3140] rounded-lg hover:bg-[#1C2235] text-sm font-medium text-[#94A3B8] transition-colors">
               Re-upload
             </button>
           </div>
@@ -405,12 +578,10 @@ export default function NewEstimatePage() {
     );
   }
 
-  // Calculating step — mission intake log
-  if (step === "calculating") {
-    return <MissionLog lines={CALC_LOG} />;
-  }
+  if (step === "calculating") return <MissionLog lines={CALC_LOG} />;
 
-  // Result step
+  // ─── Step: single-part result ─────────────────────────────────────────────
+
   if (step === "result" && result) {
     return (
       <div className="min-h-screen bg-[#0F1117]">
@@ -419,14 +590,11 @@ export default function NewEstimatePage() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-3xl tracking-tight">Should-Cost Estimate</h1>
-              <p className="text-[#64748B] text-sm mt-1">
-                {result.material_name} &middot; {result.quantity} unit{result.quantity > 1 ? "s" : ""}
-              </p>
+              <p className="text-[#64748B] text-sm mt-1">{result.material_name} &middot; {result.quantity} unit{result.quantity > 1 ? "s" : ""}</p>
             </div>
             {confidenceBadge(result.confidence_tier)}
           </div>
 
-          {/* Summary table */}
           <div className="bg-[#161B27] rounded-xl border border-[#2A3140] overflow-hidden mb-4">
             <table className="w-full">
               <thead>
@@ -436,66 +604,38 @@ export default function NewEstimatePage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#2A3140]">
-                <tr>
-                  <td className="px-6 py-3.5 text-sm text-[#94A3B8]">Material ({result.material_name})</td>
-                  <td className="px-6 py-3.5 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(result.material_cost)}</td>
-                </tr>
-                <tr>
-                  <td className="px-6 py-3.5 text-sm text-[#94A3B8]">Machining</td>
-                  <td className="px-6 py-3.5 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(result.total_machining_cost)}</td>
-                </tr>
-                <tr>
-                  <td className="px-6 py-3.5 text-sm text-[#94A3B8]">Setup & Tooling</td>
-                  <td className="px-6 py-3.5 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(result.total_setup_cost + result.total_tooling_cost)}</td>
-                </tr>
-                <tr>
-                  <td className="px-6 py-3.5 text-sm text-[#94A3B8]">Labour</td>
-                  <td className="px-6 py-3.5 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(result.total_labour_cost)}</td>
-                </tr>
-                <tr>
-                  <td className="px-6 py-3.5 text-sm text-[#94A3B8]">Power</td>
-                  <td className="px-6 py-3.5 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(result.total_power_cost)}</td>
-                </tr>
-                <tr>
-                  <td className="px-6 py-3.5 text-sm text-[#94A3B8]">Overhead (15%)</td>
-                  <td className="px-6 py-3.5 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(result.overhead)}</td>
-                </tr>
-                <tr>
-                  <td className="px-6 py-3.5 text-sm text-[#94A3B8]">Profit (20%)</td>
-                  <td className="px-6 py-3.5 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(result.profit)}</td>
-                </tr>
+                {[
+                  [`Material (${result.material_name})`, result.material_cost],
+                  ["Machining", result.total_machining_cost],
+                  ["Setup & Tooling", result.total_setup_cost + result.total_tooling_cost],
+                  ["Labour", result.total_labour_cost],
+                  ["Power", result.total_power_cost],
+                  ["Overhead (15%)", result.overhead],
+                  ["Profit (20%)", result.profit],
+                ].map(([label, val]) => (
+                  <tr key={String(label)}>
+                    <td className="px-6 py-3.5 text-sm text-[#94A3B8]">{label}</td>
+                    <td className="px-6 py-3.5 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(Number(val))}</td>
+                  </tr>
+                ))}
               </tbody>
               <tfoot>
                 <tr className="bg-[#22D3EE] text-[#0F1117]">
                   <td className="px-6 py-4 font-bold text-sm" style={{ fontFamily: "var(--font-mono)" }}>TOTAL (per unit)</td>
-                  <td className="px-6 py-4 text-right font-bold text-lg" style={{ fontFamily: "var(--font-mono)" }}>
-                    {result.currency} {fmt(result.unit_cost)}
-                  </td>
+                  <td className="px-6 py-4 text-right font-bold text-lg" style={{ fontFamily: "var(--font-mono)" }}>{result.currency} {fmt(result.unit_cost)}</td>
                 </tr>
                 {result.quantity > 1 && (
                   <tr className="bg-[#06B6D4] text-[#0F1117]">
                     <td className="px-6 py-4 font-bold text-sm" style={{ fontFamily: "var(--font-mono)" }}>ORDER TOTAL ({result.quantity} units)</td>
-                    <td className="px-6 py-4 text-right font-bold text-lg" style={{ fontFamily: "var(--font-mono)" }}>
-                      {result.currency} {fmt(result.order_cost)}
-                    </td>
+                    <td className="px-6 py-4 text-right font-bold text-lg" style={{ fontFamily: "var(--font-mono)" }}>{result.currency} {fmt(result.order_cost)}</td>
                   </tr>
                 )}
               </tfoot>
             </table>
           </div>
 
-          {/* Expand/collapse process detail */}
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="flex items-center gap-2 text-[#22D3EE] hover:text-[#06B6D4] text-sm font-medium mb-4 transition-colors"
-          >
-            <svg
-              className={`w-4 h-4 transition-transform ${expanded ? "rotate-90" : ""}`}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
+          <button onClick={() => setExpanded(!expanded)} className="flex items-center gap-2 text-[#22D3EE] hover:text-[#06B6D4] text-sm font-medium mb-4 transition-colors">
+            <svg className={`w-4 h-4 transition-transform ${expanded ? "rotate-90" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
             {expanded ? "Hide" : "Show"} full process breakdown
@@ -506,13 +646,9 @@ export default function NewEstimatePage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-[#2A3140] bg-[#1C2235]">
-                    <th className="text-left px-4 py-3 text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Process</th>
-                    <th className="text-right px-4 py-3 text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Time</th>
-                    <th className="text-right px-4 py-3 text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Machine</th>
-                    <th className="text-right px-4 py-3 text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Setup</th>
-                    <th className="text-right px-4 py-3 text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Tooling</th>
-                    <th className="text-right px-4 py-3 text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Labour</th>
-                    <th className="text-right px-4 py-3 text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Power</th>
+                    {["Process", "Time", "Machine", "Setup", "Tooling", "Labour", "Power"].map((h) => (
+                      <th key={h} className={`${h === "Process" ? "text-left" : "text-right"} px-4 py-3 text-xs font-medium text-[#64748B] uppercase tracking-wider`} style={{ fontFamily: "var(--font-mono)" }}>{h}</th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#2A3140]">
@@ -532,16 +668,473 @@ export default function NewEstimatePage() {
             </div>
           )}
 
-          {/* Actions */}
           <div className="flex gap-3 mt-6">
+            <button onClick={() => router.push("/dashboard")} className="flex-1 border border-[#2A3140] py-3.5 rounded-lg hover:bg-[#1C2235] text-sm font-medium text-[#94A3B8] transition-colors">
+              Back to Dashboard
+            </button>
+            <button onClick={() => { setStep("type"); setResult(null); setExtractedData(null); setFile(null); }} className="flex-1 bg-[#22D3EE] text-[#0F1117] py-3.5 rounded-lg font-semibold hover:bg-[#06B6D4] transition-colors">
+              New Estimate
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Step: assembly upload ────────────────────────────────────────────────
+
+  if (step === "assembly-upload") {
+    const canAnalyze = asmComponents.length >= 2;
+    return (
+      <div className="min-h-screen bg-[#0F1117]">
+        <AppNav />
+        <div className="max-w-2xl mx-auto px-4 sm:px-8 py-12">
+          <button onClick={() => setStep("type")} className="flex items-center gap-2 text-[#64748B] hover:text-[#94A3B8] text-sm mb-6 transition-colors">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+            Change type
+          </button>
+
+          <h1 className="text-3xl mb-2 tracking-tight">Assembly Drawing</h1>
+          <p className="text-[#64748B] mb-8 text-sm">
+            Upload one drawing per component. Add at least 2 components, then label each one.
+          </p>
+
+          {/* Component list */}
+          {asmComponents.length > 0 && (
+            <div className="space-y-3 mb-6">
+              {asmComponents.map((comp, i) => (
+                <div key={comp.id} className="bg-[#161B27] border border-[#2A3140] rounded-xl px-5 py-4 flex items-center gap-4">
+                  <span className="text-xs font-medium text-[#475569] w-5 text-center" style={{ fontFamily: "var(--font-mono)" }}>{i + 1}</span>
+                  <div className="flex-1 min-w-0">
+                    <input
+                      value={comp.name}
+                      onChange={(e) => updateAsmComponent(comp.id, { name: e.target.value })}
+                      className="w-full bg-transparent text-sm font-medium text-[#E2E8F0] outline-none border-b border-transparent hover:border-[#2A3140] focus:border-[#22D3EE] transition-colors py-0.5"
+                      placeholder="Component name"
+                    />
+                    <p className="text-xs text-[#475569] mt-1 truncate" style={{ fontFamily: "var(--font-mono)" }}>{comp.file.name}</p>
+                  </div>
+                  <button onClick={() => handleAsmRemoveComponent(comp.id)} className="text-[#475569] hover:text-red-400 transition-colors p-1">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Add more files */}
+          <div
+            className="border-2 border-dashed border-[#2A3140] rounded-xl p-8 text-center mb-6 hover:border-[#22D3EE]/50 hover:bg-[#22D3EE]/5 transition-colors cursor-pointer"
+            role="button"
+            tabIndex={0}
+            onClick={() => document.getElementById("asm-file-input")?.click()}
+            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); document.getElementById("asm-file-input")?.click(); } }}
+            onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-[#22D3EE]", "bg-[#22D3EE]/5"); }}
+            onDragLeave={(e) => { e.currentTarget.classList.remove("border-[#22D3EE]", "bg-[#22D3EE]/5"); }}
+            onDrop={(e) => { e.preventDefault(); e.currentTarget.classList.remove("border-[#22D3EE]", "bg-[#22D3EE]/5"); handleAsmFilesAdded(e.dataTransfer.files); }}
+          >
+            <div className="w-10 h-10 bg-[#22D3EE]/10 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <svg className="w-5 h-5 text-[#22D3EE]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+            </div>
+            <p className="text-sm text-[#94A3B8]">{asmComponents.length === 0 ? "Add component drawings" : "Add more components"}</p>
+            <p className="text-xs text-[#475569] mt-1">PDF, PNG, or JPG — one file per component</p>
+            <input id="asm-file-input" type="file" accept=".pdf,.png,.jpg,.jpeg" multiple onChange={(e) => handleAsmFilesAdded(e.target.files)} className="hidden" />
+          </div>
+
+          <div className="flex items-center gap-4 mb-6">
+            <label className="text-sm font-medium text-[#94A3B8]">Quantity (assemblies):</label>
+            <input
+              type="number" min={1} value={quantity}
+              onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+              className="w-24 px-3 py-2.5 border border-[#2A3140] rounded-lg bg-[#1C2235] outline-none text-sm text-[#E2E8F0]"
+              style={{ fontFamily: "var(--font-mono)" }}
+            />
+          </div>
+
+          {!canAnalyze && asmComponents.length > 0 && (
+            <p className="text-amber-400 text-sm mb-4">Add at least one more component to proceed.</p>
+          )}
+          {error && <div className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-4">{error}</div>}
+
+          <button
+            onClick={handleAsmExtractAll}
+            disabled={!canAnalyze}
+            className="w-full bg-[#22D3EE] text-[#0F1117] py-3.5 rounded-lg font-semibold hover:bg-[#06B6D4] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            Analyze All Components ({asmComponents.length})
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Step: assembly extracting (per-file progress) ────────────────────────
+
+  if (step === "assembly-extracting") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0F1117]">
+        <div className="w-full max-w-md px-8">
+          <p className="text-xs font-medium text-[#475569] uppercase tracking-widest mb-5" style={{ fontFamily: "var(--font-mono)" }}>
+            ANALYZING ASSEMBLY
+          </p>
+          <div className="space-y-4">
+            {asmComponents.map((comp, i) => {
+              const isDone = comp.extractedData !== null || comp.error !== "";
+              const isActive = i === currentExtractingIdx && !isDone;
+              const isPending = i > currentExtractingIdx && !isDone;
+              return (
+                <div key={comp.id} className="flex items-start gap-3">
+                  <div className="mt-0.5 w-5 flex-shrink-0 flex justify-center">
+                    {comp.error ? (
+                      <span className="text-red-400 text-base leading-none">✗</span>
+                    ) : isDone ? (
+                      <span className="text-emerald-400 text-base leading-none">✓</span>
+                    ) : isActive ? (
+                      <span className="text-[#22D3EE] text-base leading-none">›</span>
+                    ) : (
+                      <span className="text-[#2A3140] text-base leading-none">·</span>
+                    )}
+                  </div>
+                  <div>
+                    <p className={`text-sm font-medium ${isDone && !comp.error ? "text-[#475569]" : isActive ? "text-[#E2E8F0]" : isPending ? "text-[#2A3140]" : "text-[#E2E8F0]"}`} style={{ fontFamily: "var(--font-mono)" }}>
+                      {comp.name}
+                    </p>
+                    <p className={`text-xs mt-0.5 ${comp.error ? "text-red-400" : isDone ? "text-emerald-400/60" : isActive ? "text-[#475569]" : "text-[#2A3140]"}`} style={{ fontFamily: "var(--font-mono)" }}>
+                      {comp.error ? comp.error : isDone ? "extracted" : isActive ? "extracting…" : "pending"}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Step: assembly review ────────────────────────────────────────────────
+
+  if (step === "assembly-review") {
+    const allExtracted = asmComponents.every((c) => c.extractedData !== null);
+    const hasErrors = asmComponents.some((c) => c.error !== "");
+
+    return (
+      <div className="min-h-screen bg-[#0F1117]">
+        <AppNav />
+        <div className="max-w-2xl mx-auto px-4 sm:px-8 py-8">
+          <h1 className="text-3xl mb-2 tracking-tight">Review Components</h1>
+          <p className="text-[#64748B] text-sm mb-6">
+            Verify extracted data and correct materials where needed.
+          </p>
+
+          <div className="space-y-4 mb-6">
+            {asmComponents.map((comp, i) => {
+              const dims = (comp.extractedData?.dimensions as Record<string, unknown>) || {};
+              const detectedMat = comp.extractedData?.material as string | null;
+              const matConf = comp.extractedData?.material_confidence as string | undefined;
+              const needsMat = detectedMat === null || matConf === "low";
+
+              return (
+                <div key={comp.id} className="bg-[#161B27] border border-[#2A3140] rounded-xl overflow-hidden">
+                  <button
+                    onClick={() => setExpandedComponent(expandedComponent === comp.id ? null : comp.id)}
+                    className="w-full flex items-center justify-between px-5 py-4 hover:bg-[#1C2235] transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-[#475569] w-4 text-center" style={{ fontFamily: "var(--font-mono)" }}>{i + 1}</span>
+                      <span className="text-sm font-semibold text-[#E2E8F0]">{comp.name}</span>
+                      {comp.error && <span className="text-xs text-red-400 bg-red-950/40 border border-red-900/50 px-2 py-0.5 rounded-full">Extraction failed</span>}
+                      {needsMat && !comp.error && <span className="text-xs text-amber-400 bg-amber-950/40 border border-amber-900/50 px-2 py-0.5 rounded-full">Material needed</span>}
+                    </div>
+                    <svg className={`w-4 h-4 text-[#475569] transition-transform ${expandedComponent === comp.id ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {expandedComponent === comp.id && (
+                    <div className="px-5 pb-5 border-t border-[#2A3140] pt-4 space-y-4">
+                      {comp.error ? (
+                        <p className="text-sm text-red-400">{comp.error}</p>
+                      ) : (
+                        <>
+                          <div>
+                            <p className="text-xs font-medium text-[#64748B] uppercase tracking-wider mb-2" style={{ fontFamily: "var(--font-mono)" }}>Dimensions</p>
+                            <div className="space-y-1">
+                              {Object.entries(dims).filter(([, v]) => v != null).map(([k, v]) => (
+                                <div key={k} className="flex justify-between text-sm">
+                                  <span className="text-[#64748B] capitalize">{k.replace(/_/g, " ")}</span>
+                                  <span className="text-[#E2E8F0] font-medium" style={{ fontFamily: "var(--font-mono)" }}>{String(v)}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <p className="text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Material</p>
+                              {detectedMat && matConf === "high" && (
+                                <span className="text-sm text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{detectedMat}</span>
+                              )}
+                            </div>
+                            {needsMat && (
+                              <div className="space-y-2">
+                                <select
+                                  value={comp.materialOverride}
+                                  onChange={(e) => updateAsmComponent(comp.id, { materialOverride: e.target.value })}
+                                  className="w-full px-3 py-2.5 border border-[#2A3140] rounded-lg bg-[#1C2235] text-sm text-[#E2E8F0] outline-none"
+                                >
+                                  <option value="">{detectedMat ? `Keep: ${detectedMat}` : "— Select material —"}</option>
+                                  {KNOWN_MATERIALS.map((m) => <option key={m} value={m}>{m}</option>)}
+                                  <option value="__custom__">Other (enter manually)…</option>
+                                </select>
+                                {comp.materialOverride === "__custom__" && (
+                                  <input
+                                    type="text"
+                                    placeholder="e.g. EN31 Steel"
+                                    value={comp.customMaterial}
+                                    onChange={(e) => updateAsmComponent(comp.id, { customMaterial: e.target.value })}
+                                    className="w-full px-3 py-2.5 border border-[#2A3140] rounded-lg bg-[#1C2235] text-sm text-[#E2E8F0] outline-none"
+                                  />
+                                )}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="text-sm text-[#64748B]">
+                            <span className="font-medium text-[#94A3B8]">Processes: </span>
+                            {(comp.extractedData?.suggested_processes as string[] || []).join(", ")}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {hasErrors && (
+            <div className="bg-amber-950/30 border border-amber-900/50 rounded-lg px-4 py-3 text-amber-400 text-sm mb-4">
+              Some components failed extraction. Go back to re-upload those drawings.
+            </div>
+          )}
+          {error && <div className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-4">{error}</div>}
+
+          <div className="flex gap-3">
             <button
-              onClick={() => router.push("/dashboard")}
-              className="flex-1 border border-[#2A3140] py-3.5 rounded-lg hover:bg-[#1C2235] text-sm font-medium text-[#94A3B8] transition-colors"
+              onClick={() => setStep("assembly-joining")}
+              disabled={!allExtracted || hasErrors}
+              className="flex-1 bg-[#22D3EE] text-[#0F1117] py-3.5 rounded-lg font-semibold hover:bg-[#06B6D4] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
+              Next: Joining Method
+            </button>
+            <button onClick={() => setStep("assembly-upload")} className="px-6 py-3.5 border border-[#2A3140] rounded-lg hover:bg-[#1C2235] text-sm font-medium text-[#94A3B8] transition-colors">
+              Back
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Step: assembly joining method ────────────────────────────────────────
+
+  if (step === "assembly-joining") {
+    return (
+      <div className="min-h-screen bg-[#0F1117]">
+        <AppNav />
+        <div className="max-w-2xl mx-auto px-4 sm:px-8 py-8">
+          <h1 className="text-3xl mb-2 tracking-tight">Joining Method</h1>
+          <p className="text-[#64748B] text-sm mb-8">
+            How are the {asmComponents.length} components joined together?
+          </p>
+
+          <div className="bg-[#161B27] rounded-xl border border-[#2A3140] p-6 mb-4 space-y-5">
+            <div>
+              <label className="text-sm font-medium text-[#94A3B8] block mb-2">Joining process</label>
+              <select
+                value={joiningMethod}
+                onChange={(e) => setJoiningMethod(e.target.value)}
+                className="w-full px-3 py-2.5 border border-[#2A3140] rounded-lg bg-[#1C2235] text-sm text-[#E2E8F0] outline-none"
+              >
+                {JOINING_METHODS.map((m) => <option key={m.id} value={m.id}>{m.label}</option>)}
+              </select>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-[#94A3B8] block mb-2">
+                {joiningMethod === "mig_welding" || joiningMethod === "tig_welding" ? "Number of weld joints" :
+                 joiningMethod === "spot_welding" ? "Number of spot welds" :
+                 joiningMethod === "bolting" ? "Number of bolts" :
+                 joiningMethod === "riveting" ? "Number of rivets" :
+                 "Number of press-fit joints"}
+              </label>
+              <input
+                type="number"
+                min={1}
+                value={numJoints}
+                onChange={(e) => setNumJoints(parseInt(e.target.value) || 1)}
+                className="w-32 px-3 py-2.5 border border-[#2A3140] rounded-lg bg-[#1C2235] outline-none text-sm text-[#E2E8F0]"
+                style={{ fontFamily: "var(--font-mono)" }}
+              />
+            </div>
+          </div>
+
+          {/* Component summary */}
+          <div className="bg-[#161B27] rounded-xl border border-[#2A3140] p-5 mb-6">
+            <p className="text-xs font-medium text-[#64748B] uppercase tracking-wider mb-3" style={{ fontFamily: "var(--font-mono)" }}>Assembly summary</p>
+            <div className="space-y-1.5">
+              {asmComponents.map((c, i) => (
+                <div key={c.id} className="flex items-center gap-2 text-sm">
+                  <span className="text-[#475569] w-4 text-center" style={{ fontFamily: "var(--font-mono)" }}>{i + 1}</span>
+                  <span className="text-[#E2E8F0]">{c.name}</span>
+                  <span className="text-[#475569]">·</span>
+                  <span className="text-[#64748B]" style={{ fontFamily: "var(--font-mono)" }}>
+                    {c.materialOverride === "__custom__" ? c.customMaterial :
+                     c.materialOverride || (c.extractedData?.material as string) || "unknown material"}
+                  </span>
+                </div>
+              ))}
+              <div className="border-t border-[#2A3140] pt-2 mt-2 flex items-center gap-2 text-sm text-[#475569]">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                </svg>
+                {JOINING_METHODS.find((m) => m.id === joiningMethod)?.label} &middot; {numJoints} joint{numJoints > 1 ? "s" : ""} &middot; qty {quantity}
+              </div>
+            </div>
+          </div>
+
+          {error && <div className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-4">{error}</div>}
+
+          <div className="flex gap-3">
+            <button
+              onClick={handleAsmCalculate}
+              className="flex-1 bg-[#22D3EE] text-[#0F1117] py-3.5 rounded-lg font-semibold hover:bg-[#06B6D4] transition-colors"
+            >
+              Calculate Assembly Cost
+            </button>
+            <button onClick={() => setStep("assembly-review")} className="px-6 py-3.5 border border-[#2A3140] rounded-lg hover:bg-[#1C2235] text-sm font-medium text-[#94A3B8] transition-colors">
+              Back
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Step: assembly result ────────────────────────────────────────────────
+
+  if (step === "assembly-result" && assemblyResult) {
+    const r = assemblyResult;
+    return (
+      <div className="min-h-screen bg-[#0F1117]">
+        <AppNav />
+        <div className="max-w-3xl mx-auto px-4 sm:px-8 py-8">
+          <div className="mb-6">
+            <h1 className="text-3xl tracking-tight">Assembly Should-Cost</h1>
+            <p className="text-[#64748B] text-sm mt-1">
+              {r.components.length} components &middot; {r.joining_method_label} &middot; {r.quantity} unit{r.quantity > 1 ? "s" : ""}
+            </p>
+          </div>
+
+          {/* Per-component accordion */}
+          <div className="space-y-3 mb-6">
+            {r.components.map((comp) => (
+              <div key={comp.name} className="bg-[#161B27] border border-[#2A3140] rounded-xl overflow-hidden">
+                <button
+                  onClick={() => setExpandedComponent(expandedComponent === comp.name ? null : comp.name)}
+                  className="w-full flex items-center justify-between px-5 py-4 hover:bg-[#1C2235] transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold text-[#E2E8F0]">{comp.name}</span>
+                    <span className="text-xs text-[#475569]" style={{ fontFamily: "var(--font-mono)" }}>{comp.material_name}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>₹ {fmt(comp.unit_cost)}</span>
+                    <svg className={`w-4 h-4 text-[#475569] transition-transform ${expandedComponent === comp.name ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </button>
+                {expandedComponent === comp.name && (
+                  <div className="border-t border-[#2A3140]">
+                    <table className="w-full text-sm">
+                      <tbody className="divide-y divide-[#2A3140]">
+                        {[
+                          [`Material (${comp.material_name})`, comp.material_cost],
+                          ["Machining", comp.machining_cost],
+                          ["Setup", comp.setup_cost],
+                          ["Tooling", comp.tooling_cost],
+                          ["Labour", comp.labour_cost],
+                          ["Power", comp.power_cost],
+                        ].map(([label, val]) => (
+                          <tr key={String(label)}>
+                            <td className="px-5 py-2.5 text-[#64748B]">{label}</td>
+                            <td className="px-5 py-2.5 text-right text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(Number(val))}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Assembly rollup table */}
+          <div className="bg-[#161B27] rounded-xl border border-[#2A3140] overflow-hidden mb-6">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-[#2A3140] bg-[#1C2235]">
+                  <th className="text-left px-6 py-3.5 text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Assembly Cost Rollup</th>
+                  <th className="text-right px-6 py-3.5 text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>INR</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#2A3140]">
+                {r.components.map((comp) => (
+                  <tr key={comp.name}>
+                    <td className="px-6 py-3 text-sm text-[#94A3B8]">{comp.name}</td>
+                    <td className="px-6 py-3 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(comp.subtotal)}</td>
+                  </tr>
+                ))}
+                <tr className="bg-[#1C2235]">
+                  <td className="px-6 py-3 text-sm text-[#94A3B8]">
+                    {r.joining_method_label} ({r.joining_cost > 0 ? `material ₹${fmt(r.joining_material_cost)} + machine ₹${fmt(r.joining_machine_cost)} + labour ₹${fmt(r.joining_labour_cost)}` : "no consumables"})
+                  </td>
+                  <td className="px-6 py-3 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(r.joining_cost)}</td>
+                </tr>
+                <tr>
+                  <td className="px-6 py-3 text-sm text-[#64748B]">Overhead (15%)</td>
+                  <td className="px-6 py-3 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(r.overhead)}</td>
+                </tr>
+                <tr>
+                  <td className="px-6 py-3 text-sm text-[#64748B]">Profit (20%)</td>
+                  <td className="px-6 py-3 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(r.profit)}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr className="bg-[#22D3EE] text-[#0F1117]">
+                  <td className="px-6 py-4 font-bold text-sm" style={{ fontFamily: "var(--font-mono)" }}>TOTAL ASSEMBLY (per unit)</td>
+                  <td className="px-6 py-4 text-right font-bold text-lg" style={{ fontFamily: "var(--font-mono)" }}>₹ {fmt(r.unit_cost)}</td>
+                </tr>
+                {r.quantity > 1 && (
+                  <tr className="bg-[#06B6D4] text-[#0F1117]">
+                    <td className="px-6 py-4 font-bold text-sm" style={{ fontFamily: "var(--font-mono)" }}>ORDER TOTAL ({r.quantity} assemblies)</td>
+                    <td className="px-6 py-4 text-right font-bold text-lg" style={{ fontFamily: "var(--font-mono)" }}>₹ {fmt(r.order_cost)}</td>
+                  </tr>
+                )}
+              </tfoot>
+            </table>
+          </div>
+
+          <div className="flex gap-3">
+            <button onClick={() => router.push("/dashboard")} className="flex-1 border border-[#2A3140] py-3.5 rounded-lg hover:bg-[#1C2235] text-sm font-medium text-[#94A3B8] transition-colors">
               Back to Dashboard
             </button>
             <button
-              onClick={() => { setStep("upload"); setResult(null); setExtractedData(null); }}
+              onClick={() => { setStep("type"); setAssemblyResult(null); setAsmComponents([]); setResult(null); setFile(null); }}
               className="flex-1 bg-[#22D3EE] text-[#0F1117] py-3.5 rounded-lg font-semibold hover:bg-[#06B6D4] transition-colors"
             >
               New Estimate

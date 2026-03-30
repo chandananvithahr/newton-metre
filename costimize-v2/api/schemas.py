@@ -87,3 +87,46 @@ class EstimateHistoryItem(BaseModel):
     confidence_tier: str | None
     currency: str
     created_at: str
+
+
+# --- Assembly estimate ---
+
+class AssemblyComponentInput(BaseModel):
+    name: str
+    extracted_data: dict
+
+
+class AssemblyEstimateRequest(BaseModel):
+    components: list[AssemblyComponentInput]
+    joining_method: str
+    num_joints: int
+    quantity: int = 1
+
+
+class ComponentCostResult(BaseModel):
+    name: str
+    material_name: str
+    material_cost: float
+    machining_cost: float
+    setup_cost: float
+    tooling_cost: float
+    labour_cost: float
+    power_cost: float
+    subtotal: float
+    unit_cost: float
+
+
+class AssemblyEstimateResponse(BaseModel):
+    components: list[ComponentCostResult]
+    joining_cost: float
+    joining_method_label: str
+    joining_material_cost: float
+    joining_machine_cost: float
+    joining_labour_cost: float
+    assembly_subtotal: float
+    overhead: float
+    profit: float
+    unit_cost: float
+    order_cost: float
+    quantity: int
+    currency: str = "INR"

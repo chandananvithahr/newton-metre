@@ -111,6 +111,34 @@ export async function getMaterialPrice(name: string) {
   return res.json() as Promise<{ name: string; price_inr: number; source: string }>;
 }
 
+export interface AssemblyComponentInput {
+  name: string;
+  extracted_data: Record<string, unknown>;
+}
+
+export async function createAssemblyEstimate(
+  components: AssemblyComponentInput[],
+  joiningMethod: string,
+  numJoints: number,
+  quantity: number,
+) {
+  const headers = await getAuthHeaders();
+  const res = await safeFetch(`${API_URL}/api/estimate/assembly`, {
+    method: "POST",
+    headers: { ...headers, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      components,
+      joining_method: joiningMethod,
+      num_joints: numJoints,
+      quantity,
+    }),
+  });
+  if (!res.ok) {
+    throw new Error(await parseErrorResponse(res, "Assembly estimation failed. Please try again."));
+  }
+  return res.json();
+}
+
 export async function embedDrawing(file: File) {
   const headers = await getAuthHeaders();
   const formData = new FormData();
