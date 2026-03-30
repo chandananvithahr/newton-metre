@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { extractDrawing, createEstimate } from "@/lib/api";
+import { AppNav } from "@/components/app-nav";
 
 type Step = "upload" | "extracting" | "review" | "calculating" | "result";
 
@@ -100,11 +100,7 @@ export default function NewEstimatePage() {
   if (step === "upload") {
     return (
       <div className="min-h-screen bg-slate-50">
-        <nav className="flex items-center px-8 py-4 bg-white border-b border-gray-100 shadow-sm">
-          <Link href="/dashboard" className="text-xl font-bold tracking-tight text-primary-700 py-2">
-            Costrich
-          </Link>
-        </nav>
+        <AppNav />
         <div className="max-w-2xl mx-auto px-8 py-12">
           <h1 className="text-3xl font-bold mb-2 tracking-tight">New Estimate</h1>
           <p className="text-gray-500 mb-8">Upload an engineering drawing to get a should-cost breakdown.</p>
@@ -112,7 +108,13 @@ export default function NewEstimatePage() {
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
             <div
               className="border-2 border-dashed border-gray-200 rounded-xl p-10 text-center mb-6 hover:border-primary-300 hover:bg-primary-50/30 transition-colors cursor-pointer"
+              role="button"
+              tabIndex={0}
               onClick={() => document.getElementById("file-input")?.click()}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); document.getElementById("file-input")?.click(); } }}
+              onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-primary-400", "bg-primary-50/50"); }}
+              onDragLeave={(e) => { e.currentTarget.classList.remove("border-primary-400", "bg-primary-50/50"); }}
+              onDrop={(e) => { e.preventDefault(); e.currentTarget.classList.remove("border-primary-400", "bg-primary-50/50"); const f = e.dataTransfer.files[0]; if (f) setFile(f); }}
             >
               <div className="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <svg className="w-6 h-6 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -184,9 +186,7 @@ export default function NewEstimatePage() {
     const dims = (extractedData.dimensions as Record<string, unknown>) || {};
     return (
       <div className="min-h-screen bg-slate-50">
-        <nav className="flex items-center px-8 py-4 bg-white border-b border-gray-100 shadow-sm">
-          <span className="text-xl font-bold tracking-tight text-primary-700">Costrich</span>
-        </nav>
+        <AppNav />
         <div className="max-w-2xl mx-auto px-8 py-8">
           <h1 className="text-3xl font-bold mb-2 tracking-tight">Review Extracted Data</h1>
           <p className="text-gray-500 text-sm mb-6">Verify the AI-extracted data before calculating costs.</p>
@@ -264,11 +264,7 @@ export default function NewEstimatePage() {
   if (step === "result" && result) {
     return (
       <div className="min-h-screen bg-slate-50">
-        <nav className="flex items-center px-8 py-4 bg-white border-b border-gray-100 shadow-sm">
-          <Link href="/dashboard" className="text-xl font-bold tracking-tight text-primary-700 py-2">
-            Costrich
-          </Link>
-        </nav>
+        <AppNav />
         <div className="max-w-3xl mx-auto px-8 py-8">
           <div className="flex items-center justify-between mb-6">
             <div>

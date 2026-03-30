@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Link from "next/link";
 import { getEstimate } from "@/lib/api";
+import { AppNav } from "@/components/app-nav";
 
 export default function ViewEstimatePage() {
   const { id } = useParams();
@@ -51,16 +51,13 @@ export default function ViewEstimatePage() {
     confidenceTier === "low" ? "bg-red-50 text-red-700 border-red-200" :
     "bg-gray-50 text-gray-500 border-gray-200";
 
-  const fmt = (v: unknown) => Number(v || 0).toLocaleString("en-IN", { maximumFractionDigits: 0 });
+  const fmt = (v: unknown) => Number(v ?? 0).toLocaleString("en-IN", { maximumFractionDigits: 0 });
   const currency = (data.currency as string) || "INR";
+  const hasBreakdownRows = breakdown && Object.values(breakdown).some((v) => v != null);
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <nav className="flex items-center px-8 py-4 bg-white border-b border-gray-100 shadow-sm">
-        <Link href="/dashboard" className="text-xl font-bold tracking-tight text-primary-700 py-2">
-          Costrich
-        </Link>
-      </nav>
+      <AppNav />
 
       <div className="max-w-3xl mx-auto px-8 py-8">
         <div className="flex items-center justify-between mb-6">
@@ -89,7 +86,7 @@ export default function ViewEstimatePage() {
           </div>
         </div>
 
-        {breakdown && (
+        {hasBreakdownRows && (
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden mb-6">
             <table className="w-full">
               <thead>
@@ -114,7 +111,7 @@ export default function ViewEstimatePage() {
                 {(breakdown.total_setup_cost != null || breakdown.total_tooling_cost != null) && (
                   <tr>
                     <td className="px-6 py-3.5 text-sm text-gray-700">Setup & Tooling</td>
-                    <td className="px-6 py-3.5 text-right font-mono text-sm font-medium">{fmt(Number(breakdown.total_setup_cost || 0) + Number(breakdown.total_tooling_cost || 0))}</td>
+                    <td className="px-6 py-3.5 text-right font-mono text-sm font-medium">{fmt(Number(breakdown.total_setup_cost ?? 0) + Number(breakdown.total_tooling_cost ?? 0))}</td>
                   </tr>
                 )}
                 {breakdown.total_labour_cost != null && (
@@ -146,7 +143,7 @@ export default function ViewEstimatePage() {
                 <tr className="bg-primary-600 text-white">
                   <td className="px-6 py-4 font-bold text-sm">TOTAL (per unit)</td>
                   <td className="px-6 py-4 text-right font-mono font-bold text-lg">
-                    {currency} {fmt(breakdown.unit_cost || data.total_cost)}
+                    {currency} {fmt(breakdown.unit_cost ?? data.total_cost)}
                   </td>
                 </tr>
               </tfoot>

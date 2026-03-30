@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { embedDrawing, searchSimilar } from "@/lib/api";
+import { AppNav } from "@/components/app-nav";
 
 interface Match {
   drawing_id: string;
@@ -45,11 +45,7 @@ export default function SimilarPartsPage() {
   if (step === "upload") {
     return (
       <div className="min-h-screen bg-slate-50">
-        <nav className="flex items-center px-8 py-4 bg-white border-b border-gray-100 shadow-sm">
-          <Link href="/dashboard" className="text-xl font-bold tracking-tight text-primary-700 py-2">
-            Costrich
-          </Link>
-        </nav>
+        <AppNav />
         <div className="max-w-2xl mx-auto px-8 py-12">
           <h1 className="text-3xl font-bold mb-2 tracking-tight">Similar Parts Search</h1>
           <p className="text-gray-500 mb-8">Upload 2 or more engineering drawings to find similar parts and compare costs.</p>
@@ -57,7 +53,13 @@ export default function SimilarPartsPage() {
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
             <div
               className="border-2 border-dashed border-gray-200 rounded-xl p-10 text-center mb-6 hover:border-primary-300 hover:bg-primary-50/30 transition-colors cursor-pointer"
+              role="button"
+              tabIndex={0}
               onClick={() => document.getElementById("multi-file-input")?.click()}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); document.getElementById("multi-file-input")?.click(); } }}
+              onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-primary-400", "bg-primary-50/50"); }}
+              onDragLeave={(e) => { e.currentTarget.classList.remove("border-primary-400", "bg-primary-50/50"); }}
+              onDrop={(e) => { e.preventDefault(); e.currentTarget.classList.remove("border-primary-400", "bg-primary-50/50"); const newFiles = Array.from(e.dataTransfer.files); if (newFiles.length > 0) setFiles(newFiles); }}
             >
               <div className="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <svg className="w-6 h-6 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>

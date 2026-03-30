@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getEstimates, getUsage } from "@/lib/api";
 import { createClient } from "@/lib/supabase";
+import { AppNav } from "@/components/app-nav";
 
 interface Estimate {
   id: string;
@@ -67,13 +68,11 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Nav */}
-      <nav className="flex items-center justify-between px-8 py-4 bg-white border-b border-gray-100 shadow-sm">
-        <span className="text-xl font-bold tracking-tight text-primary-700">Costrich</span>
-        <button onClick={handleLogout} className="text-gray-400 hover:text-gray-600 text-sm font-medium transition-colors">
+      <AppNav>
+        <button onClick={handleLogout} className="text-gray-400 hover:text-gray-600 text-sm font-medium transition-colors py-2 px-3">
           Log out
         </button>
-      </nav>
+      </AppNav>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-8 py-8">
         <h1 className="text-3xl font-bold mb-1 tracking-tight">Dashboard</h1>
@@ -152,8 +151,11 @@ export default function DashboardPage() {
                 {estimates.map((est) => (
                   <tr
                     key={est.id}
+                    role="link"
+                    tabIndex={0}
                     onClick={() => router.push(`/estimate/${est.id}`)}
-                    className="hover:bg-primary-50/30 cursor-pointer transition-colors"
+                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); router.push(`/estimate/${est.id}`); } }}
+                    className="hover:bg-primary-50/30 cursor-pointer transition-colors focus:outline-none focus:bg-primary-50/50"
                   >
                     <td className="px-6 py-4 text-sm text-gray-600">
                       {new Date(est.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
