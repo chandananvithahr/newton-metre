@@ -102,21 +102,30 @@ export default function DashboardPage() {
         )}
 
         {/* Actions */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
           <button
             onClick={() => router.push("/estimate/new")}
-            className="flex items-center justify-center gap-3 bg-[#22D3EE] text-[#0F1117] px-6 py-5 rounded-xl hover:bg-[#06B6D4] transition-colors text-lg font-semibold"
+            className="flex items-center justify-center gap-3 bg-[#22D3EE] text-[#0F1117] px-6 py-5 rounded-xl hover:bg-[#06B6D4] transition-colors text-base font-semibold"
           >
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
             New Estimate
           </button>
           <button
-            onClick={() => router.push("/similar")}
-            className="flex items-center justify-center gap-3 bg-[#161B27] border-2 border-[#22D3EE] text-[#22D3EE] px-6 py-5 rounded-xl hover:bg-[#22D3EE]/10 transition-colors text-lg font-semibold"
+            onClick={() => router.push("/rfq/new")}
+            className="flex items-center justify-center gap-3 bg-[#161B27] border-2 border-[#22D3EE] text-[#22D3EE] px-6 py-5 rounded-xl hover:bg-[#22D3EE]/10 transition-colors text-base font-semibold"
           >
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+            </svg>
+            RFQ Extractor
+          </button>
+          <button
+            onClick={() => router.push("/similar")}
+            className="flex items-center justify-center gap-3 bg-[#161B27] border border-[#2A3140] text-[#94A3B8] px-6 py-5 rounded-xl hover:bg-[#1C2235] transition-colors text-base font-semibold"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
             </svg>
             Similar Parts

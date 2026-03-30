@@ -130,3 +130,50 @@ class AssemblyEstimateResponse(BaseModel):
     order_cost: float
     quantity: int
     currency: str = "INR"
+
+
+# --- RFQ extraction and estimation ---
+
+class RFQLineItemResult(BaseModel):
+    line_number: int
+    part_number: str | None
+    description: str
+    quantity: int
+    material: str | None
+    delivery_weeks: int | None
+    dimensions: dict
+    suggested_processes: list[str]
+    unit_price_expected: float | None
+    notes: str | None
+
+
+class RFQExtractResponse(BaseModel):
+    rfq_number: str | None
+    customer: str | None
+    date: str | None
+    document_type: str  # rfq | drawing | contract | spec_sheet | other
+    line_items: list[RFQLineItemResult]
+    confidence: str
+    page_count: int
+
+
+class RFQLineItemEstimate(BaseModel):
+    line_number: int
+    part_number: str | None
+    description: str
+    quantity: int
+    material: str | None
+    unit_cost: float
+    order_cost: float
+    confidence_tier: str | None
+    error: str | None = None  # set if estimation failed for this line
+
+
+class RFQEstimateRequest(BaseModel):
+    line_items: list[RFQLineItemResult]
+
+
+class RFQEstimateResponse(BaseModel):
+    line_items: list[RFQLineItemEstimate]
+    total_order_cost: float
+    currency: str = "INR"

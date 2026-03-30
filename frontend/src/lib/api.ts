@@ -153,3 +153,72 @@ export async function embedDrawing(file: File) {
   if (!res.ok) throw new Error("Drawing processing failed. Please try again.");
   return res.json();
 }
+
+export interface RFQLineItemResult {
+  line_number: number;
+  part_number: string | null;
+  description: string;
+  quantity: number;
+  material: string | null;
+  delivery_weeks: number | null;
+  dimensions: Record<string, number | null>;
+  suggested_processes: string[];
+  unit_price_expected: number | null;
+  notes: string | null;
+}
+
+export interface RFQExtractResponse {
+  rfq_number: string | null;
+  customer: string | null;
+  date: string | null;
+  document_type: string;
+  line_items: RFQLineItemResult[];
+  confidence: string;
+  page_count: number;
+}
+
+export interface RFQLineItemEstimate {
+  line_number: number;
+  part_number: string | null;
+  description: string;
+  quantity: number;
+  material: string | null;
+  unit_cost: number;
+  order_cost: number;
+  confidence_tier: string | null;
+  error: string | null;
+}
+
+export interface RFQEstimateResponse {
+  line_items: RFQLineItemEstimate[];
+  total_order_cost: number;
+  currency: string;
+}
+
+export async function extractRFQ(file: File): Promise<RFQExtractResponse> {
+  const headers = await getAuthHeaders();
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await safeFetch(`${API_URL}/api/rfq/extract`, {
+    method: "POST",
+    headers,
+    body: formData,
+  });
+
+  if (!res.ok) throw new Error(await parseErrorResponse(res, "RFQ extraction failed. Please try again."));
+  return res.json();
+}
+
+export async function estimateRFQ(lineItems: RFQLineItemResult[]): Promise<RFQEstimateResponse> {
+  const headers = await getAuthHeaders();
+
+  const res = await safeFetch(`${API_URL}/api/rfq/estimate`, {
+    method: "POST",
+    headers: { ...headers, "Content-Type": "application/json" },
+    body: JSON.stringify({ line_items: lineItems }),
+  });
+
+  if (!res.ok) throw new Error(await parseErrorResponse(res, "RFQ estimation failed. Please try again."));
+  return res.json();
+}
