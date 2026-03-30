@@ -5,10 +5,17 @@ from pydantic import BaseModel
 class ExtractionResponse(BaseModel):
     dimensions: dict
     material: str | None
+    material_confidence: str  # "high" | "medium" | "low" — separate from overall drawing confidence
     tolerances: dict
     suggested_processes: list[str]
     confidence: str
     notes: str
+
+
+class MaterialPriceResponse(BaseModel):
+    name: str
+    price_inr: float
+    source: str  # "database" | "cache" | "estimated"
 
 
 class EstimateRequest(BaseModel):

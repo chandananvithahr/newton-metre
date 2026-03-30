@@ -2,8 +2,20 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { extractDrawing, createEstimate } from "@/lib/api";
+import { extractDrawing, createEstimate, getMaterialPrice } from "@/lib/api";
 import { AppNav } from "@/components/app-nav";
+
+const KNOWN_MATERIALS = [
+  "Mild Steel IS2062",
+  "EN8 Steel",
+  "EN24 Steel",
+  "Stainless Steel 304",
+  "Aluminum 6061",
+  "Brass IS319",
+  "Copper",
+  "Cast Iron",
+  "Titanium Grade 5",
+];
 
 type Step = "upload" | "extracting" | "review" | "calculating" | "result";
 
@@ -46,6 +58,10 @@ export default function NewEstimatePage() {
   const [quantity, setQuantity] = useState(1);
   const [error, setError] = useState("");
   const [expanded, setExpanded] = useState(false);
+  const [materialOverride, setMaterialOverride] = useState<string>("");
+  const [customMaterial, setCustomMaterial] = useState<string>("");
+  const [materialPrice, setMaterialPrice] = useState<{ price_inr: number; source: string } | null>(null);
+  const [fetchingPrice, setFetchingPrice] = useState(false);
 
   async function handleUpload() {
     if (!file) return;
@@ -55,10 +71,28 @@ export default function NewEstimatePage() {
     try {
       const data = await extractDrawing(file);
       setExtractedData(data);
+      setMaterialOverride("");
+      setCustomMaterial("");
+      setMaterialPrice(null);
       setStep("review");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Extraction failed");
       setStep("upload");
+    }
+  }
+
+  async function handleFetchPrice() {
+    const name = materialOverride === "__custom__" ? customMaterial.trim() : materialOverride;
+    if (!name) return;
+    setFetchingPrice(true);
+    setMaterialPrice(null);
+    try {
+      const result = await getMaterialPrice(name);
+      setMaterialPrice({ price_inr: result.price_inr, source: result.source });
+    } catch {
+      // non-critical — price lookup is best-effort
+    } finally {
+      setFetchingPrice(false);
     }
   }
 
@@ -67,8 +101,17 @@ export default function NewEstimatePage() {
     setError("");
     setStep("calculating");
 
+    const effectiveMaterial =
+      materialOverride === "__custom__"
+        ? customMaterial.trim() || null
+        : materialOverride || extractedData.material;
+
+    const dataToSend = effectiveMaterial
+      ? { ...extractedData, material: effectiveMaterial }
+      : extractedData;
+
     try {
-      const est = await createEstimate(extractedData, quantity);
+      const est = await createEstimate(dataToSend, quantity);
       setResult(est);
       setStep("result");
     } catch (e) {
@@ -184,6 +227,14 @@ export default function NewEstimatePage() {
   // Review step
   if (step === "review" && extractedData) {
     const dims = (extractedData.dimensions as Record<string, unknown>) || {};
+    const detectedMaterial = extractedData.material as string | null;
+    const matConfidence = extractedData.material_confidence as string | undefined;
+    const needsMaterialInput = detectedMaterial === null || matConfidence === "low";
+    const activeMaterial =
+      materialOverride === "__custom__"
+        ? customMaterial.trim()
+        : materialOverride || detectedMaterial;
+
     return (
       <div className="min-h-screen bg-slate-50">
         <AppNav />
@@ -196,42 +247,114 @@ export default function NewEstimatePage() {
             <table className="w-full">
               <tbody>
                 {Object.entries(dims).map(([key, val]) =>
-                  val != null && (
+                  val != null ? (
                     <tr key={key} className="border-b border-gray-50 last:border-0">
                       <td className="py-2.5 text-sm text-gray-600 capitalize">{key.replace(/_/g, " ")}</td>
                       <td className="py-2.5 text-right font-mono text-sm font-medium text-gray-900">{String(val)}</td>
                     </tr>
-                  ),
+                  ) : null
                 )}
               </tbody>
             </table>
           </div>
 
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-6 space-y-2">
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-500">Material</span>
-              <span className="text-sm font-medium">{String(extractedData.material || "Not detected")}</span>
+          {/* Material section — editable if missing or low confidence */}
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-4">
+            <div className="flex items-start justify-between mb-3">
+              <span className="text-sm font-semibold text-gray-700">Material</span>
+              {detectedMaterial !== null && matConfidence === "high" ? (
+                <span className="text-sm font-medium text-gray-900">{detectedMaterial}</span>
+              ) : (
+                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                  detectedMaterial === null
+                    ? "bg-amber-100 text-amber-700"
+                    : "bg-yellow-50 text-yellow-700"
+                }`}>
+                  {detectedMaterial === null ? "Not detected" : "Low confidence"}
+                </span>
+              )}
             </div>
+
+            {needsMaterialInput ? (
+              <div className="space-y-3">
+                <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5 text-amber-800 text-sm">
+                  {detectedMaterial === null
+                    ? "Material not found in the drawing. Select from the list or enter manually."
+                    : `AI detected "${detectedMaterial}" with low confidence. Please confirm or correct it.`}
+                </div>
+
+                <select
+                  value={materialOverride}
+                  onChange={(e) => {
+                    setMaterialOverride(e.target.value);
+                    setMaterialPrice(null);
+                  }}
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-sm outline-none focus:border-primary-500"
+                >
+                  <option value="">
+                    {detectedMaterial !== null ? `Keep detected: ${detectedMaterial}` : "— Select material —"}
+                  </option>
+                  {KNOWN_MATERIALS.map((m) => (
+                    <option key={m} value={m}>{m}</option>
+                  ))}
+                  <option value="__custom__">Other (enter manually)…</option>
+                </select>
+
+                {materialOverride === "__custom__" ? (
+                  <input
+                    type="text"
+                    placeholder="e.g. EN31 Steel, Bronze, AISI 4140"
+                    value={customMaterial}
+                    onChange={(e) => {
+                      setCustomMaterial(e.target.value);
+                      setMaterialPrice(null);
+                    }}
+                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-sm outline-none focus:border-primary-500"
+                  />
+                ) : null}
+
+                {/* Price lookup */}
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={handleFetchPrice}
+                    disabled={!activeMaterial || fetchingPrice}
+                    className="text-sm text-primary-600 hover:text-primary-700 font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {fetchingPrice ? "Fetching…" : "Look up market price (INR/kg)"}
+                  </button>
+                  {materialPrice !== null ? (
+                    <span className="text-sm font-mono font-medium text-gray-900">
+                      ₹{materialPrice.price_inr.toLocaleString("en-IN")}/kg
+                      <span className="text-xs text-gray-400 font-sans ml-1">({materialPrice.source})</span>
+                    </span>
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
+          </div>
+
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-6 space-y-2">
             <div className="flex justify-between">
               <span className="text-sm text-gray-500">Processes</span>
               <span className="text-sm font-medium">{(extractedData.suggested_processes as string[] || []).join(", ")}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-sm text-gray-500">AI Confidence</span>
-              <span className="text-sm font-medium">{String(extractedData.confidence || "—")}</span>
+              <span className="text-sm font-medium capitalize">{String(extractedData.confidence || "—")}</span>
             </div>
           </div>
 
-          {error && (
+          {error ? (
             <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-red-700 text-sm mb-4">
               {error}
             </div>
-          )}
+          ) : null}
 
           <div className="flex gap-3">
             <button
               onClick={handleCalculate}
-              className="flex-1 bg-primary-600 text-white py-3.5 rounded-lg font-semibold hover:bg-primary-700 transition-colors shadow-sm"
+              disabled={needsMaterialInput && !activeMaterial}
+              className="flex-1 bg-primary-600 text-white py-3.5 rounded-lg font-semibold hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
             >
               Calculate Cost
             </button>

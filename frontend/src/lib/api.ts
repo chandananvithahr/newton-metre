@@ -103,6 +103,14 @@ export async function searchSimilar(file: File) {
   return res.json();
 }
 
+export async function getMaterialPrice(name: string) {
+  const headers = await getAuthHeaders();
+  const params = new URLSearchParams({ name });
+  const res = await safeFetch(`${API_URL}/api/material-price?${params}`, { headers });
+  if (!res.ok) throw new Error(await parseErrorResponse(res, "Failed to fetch material price."));
+  return res.json() as Promise<{ name: string; price_inr: number; source: string }>;
+}
+
 export async function embedDrawing(file: File) {
   const headers = await getAuthHeaders();
   const formData = new FormData();

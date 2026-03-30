@@ -52,11 +52,17 @@ async def extract_drawing(
 
     log_usage(user_id, "extract", 0.03, {"filename": file.filename})
 
+    material = result.get("material")
+    overall_confidence = result.get("confidence", "low")
+    # Material confidence is "low" if not detected at all; otherwise follows drawing confidence
+    material_confidence = "low" if material is None else overall_confidence
+
     return ExtractionResponse(
         dimensions=result.get("dimensions", {}),
-        material=result.get("material"),
+        material=material,
+        material_confidence=material_confidence,
         tolerances=result.get("tolerances", {}),
         suggested_processes=result.get("suggested_processes", []),
-        confidence=result.get("confidence", "low"),
+        confidence=overall_confidence,
         notes=result.get("notes", ""),
     )
