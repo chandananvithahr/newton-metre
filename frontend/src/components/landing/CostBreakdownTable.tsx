@@ -25,7 +25,7 @@ function CopyCell({ value, onCopy }: { value: string; onCopy: (v: string) => voi
     <td
       onClick={() => onCopy(value)}
       title="Click to copy"
-      className="text-right px-4 py-2.5 cursor-pointer select-none tabular-nums font-medium text-[#E2E8F0] hover:text-[#22D3EE] transition-colors"
+      className="text-right px-4 py-2.5 cursor-pointer select-none tabular-nums font-medium text-slate-700 hover:text-cyan-600 transition-colors"
       style={{ fontFamily: "var(--font-mono)" }}
     >
       {value}
@@ -43,20 +43,20 @@ export function CostBreakdownTable() {
   }
 
   return (
-    <div className="bg-[#161B27] border border-[#2A3140] rounded-xl overflow-hidden">
+    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
       {/* Card header */}
-      <div className="bg-[#1C2235] px-4 py-3 border-b border-[#2A3140] flex items-center justify-between">
+      <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 flex items-center justify-between">
         <div>
-          <div className="text-sm font-semibold text-[#E2E8F0]">EN8 Steel Shaft — Ø50×100mm</div>
+          <div className="text-sm font-semibold text-slate-800">EN8 Steel Shaft — Ø50×100mm</div>
           <div
-            className="text-xs text-[#64748B] mt-0.5"
+            className="text-xs text-slate-400 mt-0.5"
             style={{ fontFamily: "var(--font-mono)" }}
           >
             Qty 100 · CNC Turning + Drilling + Threading
           </div>
         </div>
         <span
-          className="bg-emerald-950/60 text-emerald-400 text-xs font-semibold px-2 py-1 rounded-full border border-emerald-800"
+          className="bg-emerald-50 text-emerald-700 text-xs font-semibold px-2 py-1 rounded-full border border-emerald-200"
           style={{ fontFamily: "var(--font-mono)" }}
         >
           HIGH
@@ -72,11 +72,11 @@ export function CostBreakdownTable() {
             <th>Amount</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-[#2A3140]">
+        <tbody className="divide-y divide-slate-100">
           {COST_LINES.map((line) => (
-            <tr key={line.label} className="hover:bg-[#1C2235] transition-colors">
-              <td className="px-4 py-2.5 text-[#94A3B8] w-[40%]">{line.label}</td>
-              <td className="px-2 py-2.5 text-[#475569] text-xs" style={{ fontFamily: "var(--font-mono)" }}>
+            <tr key={line.label} className="hover:bg-slate-50 transition-colors">
+              <td className="px-4 py-2.5 text-slate-500 w-[40%]">{line.label}</td>
+              <td className="px-2 py-2.5 text-slate-400 text-xs" style={{ fontFamily: "var(--font-mono)" }}>
                 {line.detail}
               </td>
               <CopyCell value={line.value} onCopy={handleCopy} />
@@ -89,7 +89,7 @@ export function CostBreakdownTable() {
       <div
         onClick={() => handleCopy(TOTAL)}
         title="Click to copy total"
-        className="px-4 py-3 flex items-center justify-between cursor-pointer bg-[#22D3EE] text-[#0F1117] hover:bg-[#06B6D4] transition-colors"
+        className="px-4 py-3 flex items-center justify-between cursor-pointer bg-slate-900 text-white hover:bg-slate-700 transition-colors"
       >
         <span className="font-bold text-sm">Should cost / unit</span>
         <span className="text-xl font-bold" style={{ fontFamily: "var(--font-mono)" }}>
@@ -98,7 +98,7 @@ export function CostBreakdownTable() {
       </div>
 
       <p
-        className="text-center text-xs text-[#475569] py-2"
+        className="text-center text-xs text-slate-400 py-2"
         style={{ fontFamily: "var(--font-mono)" }}
       >
         Click any value to copy
