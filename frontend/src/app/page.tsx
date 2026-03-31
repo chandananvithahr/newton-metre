@@ -38,6 +38,10 @@ export default function LandingPage() {
           <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle, #94A3B8 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
 
           <div className="max-w-5xl w-full text-center space-y-6 relative z-10">
+            <div className="flex justify-center mb-2">
+              <Image src="/costrich-logo.png" alt="Costrich" width={80} height={80} className="rounded-2xl shadow-md" />
+            </div>
+
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-50 border border-cyan-200 font-mono text-[11px] text-cyan-700 uppercase tracking-widest">
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />
               Live product · Not a waitlist
@@ -83,7 +87,7 @@ export default function LandingPage() {
                 {
                   n: "01",
                   title: "Upload any drawing",
-                  desc: "PDF, image, any CAD output. AI extracts dimensions, material, tolerances, and processes automatically.",
+                  desc: "PDF, image, any CAD output. Dimensions, material, tolerances, and processes extracted automatically.",
                 },
                 {
                   n: "02",
@@ -110,31 +114,24 @@ export default function LandingPage() {
         <section id="features" className="py-20">
           <div className="max-w-5xl mx-auto px-6 lg:px-10">
             <p className="font-mono text-[11px] text-cyan-600 uppercase tracking-widest mb-3">Capabilities</p>
-            <h2 className="font-heading text-[clamp(28px,4vw,44px)] text-slate-900 tracking-tight mb-4">
+            <h2 className="font-heading text-[clamp(28px,4vw,44px)] text-slate-900 tracking-tight mb-12">
               Not another <span className="text-cyan-600 italic">AI wrapper.</span>
             </h2>
-            <p className="font-sans text-base text-slate-500 mb-12 max-w-2xl leading-relaxed">
-              Built on Sandvik cutting data, Machinery&apos;s Handbook, and Indian MSME machine hour rates.
-            </p>
 
-            <div className="grid sm:grid-cols-2 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
-                { title: "Should-Cost Engine", desc: "Physics-based cycle times, Indian machine rates, Taylor tool wear. Not guesswork." },
-                { title: "AI Validation", desc: "Physics engine and AI run in parallel. Four confidence tiers. Self-correcting." },
-                { title: "4 Part Types", desc: "Turned, milled, sheet metal, PCB & cable. 40+ surface treatments. 15 heat treatments." },
-                { title: "Cost Memory", desc: "Every estimate saved. Compare new quotes against historical baselines. Knowledge that doesn't retire." },
+                { title: "Physics engine", desc: "MRR, cutting force, Taylor tool life. Real formulas, not token predictions." },
+                { title: "Indian rates", desc: "CNC ₹800/hr, milling ₹1,000/hr, labour ₹250/hr. 15-city index. Not US benchmarks." },
+                { title: "Similarity search", desc: "Match to past estimates. Compare paid vs. should-cost. Build institutional memory." },
+                { title: "AI validation", desc: "Physics and AI run in parallel. Gap >15% triggers line-by-line arbitration." },
+                { title: "Any drawing", desc: "PDF, image, any CAD output. Dimensions, material, tolerances extracted automatically." },
+                { title: "4 part types", desc: "Turned, milled, sheet metal, PCB & cable. Defense · Aerospace · Automobile." },
               ].map((f) => (
                 <div key={f.title} className="bg-white border border-slate-200 rounded-xl p-6 hover:border-cyan-300 transition-colors">
                   <h3 className="font-sans text-sm font-semibold text-slate-800 mb-2">{f.title}</h3>
                   <p className="font-sans text-sm text-slate-500 leading-relaxed">{f.desc}</p>
                 </div>
               ))}
-            </div>
-
-            <div className="mt-10 pt-5 border-t border-slate-200">
-              <p className="text-center font-mono text-[10px] text-slate-400 uppercase tracking-widest">
-                Sandvik Coromant · Kennametal · Machinery&apos;s Handbook · CMTI Machine Hour Rates
-              </p>
             </div>
           </div>
         </section>
