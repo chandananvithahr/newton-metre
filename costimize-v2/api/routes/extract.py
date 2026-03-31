@@ -1,4 +1,5 @@
 """POST /api/extract -- upload drawing, AI extracts dimensions + processes."""
+from pathlib import Path
 from typing import List
 from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
 from slowapi import Limiter
@@ -11,12 +12,24 @@ from api.schemas import ExtractionResponse
 router = APIRouter()
 limiter = Limiter(key_func=get_remote_address)
 
-MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024  # 10 MB
+MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024  # 20 MB (CAD files can be larger)
 MAX_SHEETS = 5
 
 ALLOWED_CONTENT_TYPES = {
     "image/png", "image/jpeg", "image/jpg", "image/webp",
     "application/pdf", "image/tiff",
+    # DXF / DWG
+    "application/dxf", "application/acad", "image/vnd.dxf",
+    "image/x-dwg", "image/vnd.dwg", "application/dwg", "application/x-dwg",
+    # STEP
+    "application/step", "application/stp", "model/step", "model/stp",
+    # Generic binary — client may send CAD files as octet-stream; we detect by extension
+    "application/octet-stream",
+}
+
+ALLOWED_EXTENSIONS = {
+    ".png", ".jpg", ".jpeg", ".webp", ".pdf", ".tiff",
+    ".dxf", ".dwg", ".step", ".stp",
 }
 
 
@@ -39,20 +52,34 @@ async def extract_drawing(
             detail="You've used your $0.50 credit for this period. Credits refresh every 48 hours.",
         )
 
-    if file.content_type and file.content_type not in ALLOWED_CONTENT_TYPES:
+    filename = file.filename or "drawing.bin"
+    ext = Path(filename).suffix.lower()
+
+    if ext not in ALLOWED_EXTENSIONS and (file.content_type and file.content_type not in ALLOWED_CONTENT_TYPES):
         raise HTTPException(
             status_code=400,
-            detail=f"Unsupported file type '{file.content_type}'. Accepted: PDF, PNG, JPEG, TIFF, WebP.",
+            detail=f"Unsupported file type. Accepted: PDF, PNG, JPEG, TIFF, WebP, DXF, DWG, STEP/STP.",
         )
 
-    image_bytes = await file.read()
-    if len(image_bytes) > MAX_FILE_SIZE_BYTES:
-        raise HTTPException(status_code=400, detail="File too large. Maximum 10MB.")
+    raw_bytes = await file.read()
+    if len(raw_bytes) > MAX_FILE_SIZE_BYTES:
+        raise HTTPException(status_code=400, detail="File too large. Maximum 20MB.")
 
     try:
-        from extractors.vision import analyze_drawing
+        from extractors.vision import analyze_drawing, analyze_step_text
+        from extractors.cad_converter import dxf_to_text, step_to_text, is_dxf_dwg, is_step
 
-        result = analyze_drawing(image_bytes, file.filename or "drawing.png")
+        if is_dxf_dwg(file.content_type, filename):
+            cad_text = dxf_to_text(raw_bytes, filename)
+            result = analyze_step_text(cad_text)   # same text AI path
+        elif is_step(file.content_type, filename):
+            cad_text = step_to_text(raw_bytes)
+            result = analyze_step_text(cad_text)
+        else:
+            result = analyze_drawing(raw_bytes, filename)
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception:
         raise HTTPException(
             status_code=500, detail="Failed to analyze drawing. Please try a clearer image.",

@@ -457,10 +457,10 @@ export default function NewEstimatePage() {
               ) : (
                 <>
                   <p className="text-sm font-medium text-[#94A3B8] mb-1">Click to upload or drag and drop</p>
-                  <p className="text-xs text-[#475569]">PDF, PNG, or JPG (max 10MB)</p>
+                  <p className="text-xs text-[#475569]">PDF · DXF · DWG · STEP · PNG · JPG (max 20MB)</p>
                 </>
               )}
-              <input id="file-input" type="file" accept=".pdf,.png,.jpg,.jpeg" onChange={(e) => setFile(e.target.files?.[0] || null)} className="hidden" />
+              <input id="file-input" type="file" accept=".pdf,.png,.jpg,.jpeg,.dxf,.dwg,.step,.stp" onChange={(e) => setFile(e.target.files?.[0] || null)} className="hidden" />
             </div>
 
             {/* Extra sheets */}
@@ -498,7 +498,7 @@ export default function NewEstimatePage() {
                 <input
                   id="extra-sheet-input"
                   type="file"
-                  accept=".pdf,.png,.jpg,.jpeg"
+                  accept=".pdf,.png,.jpg,.jpeg,.dxf,.dwg,.step,.stp"
                   className="hidden"
                   onChange={(e) => {
                     const f = e.target.files?.[0];
@@ -855,7 +855,7 @@ export default function NewEstimatePage() {
             </div>
             <p className="text-sm text-[#94A3B8]">{asmComponents.length === 0 ? "Add component drawings" : "Add more components"}</p>
             <p className="text-xs text-[#475569] mt-1">PDF, PNG, or JPG — one file per component</p>
-            <input id="asm-file-input" type="file" accept=".pdf,.png,.jpg,.jpeg" multiple onChange={(e) => handleAsmFilesAdded(e.target.files)} className="hidden" />
+            <input id="asm-file-input" type="file" accept=".pdf,.png,.jpg,.jpeg,.dxf,.dwg,.step,.stp" multiple onChange={(e) => handleAsmFilesAdded(e.target.files)} className="hidden" />
           </div>
 
           <div className="flex items-center gap-4 mb-6">

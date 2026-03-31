@@ -225,3 +225,52 @@ def _analyze_with_gemini(image_bytes: bytes) -> dict:
     )
     text = response.text.strip()
     return _parse_and_validate(text)
+
+
+STEP_EXTRACTION_PROMPT = """You are an expert mechanical engineer reading a STEP (ISO-10303-21) CAD file.
+Extract engineering dimensions, material, and manufacturing processes from the STEP entities below.
+
+STEP files encode 3D geometry numerically. Key hints:
+- CYLINDER_SURFACE with radius → shaft or bore diameter (2 × radius)
+- PLANE entities → flat faces, used to infer length/width/height
+- PRODUCT name → part name, may hint at material or geometry
+- MATERIAL entity → raw material specification
+- Measurement values in MEASURE_WITH_UNIT → may be in mm
+
+""" + EXTRACTION_PROMPT
+
+
+def analyze_step_text(step_text: str) -> dict:
+    """Analyze a STEP file that has been converted to structured text."""
+    if GEMINI_API_KEY:
+        try:
+            return _analyze_step_with_gemini(step_text)
+        except Exception as e:
+            if OPENAI_API_KEY:
+                return _analyze_step_with_openai(step_text)
+            raise RuntimeError(f"Gemini failed and no OpenAI fallback: {e}")
+    if OPENAI_API_KEY:
+        return _analyze_step_with_openai(step_text)
+    raise RuntimeError("No API key configured.")
+
+
+def _analyze_step_with_openai(step_text: str) -> dict:
+    import openai
+    client = openai.OpenAI(api_key=OPENAI_API_KEY)
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "user", "content": f"{STEP_EXTRACTION_PROMPT}\n\n{step_text}"}],
+        max_tokens=2000,
+    )
+    return _parse_and_validate(response.choices[0].message.content.strip())
+
+
+def _analyze_step_with_gemini(step_text: str) -> dict:
+    import google.generativeai as genai
+    genai.configure(api_key=GEMINI_API_KEY)
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    response = model.generate_content(
+        f"{STEP_EXTRACTION_PROMPT}\n\n{step_text}",
+        generation_config={"max_output_tokens": 2000},
+    )
+    return _parse_and_validate(response.text.strip())

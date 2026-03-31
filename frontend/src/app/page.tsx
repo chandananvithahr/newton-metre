@@ -91,8 +91,8 @@ export default function LandingPage() {
                 {
                   n: "01",
                   title: "Upload",
-                  desc: "Upload your engineering drawing, BOM, or RFQ document. Dimensions, material, and process requirements extracted automatically.",
-                  tags: ["PDF & image support", "Any CAD format"],
+                  desc: "Upload your engineering drawing or CAD file. Dimensions, material, and process requirements extracted directly — no conversion, no quality loss.",
+                  tags: ["PDF · DXF · DWG · STEP", "Image support"],
                 },
                 {
                   n: "02",
@@ -136,7 +136,7 @@ export default function LandingPage() {
                 { title: "Indian rates", desc: "CNC ₹800/hr, milling ₹1,000/hr, labour ₹250/hr. 15-city index. Not US benchmarks." },
                 { title: "Similarity search", desc: "Match to past estimates. Compare paid vs. should-cost. Build institutional memory." },
                 { title: "AI validation", desc: "Physics and AI run in parallel. Gap >15% triggers line-by-line arbitration." },
-                { title: "Any drawing", desc: "PDF, image, any CAD output. No pre-processing, no templates." },
+                { title: "Any drawing", desc: "PDF, image, DXF, DWG, STEP. Dimensions extracted directly — no pre-processing, no templates." },
                 { title: "4 part types", desc: "Turned, milled, sheet metal, PCB & cable. Defense · Aerospace · Automobile." },
               ].map((f) => (
                 <div key={f.title} className="bg-white border border-slate-200 rounded-xl p-6 hover:border-cyan-300 transition-colors">
