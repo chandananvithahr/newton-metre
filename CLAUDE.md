@@ -11,7 +11,7 @@ Always pull the screen screenshot alongside the HTML and match it pixel-for-pixe
 
 ## Project Overview
 
-AI.Procurve (Costimize) — an AI-powered procurement negotiation intelligence tool. Gives line-by-line should-cost breakdowns (±5-10% accuracy) for mechanical parts, sheet metal parts, PCB assemblies, and cable assemblies. Built for Indian manufacturing job shop economics (₹ currency, INR pricing).
+Costrich — "Know what it costs. Before they quote." An AI-powered procurement negotiation intelligence tool. Gives line-by-line should-cost breakdowns (±5-10% accuracy) for mechanical parts, sheet metal parts, PCB assemblies, and cable assemblies. Built for Indian manufacturing job shop economics (₹ currency, INR pricing).
 
 **Target industries:** Defense, Aerospace, Automobile
 **Target part types:** Turned, Milled, Sheet metal
