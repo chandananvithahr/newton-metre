@@ -172,19 +172,21 @@ def _step_to_text_occ(file_bytes: bytes) -> str:
     - Feature count → shape complexity
     - STEP header → product name, description
     """
-    from OCC.Core.STEPControl import STEPControl_Reader
-    from OCC.Core.IFSelect import IFSelect_RetDone
-    from OCC.Core.TopExp import TopExp_Explorer
-    from OCC.Core.TopAbs import TopAbs_FACE
-    from OCC.Core.BRepAdaptor import BRepAdaptor_Surface
-    from OCC.Core.GeomAbs import (
+    # cadquery-ocp exposes Open CASCADE as OCP.* (not OCC.Core.*)
+    from OCP.STEPControl import STEPControl_Reader
+    from OCP.IFSelect import IFSelect_RetDone
+    from OCP.TopExp import TopExp_Explorer
+    from OCP.TopAbs import TopAbs_FACE
+    from OCP.TopoDS import topods_Face
+    from OCP.BRepAdaptor import BRepAdaptor_Surface
+    from OCP.GeomAbs import (
         GeomAbs_Cylinder, GeomAbs_Plane, GeomAbs_Cone,
         GeomAbs_Torus, GeomAbs_Sphere,
     )
-    from OCC.Core.GProp import GProp_GProps
-    from OCC.Core.BRepGProp import brepgprop_SurfaceProperties, brepgprop_VolumeProperties
-    from OCC.Core.Bnd import Bnd_Box
-    from OCC.Core.BRepBndLib import brepbndlib_Add
+    from OCP.GProp import GProp_GProps
+    from OCP.BRepGProp import BRepGProp
+    from OCP.Bnd import Bnd_Box
+    from OCP.BRepBndLib import BRepBndLib
 
     with tempfile.NamedTemporaryFile(suffix=".step", delete=False) as tmp:
         tmp.write(file_bytes)
@@ -204,7 +206,7 @@ def _step_to_text_occ(file_bytes: bytes) -> str:
 
     # ── Bounding box ─────────────────────────────────────────────────────────
     bbox = Bnd_Box()
-    brepbndlib_Add(shape, bbox)
+    BRepBndLib.Add_s(shape, bbox)
     xmin, ymin, zmin, xmax, ymax, zmax = bbox.Get()
     dx = xmax - xmin
     dy = ymax - ymin
@@ -220,7 +222,7 @@ def _step_to_text_occ(file_bytes: bytes) -> str:
     # ── Volume and surface area ───────────────────────────────────────────────
     try:
         vol_props = GProp_GProps()
-        brepgprop_VolumeProperties(shape, vol_props)
+        BRepGProp.VolumeProperties_s(shape, vol_props)
         volume_mm3 = vol_props.Mass()
         sections.append("VOLUME:")
         sections.append(f"  {volume_mm3:.2f} mm³  ({volume_mm3 / 1000:.4f} cm³)")
@@ -235,7 +237,7 @@ def _step_to_text_occ(file_bytes: bytes) -> str:
 
     try:
         surf_props = GProp_GProps()
-        brepgprop_SurfaceProperties(shape, surf_props)
+        BRepGProp.SurfaceProperties_s(shape, surf_props)
         area_mm2 = surf_props.Mass()
         sections.append("SURFACE AREA:")
         sections.append(f"  {area_mm2:.2f} mm²  ({area_mm2 / 100:.2f} cm²)")
@@ -253,7 +255,7 @@ def _step_to_text_occ(file_bytes: bytes) -> str:
 
     explorer = TopExp_Explorer(shape, TopAbs_FACE)
     while explorer.More():
-        face = explorer.Current()
+        face = topods_Face(explorer.Current())
         surf = BRepAdaptor_Surface(face)
         stype = surf.GetType()
 
