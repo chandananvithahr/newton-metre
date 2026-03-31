@@ -1,205 +1,142 @@
-# Costimize MVP - AI Manufacturing Cost Estimator
+# Costrich
 
-Costimize is an AI-powered manufacturing cost estimation tool that analyzes CNC engineering drawings and provides instant cost estimates for turning operations. Built with Streamlit and Google Gemini Vision API.
+> **Know what it costs. Before they quote.**
 
-## Features
+AI-powered procurement negotiation intelligence for Indian manufacturing. Gives procurement teams line-by-line should-cost breakdowns for manufactured parts — so you walk into every supplier negotiation knowing exactly what the part should cost, process by process.
 
-- 🤖 **AI-Powered Drawing Analysis**: Upload CNC engineering drawings (PNG, JPG) and automatically extract:
-  - Part type (turning/milling)
-  - Dimensions (OD, ID, length, width, height)
-  - Material specifications
-  - Features (threads, holes, grooves, etc.)
-  - Surface finish requirements
-  - Tolerance specifications
+**Live:** [costrich.app](https://frontend-theta-ecru-95.vercel.app) · [API](https://costimize-api-production.up.railway.app/api/health)
 
-- 💰 **Intelligent Cost Estimation**: 
-  - Material cost calculation with wastage
-  - Machining time estimation
-  - Setup cost amortization
-  - Overhead and profit margins
-  - Detailed cost breakdown
+---
 
-- 📊 **Professional UI**: 
-  - Clean, modern interface
-  - Real-time analysis results
-  - Expandable cost breakdowns
-  - Manual dimension input fallback
+## What It Does
+
+Upload an engineering drawing or BOM. Get back a physics-based cost breakdown — material, machining time, setup, tooling, surface treatment — with ±5-10% accuracy.
+
+No guesswork. No "industry benchmarks." Real cutting parameters, real Indian machine hour rates, real INR pricing.
+
+```
+Drawing / BOM
+     ↓
+AI extracts dimensions, processes, material
+     ↓
+Physics engine calculates should-cost line by line
+     ↓
+Gemini cross-validates (parallel)
+     ↓
+Confidence-tiered breakdown — ready to negotiate
+```
+
+---
+
+## Part Types Supported
+
+| Part Type | Engine | Accuracy |
+|-----------|--------|----------|
+| Turned & Milled (Mechanical) | MRR physics + Sandvik kc1 + Taylor tool life | ±5-10% |
+| Sheet Metal | Fiber laser speeds + bending tonnage + nesting | ±5-10% |
+| PCB Assembly | BOM parsing + fab cost + component scraping | ±10-15% |
+| Cable Assembly | Wire/connector counting + labour model | ±10-15% |
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Next.js 14 + Tailwind CSS v4 |
+| Backend API | FastAPI (Python 3.11) |
+| Database | Supabase (Postgres + pgvector) |
+| Auth | Supabase Auth (JWT) |
+| AI Vision | GPT-4o (primary) + Gemini 1.5 Flash (fallback) |
+| Similarity Search | Gemini embeddings + pgvector |
+| Deployment | Vercel (frontend) + Railway (backend) |
+
+---
+
+## Key Features
+
+- **Line-by-line cost deconstruction** — material, machining, setup, tooling, surface treatment, overhead, margin
+- **Physics-based engine** — Sandvik kc1 specific cutting force data, Taylor tool life model, fiber laser cutting speeds for 6 material groups × 9 thicknesses
+- **40+ surface treatments** — electroplating, anodizing, PVD/CVD, powder coat — area-based INR/sq.dm costing
+- **Parallel validation** — physics engine + Gemini run simultaneously, confidence-tiered output (HIGH/MEDIUM/LOW)
+- **Similarity search** — find the most similar drawing ever made or bought, with specs and historical cost
+- **RFQ extraction** — upload any RFQ PDF, extract part requirements and get instant estimate
+- **STEP / DXF / DWG support** — direct geometry extraction, no manual dimension entry
+
+---
 
 ## Project Structure
 
 ```
 costimize-mvp/
-├── app.py                 # Main Streamlit application
-├── vision.py              # Gemini vision for drawing analysis
-├── cost_engine.py         # Cost calculation logic
-├── material_price_fetcher.py  # Web price fetching
-├── requirements.txt       # Python dependencies
-├── .env.example           # Environment variables template
-├── .env                   # Your API keys (not in git)
-├── sample_data/
-│   └── materials.json     # Material costs database
-└── README.md              # This file
+├── frontend/                    # Next.js web app (Vercel)
+│   └── src/app/                 # 6 pages: landing, auth, dashboard, estimate, detail, similarity
+│
+└── costimize-v2/                # Python engines + FastAPI backend (Railway)
+    ├── api/                     # FastAPI routes
+    ├── engines/
+    │   ├── mechanical/          # MRR physics, Sandvik data, 18 processes
+    │   ├── sheet_metal/         # Laser cutting, bending, welding
+    │   ├── pcb/                 # BOM parsing, fab cost
+    │   ├── cable/               # Wire/connector assembly
+    │   ├── validation/          # Parallel physics + AI validation pipeline
+    │   └── similarity/          # Drawing similarity search
+    ├── extractors/              # AI vision, process detection, BOM extraction
+    └── tests/                   # 164 tests across 12 files
 ```
-
-## Setup Instructions
-
-### 1. Install Dependencies
-
-Make sure you have Python 3.8+ installed, then install the required packages:
-
-```bash
-pip install -r requirements.txt
-```
-
-This will install:
-- `streamlit` - Web app framework
-- `google-generativeai` - Google Gemini API client
-- `python-dotenv` - Environment variable management
-- `Pillow` - Image processing
-- `requests` - HTTP requests for web price fetching
-- `beautifulsoup4` - Web scraping
-
-### 2. Configure API Key
-
-The `.env` file already contains your API key. If you need to update it:
-
-1. Edit `.env` and update your Google Gemini API key:
-   ```
-   GOOGLE_API_KEY=your_actual_api_key_here
-   ```
-
-   **How to get a Gemini API key:**
-   - Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
-   - Sign in with your Google account
-   - Click "Create API Key"
-   - Copy the key and paste it in your `.env` file
-
-### 3. Verify Materials Database
-
-The `sample_data/materials.json` file contains material prices and densities. You can edit this file to add or update materials with current market prices.
-
-## How to Run
-
-1. Navigate to the project directory:
-   ```bash
-   cd costimize-mvp
-   ```
-
-2. Start the Streamlit app:
-   ```bash
-   streamlit run app.py
-   ```
-
-3. The app will open in your default web browser at `http://localhost:8501`
-
-## Usage
-
-1. **Upload a Drawing**: Click "Choose a file" and select a PNG or JPG image of your CNC engineering drawing
-
-2. **Set Parameters** (in sidebar):
-   - **Quantity**: Number of pieces to manufacture (1-10,000)
-   - **Material**: Select from dropdown or choose "Auto-detect from drawing"
-   - **Machine Rate**: Optional override for custom shop rates
-   - **Use live web prices**: Toggle to fetch current market prices
-   - **Region**: Currently optimized for India (USA/Europe coming soon)
-
-3. **Review Analysis**: The AI will extract:
-   - Part type and dimensions
-   - Material (if specified on drawing)
-   - Features and tolerances
-   - Confidence level
-
-4. **Get Cost Estimate**: 
-   - View cost per piece and total cost
-   - Expand breakdown for detailed analysis
-   - Use manual dimension input if AI extraction fails
-
-5. **Manual Input Fallback**: If dimensions aren't extracted automatically, use the collapsible "Manual Dimension Input" section
-
-## Cost Calculation Details
-
-The cost estimator uses real Indian job shop economics:
-
-- **Material Cost**: 
-  - Bar stock calculation with 3mm diameter and 5mm length allowance
-  - 15% material wastage for cutoff and chips
-  - Prices from `materials.json` or live web prices (cached for 24 hours)
-
-- **Machining Time**:
-  - Base time formula: `(OD × length) / 5000`
-  - Facing, roughing, finishing passes
-  - Feature time (threads, grooves, etc.)
-  - Parting off time
-
-- **Machining Cost**:
-  - Default: ₹800/hr for standard CNC lathe
-  - 30% surcharge for tight tolerances (< ±0.05mm)
-  - 30-minute setup time amortized over quantity
-
-- **Overhead & Profit**:
-  - 15% overhead
-  - 20% profit margin
-
-## Error Handling
-
-The app includes robust error handling:
-
-- **API Key Errors**: Clear message if Gemini API key is missing or invalid
-- **API Failures**: Friendly error message with manual input fallback
-- **Missing Dimensions**: Automatic prompt for manual dimension input
-- **Invalid Materials**: Error message with list of available materials
-
-## Notes
-
-- ⚠️ **Accuracy**: This is an AI-assisted estimate. Actual costs may vary ±15-20% based on:
-  - Shop-specific rates
-  - Material availability
-  - Specific manufacturing requirements
-  - Market fluctuations
-
-- 📄 **PDF Support**: PDF upload is detected but not yet fully implemented. Convert to PNG/JPG for best results.
-
-- 🔄 **Session State**: The app remembers your last analysis, so you can adjust parameters without re-uploading.
-
-## Future Enhancements
-
-- [ ] Full PDF processing support
-- [ ] Milling cost estimation
-- [ ] Multi-region pricing (USA, Europe)
-- [ ] PDF quote generation
-- [ ] Material database management UI
-- [ ] Cost history and comparison
-- [ ] Export to Excel/CSV
-
-## Troubleshooting
-
-**"API key not found" error:**
-- Check that `.env` file exists and contains `GOOGLE_API_KEY=your_key`
-- Make sure you're in the correct directory when running the app
-
-**"Failed to load materials" error:**
-- Verify `sample_data/materials.json` exists and is valid JSON
-- Check file permissions
-
-**Image upload fails:**
-- Ensure file is PNG, JPG, or JPEG format
-- Check file size (Streamlit has upload limits)
-
-**Cost calculation errors:**
-- Verify dimensions are provided (either from AI or manual input)
-- Check that selected material exists in `materials.json`
-- Ensure quantity is greater than 0
-
-## License
-
-This is an MVP project for demonstration purposes.
-
-## Support
-
-For issues or questions, please check:
-- Streamlit documentation: https://docs.streamlit.io
-- Google Gemini API docs: https://ai.google.dev/docs
 
 ---
 
-**Built with ❤️ for the manufacturing industry**
+## Running Locally
+
+```bash
+# Frontend
+cd frontend
+npm install
+npm run dev                      # http://localhost:3000
+
+# Backend
+cd costimize-v2
+pip install -r api/requirements.txt
+uvicorn api.main:app --reload    # http://localhost:8000
+
+# Tests
+cd costimize-v2
+python -m pytest tests/ -v       # 164 tests
+```
+
+**Environment variables required:**
+
+```
+# Backend
+SUPABASE_URL=
+SUPABASE_SERVICE_ROLE_KEY=
+OPENAI_API_KEY=
+GEMINI_API_KEY=
+
+# Frontend
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+NEXT_PUBLIC_API_URL=
+```
+
+---
+
+## Target Market
+
+Indian manufacturers in **Defense · Aerospace · Automobile** — procurement teams negotiating with suppliers for custom turned, milled, and sheet metal parts.
+
+The problem: suppliers know buyers don't understand manufacturing costs. Margins get padded 30-40% and nobody can prove it. Costrich closes that information gap.
+
+---
+
+## Status
+
+- Live product with real users
+- 164 tests passing
+- Physics engine covers 80%+ of common Indian manufacturing part types
+- Training data pipeline live — every validated estimate becomes future ML training data
+
+---
+
+*Built for Indian manufacturing. INR pricing. Indian machine hour rates. Indian job shop economics.*
