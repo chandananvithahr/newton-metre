@@ -2,6 +2,13 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Design System
+
+**IMPORTANT:** When implementing any UI from Stitch designs, always read `DESIGN.md` first.
+`DESIGN.md` is the ground truth for all colors, typography, spacing, and component styles.
+Treat Stitch HTML + screenshot as a constraint — do NOT rewrite layout logic or substitute values.
+Always pull the screen screenshot alongside the HTML and match it pixel-for-pixel.
+
 ## Project Overview
 
 AI.Procurve (Costimize) — an AI-powered procurement negotiation intelligence tool. Gives line-by-line should-cost breakdowns (±5-10% accuracy) for mechanical parts, sheet metal parts, PCB assemblies, and cable assemblies. Built for Indian manufacturing job shop economics (₹ currency, INR pricing).
