@@ -227,15 +227,20 @@ def _analyze_with_gemini(image_bytes: bytes) -> dict:
     return _parse_and_validate(text)
 
 
-STEP_EXTRACTION_PROMPT = """You are an expert mechanical engineer reading a STEP (ISO-10303-21) CAD file.
-Extract engineering dimensions, material, and manufacturing processes from the STEP entities below.
+STEP_EXTRACTION_PROMPT = """You are an expert mechanical engineer analyzing a 3D CAD file (STEP format).
+The geometry has been extracted by Open CASCADE — you will see exact measurements, not raw STEP text.
 
-STEP files encode 3D geometry numerically. Key hints:
-- CYLINDER_SURFACE with radius → shaft or bore diameter (2 × radius)
-- PLANE entities → flat faces, used to infer length/width/height
-- PRODUCT name → part name, may hint at material or geometry
-- MATERIAL entity → raw material specification
-- Measurement values in MEASURE_WITH_UNIT → may be in mm
+How to interpret the data:
+- BOUNDING BOX → overall part envelope (length × width × height in mm)
+- CYLINDRICAL FEATURES → shafts, bores, holes. Largest Ø = likely OD. Smallest = likely bore/hole.
+  Multiple faces at the same Ø = a single stepped diameter. ×2 faces typically = one complete cylinder.
+- FACE ANALYSIS → planar faces = flat surfaces, cylindrical = round features, toroidal = fillets/chamfers
+- PART TYPE HINT → "Rotational" = turned part, "Prismatic" = milled or sheet metal
+- VOLUME + WEIGHT → use to verify material. If weight suggests steel but user says aluminium, flag it.
+- SURFACE AREA → drives coating/plating cost
+
+For turned parts: OD and length come from bounding box + largest cylinder. Stepped diameters from multiple cylinder radii.
+For milled parts: length/width/height from bounding box. Pocket/slot features from small planar face counts.
 
 """ + EXTRACTION_PROMPT
 

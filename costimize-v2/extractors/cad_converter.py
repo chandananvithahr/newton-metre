@@ -160,24 +160,18 @@ def dxf_to_text(file_bytes: bytes, filename: str = "drawing.dxf") -> str:
 # ── STEP extraction via pythonOCC (primary) ───────────────────────────────────
 
 def _step_to_text_occ(file_bytes: bytes) -> str:
-    """Extract engineering geometry from STEP using Open CASCADE Technology.
+    """Extract engineering geometry from STEP using Open CASCADE (cadquery-ocp).
 
-    Requires cadquery-ocp: pip install cadquery-ocp
-
-    Extracts:
-    - Bounding box → part length × width × height
-    - Cylindrical faces → all shaft/bore diameters (unique radii sorted)
-    - Volume → material weight (volume × density)
-    - Surface area → finishing cost driver
-    - Feature count → shape complexity
-    - STEP header → product name, description
+    API verified against CadQuery source (github.com/CadQuery/cadquery):
+    - Static methods use _s suffix: BRepBndLib.Add_s(), BRepGProp.VolumeProperties_s()
+    - Downcasts use TopoDS.Face_s() (not topods_Face)
+    - Instance methods have no suffix: bbox.Get(), adaptor.GetType()
     """
-    # cadquery-ocp exposes Open CASCADE as OCP.* (not OCC.Core.*)
     from OCP.STEPControl import STEPControl_Reader
     from OCP.IFSelect import IFSelect_RetDone
     from OCP.TopExp import TopExp_Explorer
     from OCP.TopAbs import TopAbs_FACE
-    from OCP.TopoDS import topods_Face
+    from OCP.TopoDS import TopoDS
     from OCP.BRepAdaptor import BRepAdaptor_Surface
     from OCP.GeomAbs import (
         GeomAbs_Cylinder, GeomAbs_Plane, GeomAbs_Cone,
@@ -188,6 +182,7 @@ def _step_to_text_occ(file_bytes: bytes) -> str:
     from OCP.Bnd import Bnd_Box
     from OCP.BRepBndLib import BRepBndLib
 
+    # Write bytes to temp file for OCC reader
     with tempfile.NamedTemporaryFile(suffix=".step", delete=False) as tmp:
         tmp.write(file_bytes)
         tmp_path = tmp.name
@@ -197,51 +192,67 @@ def _step_to_text_occ(file_bytes: bytes) -> str:
         status = reader.ReadFile(tmp_path)
         if status != IFSelect_RetDone:
             raise ValueError("STEP reader failed to parse file.")
-        reader.TransferRoots()
-        shape = reader.OneShape()
+
+        # Transfer all roots (handles multi-root files)
+        for i in range(reader.NbRootsForTransfer()):
+            reader.TransferRoot(i + 1)  # 1-indexed
+
+        # Collect all shapes
+        shapes = []
+        for i in range(reader.NbShapes()):
+            shapes.append(reader.Shape(i + 1))  # 1-indexed
+
+        if not shapes:
+            raise ValueError("STEP file contained no geometry.")
+
+        shape = shapes[0]  # Primary shape for analysis
     finally:
         Path(tmp_path).unlink(missing_ok=True)
 
-    sections = ["=== STEP FILE — pythonOCC GEOMETRY ANALYSIS ===", ""]
+    sections = ["=== STEP FILE — OCC GEOMETRY ANALYSIS ===", ""]
+
+    if len(shapes) > 1:
+        sections.append(f"NOTE: File contains {len(shapes)} shapes (assembly). Analyzing primary shape.")
+        sections.append("")
 
     # ── Bounding box ─────────────────────────────────────────────────────────
     bbox = Bnd_Box()
-    BRepBndLib.Add_s(shape, bbox)
+    BRepBndLib.Add_s(shape, bbox, True)  # True = use triangulation (faster)
     xmin, ymin, zmin, xmax, ymax, zmax = bbox.Get()
-    dx = xmax - xmin
-    dy = ymax - ymin
-    dz = zmax - zmin
-    # Sort so length ≥ width ≥ height
+    dx = abs(xmax - xmin)
+    dy = abs(ymax - ymin)
+    dz = abs(zmax - zmin)
     dims = sorted([dx, dy, dz], reverse=True)
     sections.append("BOUNDING BOX:")
-    sections.append(f"  length (longest) : {dims[0]:.4f} mm")
-    sections.append(f"  width            : {dims[1]:.4f} mm")
-    sections.append(f"  height           : {dims[2]:.4f} mm")
+    sections.append(f"  length (longest) : {dims[0]:.3f} mm")
+    sections.append(f"  width            : {dims[1]:.3f} mm")
+    sections.append(f"  height (shortest): {dims[2]:.3f} mm")
     sections.append("")
 
-    # ── Volume and surface area ───────────────────────────────────────────────
+    # ── Volume ────────────────────────────────────────────────────────────────
     try:
         vol_props = GProp_GProps()
         BRepGProp.VolumeProperties_s(shape, vol_props)
         volume_mm3 = vol_props.Mass()
-        sections.append("VOLUME:")
-        sections.append(f"  {volume_mm3:.2f} mm³  ({volume_mm3 / 1000:.4f} cm³)")
-        # Approximate weight for common materials
-        sections.append("  Approx. weight:")
-        for mat, density in [("Steel (7.85 g/cm³)", 7.85), ("Aluminium (2.7 g/cm³)", 2.7), ("Brass (8.5 g/cm³)", 8.5)]:
-            w = (volume_mm3 / 1000) * density
-            sections.append(f"    {mat}: {w:.1f} g")
-        sections.append("")
+        if volume_mm3 > 0:
+            sections.append("VOLUME:")
+            sections.append(f"  {volume_mm3:.2f} mm³  ({volume_mm3 / 1000:.4f} cm³)")
+            sections.append("  Approx. weight:")
+            for mat, density in [("Steel 7.85", 7.85), ("Aluminium 2.7", 2.7), ("Brass 8.5", 8.5), ("Titanium 4.5", 4.5)]:
+                w = (volume_mm3 / 1000) * density
+                sections.append(f"    {mat} g/cm³ → {w:.1f} g")
+            sections.append("")
     except Exception:
         pass
 
+    # ── Surface area ──────────────────────────────────────────────────────────
     try:
         surf_props = GProp_GProps()
         BRepGProp.SurfaceProperties_s(shape, surf_props)
         area_mm2 = surf_props.Mass()
-        sections.append("SURFACE AREA:")
-        sections.append(f"  {area_mm2:.2f} mm²  ({area_mm2 / 100:.2f} cm²)")
-        sections.append("")
+        if area_mm2 > 0:
+            sections.append(f"SURFACE AREA: {area_mm2:.2f} mm²  ({area_mm2 / 100:.2f} cm²)")
+            sections.append("")
     except Exception:
         pass
 
@@ -251,45 +262,60 @@ def _step_to_text_occ(file_bytes: bytes) -> str:
     cones = 0
     tori = 0
     spheres = 0
-    other = 0
+    other_faces = 0
 
     explorer = TopExp_Explorer(shape, TopAbs_FACE)
     while explorer.More():
-        face = topods_Face(explorer.Current())
-        surf = BRepAdaptor_Surface(face)
-        stype = surf.GetType()
+        try:
+            face = TopoDS.Face_s(explorer.Current())
+            surf = BRepAdaptor_Surface(face)
+            stype = surf.GetType()
 
-        if stype == GeomAbs_Cylinder:
-            try:
+            if stype == GeomAbs_Cylinder:
                 r = surf.Cylinder().Radius()
                 cylinders.append(round(r, 4))
-            except Exception:
-                pass
-        elif stype == GeomAbs_Plane:
-            planes += 1
-        elif stype == GeomAbs_Cone:
-            cones += 1
-        elif stype == GeomAbs_Torus:
-            tori += 1
-        elif stype == GeomAbs_Sphere:
-            spheres += 1
-        else:
-            other += 1
-
+            elif stype == GeomAbs_Plane:
+                planes += 1
+            elif stype == GeomAbs_Cone:
+                cones += 1
+            elif stype == GeomAbs_Torus:
+                tori += 1
+            elif stype == GeomAbs_Sphere:
+                spheres += 1
+            else:
+                other_faces += 1
+        except Exception:
+            other_faces += 1
         explorer.Next()
 
-    sections.append("FACE TYPE SUMMARY:")
-    sections.append(f"  Cylindrical faces : {len(cylinders)}")
-    sections.append(f"  Planar faces      : {planes}")
-    sections.append(f"  Conical faces     : {cones}")
-    sections.append(f"  Toroidal faces    : {tori}")
-    sections.append(f"  Spherical faces   : {spheres}")
-    sections.append(f"  Other             : {other}")
+    total_faces = len(cylinders) + planes + cones + tori + spheres + other_faces
+    sections.append(f"FACE ANALYSIS ({total_faces} faces):")
+    sections.append(f"  Planar      : {planes}")
+    sections.append(f"  Cylindrical : {len(cylinders)}")
+    if cones:
+        sections.append(f"  Conical     : {cones}")
+    if tori:
+        sections.append(f"  Toroidal    : {tori}  (likely fillets/chamfers)")
+    if spheres:
+        sections.append(f"  Spherical   : {spheres}")
+    if other_faces:
+        sections.append(f"  Other/NURBS : {other_faces}  (freeform surfaces)")
     sections.append("")
+
+    # ── Part type heuristic ───────────────────────────────────────────────────
+    if total_faces > 0:
+        cyl_ratio = len(cylinders) / total_faces
+        plane_ratio = planes / total_faces
+        if cyl_ratio > 0.3:
+            sections.append("PART TYPE HINT: Rotational part (turned/cylindrical) — high cylinder face ratio")
+        elif plane_ratio > 0.6:
+            sections.append("PART TYPE HINT: Prismatic part (milled/sheet metal) — mostly planar faces")
+        elif tori > 2:
+            sections.append("PART TYPE HINT: Complex part with fillets — likely milled")
+        sections.append("")
 
     # ── Cylindrical features — deduplicated and sorted ────────────────────────
     if cylinders:
-        # Group by radius (within 0.01mm tolerance)
         unique_radii: dict[float, int] = {}
         for r in cylinders:
             matched = False
@@ -303,19 +329,24 @@ def _step_to_text_occ(file_bytes: bytes) -> str:
 
         sorted_radii = sorted(unique_radii.items(), key=lambda x: x[0], reverse=True)
 
-        sections.append(f"CYLINDRICAL FEATURES ({len(sorted_radii)} unique radii):")
-        sections.append("  (Sorted largest → smallest — largest likely shaft OD, smallest likely holes/bores)")
+        sections.append(f"CYLINDRICAL FEATURES ({len(sorted_radii)} unique diameters):")
         for r, count in sorted_radii:
             d = r * 2
-            sections.append(f"  radius={r:.4f} mm  diameter={d:.4f} mm  ×{count} face(s)")
+            label = ""
+            if r == sorted_radii[0][0]:
+                label = "  ← likely OD"
+            elif r == sorted_radii[-1][0] and len(sorted_radii) > 1:
+                label = "  ← likely bore/hole"
+            sections.append(f"  Ø{d:.3f} mm  (r={r:.3f})  ×{count} face(s){label}")
         sections.append("")
 
-        # Heuristic: outer diameter = largest cylinder
-        max_r = sorted_radii[0][0]
-        sections.append(f"LIKELY OUTER DIAMETER: {max_r * 2:.4f} mm")
-        if len(sorted_radii) > 1:
-            min_r = sorted_radii[-1][0]
-            sections.append(f"LIKELY BORE / HOLE DIAMETER: {min_r * 2:.4f} mm")
+    # ── Aspect ratio → manufacturing hint ─────────────────────────────────────
+    if dims[2] > 0:
+        aspect = dims[0] / dims[2]
+        if aspect > 5:
+            sections.append(f"ASPECT RATIO: {aspect:.1f}:1 — long/thin part (shaft, rod, or sheet)")
+        elif aspect < 1.5:
+            sections.append(f"ASPECT RATIO: {aspect:.1f}:1 — compact/cubic part")
         sections.append("")
 
     return "\n".join(sections)
