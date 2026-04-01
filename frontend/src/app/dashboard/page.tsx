@@ -179,7 +179,7 @@ export default function DashboardPage() {
       {/* ── Top Nav ───────────────────────────────────────────────────────── */}
       <header className="bg-white border-b border-slate-200 shadow-sm flex justify-between items-center w-full px-6 py-3 h-16 fixed top-0 z-50">
         <div className="flex items-center gap-8">
-          <div className="text-2xl font-black tracking-tighter text-blue-800">Costrich</div>
+          <div className="text-2xl font-black tracking-tighter text-blue-800">Newton-Metre</div>
           <nav className="hidden md:flex items-center gap-6 text-sm font-semibold tracking-tight">
             <span className="text-blue-700 border-b-2 border-blue-700 pb-1">Dashboard</span>
             <button onClick={() => router.push("/estimate/new")} className="text-slate-500 hover:text-blue-700 transition-colors">New Analysis</button>

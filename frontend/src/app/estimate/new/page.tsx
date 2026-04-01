@@ -174,10 +174,10 @@ export default function NewEstimatePage() {
   function confidenceBadge(tier: string | null) {
     if (!tier) return null;
     const styles: Record<string, string> = {
-      high:         "bg-emerald-950/60 text-emerald-400 border-emerald-800",
-      medium:       "bg-amber-950/60 text-amber-400 border-amber-800",
-      low:          "bg-red-950/60 text-red-400 border-red-800",
-      insufficient: "bg-[#1C2235] text-[#64748B] border-[#2A3140]",
+      high:         "bg-emerald-50 text-emerald-700 border-emerald-200",
+      medium:       "bg-amber-50 text-amber-700 border-amber-200",
+      low:          "bg-red-50 text-red-700 border-red-200",
+      insufficient: "bg-slate-50 text-slate-500 border-slate-200",
     };
     return (
       <span
@@ -337,10 +337,10 @@ export default function NewEstimatePage() {
 
   function MissionLog({ lines }: { lines: string[] }) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0F1117]">
+      <div className="min-h-screen flex items-center justify-center bg-[#F8F8F6]">
         <div className="w-full max-w-md px-8">
           <p
-            className="text-xs font-medium text-[#475569] uppercase tracking-widest mb-5"
+            className="text-xs font-medium text-slate-400 uppercase tracking-widest mb-5"
             style={{ fontFamily: "var(--font-mono)" }}
           >
             MISSION INTAKE
@@ -355,11 +355,11 @@ export default function NewEstimatePage() {
                   style={{ animationDelay: `${i * 0.35}s`, fontFamily: "var(--font-mono)" }}
                 >
                   {isLast ? (
-                    <span className="text-[#22D3EE] text-base leading-none">›</span>
+                    <span className="text-cyan-600 text-base leading-none">›</span>
                   ) : (
                     <span className="text-emerald-400 text-base leading-none">✓</span>
                   )}
-                  <span className={isLast ? "text-[#E2E8F0]" : "text-[#475569]"}>{line}</span>
+                  <span className={isLast ? "text-slate-900" : "text-slate-400"}>{line}</span>
                   {isLast && <span className="cursor-blink" />}
                 </div>
               );
@@ -374,40 +374,40 @@ export default function NewEstimatePage() {
 
   if (step === "type") {
     return (
-      <div className="min-h-screen bg-[#0F1117]">
+      <div className="min-h-screen bg-[#F8F8F6]">
         <AppNav />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-12">
           <h1 className="text-3xl mb-2 tracking-tight">New Estimate</h1>
-          <p className="text-[#64748B] mb-8 text-sm">
+          <p className="text-slate-500 mb-8 text-sm">
             What type of drawing are you uploading?
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <button
               onClick={() => { setDrawingType("single"); setStep("upload"); }}
-              className="bg-[#161B27] border border-[#2A3140] rounded-2xl p-8 text-left hover:border-[#22D3EE]/60 hover:bg-[#22D3EE]/5 transition-colors group"
+              className="bg-white border border-slate-200 rounded-2xl p-8 text-left hover:border-cyan-400/60 hover:bg-cyan-100/5 transition-colors group"
             >
-              <div className="w-12 h-12 bg-[#22D3EE]/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-[#22D3EE]/20 transition-colors">
-                <svg className="w-6 h-6 text-[#22D3EE]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <div className="w-12 h-12 bg-cyan-50 rounded-xl flex items-center justify-center mb-5 group-hover:bg-cyan-100 transition-colors">
+                <svg className="w-6 h-6 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                 </svg>
               </div>
-              <h2 className="text-lg font-semibold text-[#E2E8F0] mb-2">Single Part</h2>
-              <p className="text-sm text-[#64748B]">
+              <h2 className="text-lg font-semibold text-slate-900 mb-2">Single Part</h2>
+              <p className="text-sm text-slate-500">
                 One drawing, one component — turned shaft, milled housing, sheet metal bracket, etc.
               </p>
             </button>
 
             <button
               onClick={() => { setDrawingType("assembly"); setStep("assembly-upload"); }}
-              className="bg-[#161B27] border border-[#2A3140] rounded-2xl p-8 text-left hover:border-[#22D3EE]/60 hover:bg-[#22D3EE]/5 transition-colors group"
+              className="bg-white border border-slate-200 rounded-2xl p-8 text-left hover:border-cyan-400/60 hover:bg-cyan-100/5 transition-colors group"
             >
-              <div className="w-12 h-12 bg-[#22D3EE]/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-[#22D3EE]/20 transition-colors">
-                <svg className="w-6 h-6 text-[#22D3EE]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <div className="w-12 h-12 bg-cyan-50 rounded-xl flex items-center justify-center mb-5 group-hover:bg-cyan-100 transition-colors">
+                <svg className="w-6 h-6 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
                 </svg>
               </div>
-              <h2 className="text-lg font-semibold text-[#E2E8F0] mb-2">Assembly</h2>
-              <p className="text-sm text-[#64748B]">
+              <h2 className="text-lg font-semibold text-slate-900 mb-2">Assembly</h2>
+              <p className="text-sm text-slate-500">
                 Multiple component drawings joined by welding, bolting, riveting, or press fit.
               </p>
             </button>
@@ -421,12 +421,12 @@ export default function NewEstimatePage() {
 
   if (step === "upload") {
     return (
-      <div className="min-h-screen bg-[#0F1117]">
+      <div className="min-h-screen bg-[#F8F8F6]">
         <AppNav />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-12">
           <button
             onClick={() => setStep("type")}
-            className="flex items-center gap-2 text-[#64748B] hover:text-[#94A3B8] text-sm mb-6 transition-colors"
+            className="flex items-center gap-2 text-slate-500 hover:text-slate-600 text-sm mb-6 transition-colors"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -434,30 +434,30 @@ export default function NewEstimatePage() {
             Change type
           </button>
           <h1 className="text-3xl mb-2 tracking-tight">Single Part</h1>
-          <p className="text-[#64748B] mb-8 text-sm">Upload one or more sheets of the same part drawing.</p>
+          <p className="text-slate-500 mb-8 text-sm">Upload one or more sheets of the same part drawing.</p>
 
-          <div className="bg-[#161B27] rounded-2xl border border-[#2A3140] p-8">
+          <div className="bg-white rounded-2xl border border-slate-200 p-8">
 
             {/* Sheet 1 — primary drawing */}
-            <p className="text-xs font-medium text-[#64748B] uppercase tracking-wider mb-2" style={{ fontFamily: "var(--font-mono)" }}>
+            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2" style={{ fontFamily: "var(--font-mono)" }}>
               Sheet 1 {extraSheets.length === 0 ? "(required)" : ""}
             </p>
             <div
-              className="border-2 border-dashed border-[#2A3140] rounded-xl p-8 text-center mb-4 hover:border-[#22D3EE]/50 hover:bg-[#22D3EE]/5 transition-colors cursor-pointer"
+              className="border-2 border-dashed border-slate-200 rounded-xl p-8 text-center mb-4 hover:border-cyan-400/50 hover:bg-cyan-100/5 transition-colors cursor-pointer"
               role="button"
               tabIndex={0}
               onClick={() => document.getElementById("file-input")?.click()}
               onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); document.getElementById("file-input")?.click(); } }}
-              onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-[#22D3EE]", "bg-[#22D3EE]/5"); }}
-              onDragLeave={(e) => { e.currentTarget.classList.remove("border-[#22D3EE]", "bg-[#22D3EE]/5"); }}
-              onDrop={(e) => { e.preventDefault(); e.currentTarget.classList.remove("border-[#22D3EE]", "bg-[#22D3EE]/5"); const f = e.dataTransfer.files[0]; if (f) setFile(f); }}
+              onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-cyan-300", "bg-cyan-50/50"); }}
+              onDragLeave={(e) => { e.currentTarget.classList.remove("border-cyan-300", "bg-cyan-50/50"); }}
+              onDrop={(e) => { e.preventDefault(); e.currentTarget.classList.remove("border-cyan-300", "bg-cyan-50/50"); const f = e.dataTransfer.files[0]; if (f) setFile(f); }}
             >
               {file ? (
-                <p className="text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{file.name}</p>
+                <p className="text-sm font-medium text-slate-900" style={{ fontFamily: "var(--font-mono)" }}>{file.name}</p>
               ) : (
                 <>
-                  <p className="text-sm font-medium text-[#94A3B8] mb-1">Click to upload or drag and drop</p>
-                  <p className="text-xs text-[#475569]">PDF · DXF · DWG · STEP · PNG · JPG (max 20MB)</p>
+                  <p className="text-sm font-medium text-slate-600 mb-1">Click to upload or drag and drop</p>
+                  <p className="text-xs text-slate-400">PDF · DXF · DWG · STEP · PNG · JPG (max 20MB)</p>
                 </>
               )}
               <input id="file-input" type="file" accept=".pdf,.png,.jpg,.jpeg,.dxf,.dwg,.step,.stp" onChange={(e) => setFile(e.target.files?.[0] || null)} className="hidden" />
@@ -465,15 +465,15 @@ export default function NewEstimatePage() {
 
             {/* Extra sheets */}
             {extraSheets.map((sheet, idx) => (
-              <div key={idx} className="flex items-center gap-3 bg-[#1C2235] border border-[#2A3140] rounded-lg px-4 py-3 mb-2">
-                <svg className="w-4 h-4 text-[#475569] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <div key={idx} className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 mb-2">
+                <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5" />
                 </svg>
-                <span className="text-xs text-[#64748B] font-medium shrink-0" style={{ fontFamily: "var(--font-mono)" }}>Sheet {idx + 2}</span>
-                <span className="text-sm text-[#E2E8F0] truncate flex-1" style={{ fontFamily: "var(--font-mono)" }}>{sheet.name}</span>
+                <span className="text-xs text-slate-500 font-medium shrink-0" style={{ fontFamily: "var(--font-mono)" }}>Sheet {idx + 2}</span>
+                <span className="text-sm text-slate-900 truncate flex-1" style={{ fontFamily: "var(--font-mono)" }}>{sheet.name}</span>
                 <button
                   onClick={() => setExtraSheets((prev) => prev.filter((_, i) => i !== idx))}
-                  className="text-[#475569] hover:text-red-400 transition-colors shrink-0"
+                  className="text-slate-400 hover:text-red-400 transition-colors shrink-0"
                   aria-label="Remove sheet"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -488,7 +488,7 @@ export default function NewEstimatePage() {
               <div className="mb-4">
                 <button
                   onClick={() => document.getElementById("extra-sheet-input")?.click()}
-                  className="flex items-center gap-2 text-[#22D3EE] text-sm hover:text-[#06B6D4] transition-colors"
+                  className="flex items-center gap-2 text-cyan-600 text-sm hover:text-cyan-700 transition-colors"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -507,13 +507,13 @@ export default function NewEstimatePage() {
                   }}
                 />
                 {extraSheets.length > 0 && (
-                  <p className="text-xs text-[#475569] mt-1">All sheets must be views of the same part — mismatched drawings will be rejected.</p>
+                  <p className="text-xs text-slate-400 mt-1">All sheets must be views of the same part — mismatched drawings will be rejected.</p>
                 )}
               </div>
             )}
 
             <div className="flex items-center gap-4 mb-6">
-              <label className="text-sm font-medium text-[#94A3B8]">Quantity:</label>
+              <label className="text-sm font-medium text-slate-600">Quantity:</label>
               <input
                 type="number" min={1} value={quantity || ""}
                 onChange={(e) => {
@@ -526,7 +526,7 @@ export default function NewEstimatePage() {
                   setQuantity(isNaN(n) || n < 1 ? 1 : n);
                 }}
                 placeholder="e.g. 500"
-                className="w-28 px-3 py-2.5 border border-[#2A3140] rounded-lg bg-[#1C2235] outline-none text-sm text-[#E2E8F0] placeholder-[#475569]"
+                className="w-28 px-3 py-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none text-sm text-slate-900 placeholder-slate-400"
                 style={{ fontFamily: "var(--font-mono)" }}
               />
             </div>
@@ -536,7 +536,7 @@ export default function NewEstimatePage() {
             <button
               onClick={handleUpload}
               disabled={!file}
-              className="w-full bg-[#22D3EE] text-[#0F1117] py-3.5 rounded-lg font-semibold hover:bg-[#06B6D4] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="w-full bg-cyan-600 text-white py-3.5 rounded-lg font-semibold hover:bg-cyan-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               {extraSheets.length > 0 ? `Analyze ${extraSheets.length + 1} Sheets` : "Analyze Drawing"}
             </button>
@@ -561,21 +561,21 @@ export default function NewEstimatePage() {
         : materialOverride || detectedMaterial;
 
     return (
-      <div className="min-h-screen bg-[#0F1117]">
+      <div className="min-h-screen bg-[#F8F8F6]">
         <AppNav />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-8">
           <h1 className="text-3xl mb-2 tracking-tight">Review Extracted Data</h1>
-          <p className="text-[#64748B] text-sm mb-6">Verify AI-extracted data before calculating costs.</p>
+          <p className="text-slate-500 text-sm mb-6">Verify AI-extracted data before calculating costs.</p>
 
-          <div className="bg-[#161B27] rounded-xl border border-[#2A3140] p-6 mb-4">
-            <h2 className="text-xs font-medium text-[#64748B] uppercase tracking-wider mb-4" style={{ fontFamily: "var(--font-mono)" }}>Dimensions</h2>
+          <div className="bg-white rounded-xl border border-slate-200 p-6 mb-4">
+            <h2 className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-4" style={{ fontFamily: "var(--font-mono)" }}>Dimensions</h2>
             <table className="w-full">
               <tbody>
                 {Object.entries(dims).map(([key, val]) =>
                   val != null ? (
-                    <tr key={key} className="border-b border-[#2A3140] last:border-0">
-                      <td className="py-2.5 text-sm text-[#64748B] capitalize">{key.replace(/_/g, " ")}</td>
-                      <td className="py-2.5 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{String(val)}</td>
+                    <tr key={key} className="border-b border-slate-200 last:border-0">
+                      <td className="py-2.5 text-sm text-slate-500 capitalize">{key.replace(/_/g, " ")}</td>
+                      <td className="py-2.5 text-right text-sm font-medium text-slate-900" style={{ fontFamily: "var(--font-mono)" }}>{String(val)}</td>
                     </tr>
                   ) : null
                 )}
@@ -583,11 +583,11 @@ export default function NewEstimatePage() {
             </table>
           </div>
 
-          <div className="bg-[#161B27] rounded-xl border border-[#2A3140] p-6 mb-4">
+          <div className="bg-white rounded-xl border border-slate-200 p-6 mb-4">
             <div className="flex items-start justify-between mb-3">
-              <span className="text-sm font-medium text-[#94A3B8]">Material</span>
+              <span className="text-sm font-medium text-slate-600">Material</span>
               {detectedMaterial !== null && matConfidence === "high" ? (
-                <span className="text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{detectedMaterial}</span>
+                <span className="text-sm font-medium text-slate-900" style={{ fontFamily: "var(--font-mono)" }}>{detectedMaterial}</span>
               ) : (
                 <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${detectedMaterial === null ? "bg-amber-950/60 text-amber-400 border border-amber-800" : "bg-amber-950/40 text-amber-400 border border-amber-900"}`} style={{ fontFamily: "var(--font-mono)" }}>
                   {detectedMaterial === null ? "Not detected" : "Low confidence"}
@@ -599,22 +599,22 @@ export default function NewEstimatePage() {
                 <div className="bg-amber-950/30 border border-amber-900/50 rounded-lg px-3 py-2.5 text-amber-400 text-sm">
                   {detectedMaterial === null ? "Material not found in the drawing. Select from the list or enter manually." : `AI detected "${detectedMaterial}" with low confidence. Please confirm or correct it.`}
                 </div>
-                <select value={materialOverride} onChange={(e) => { setMaterialOverride(e.target.value); setMaterialPrice(null); }} className="w-full px-3 py-2.5 border border-[#2A3140] rounded-lg bg-[#1C2235] text-sm text-[#E2E8F0] outline-none">
+                <select value={materialOverride} onChange={(e) => { setMaterialOverride(e.target.value); setMaterialPrice(null); }} className="w-full px-3 py-2.5 border border-slate-200 rounded-lg bg-slate-50 text-sm text-slate-900 outline-none">
                   <option value="">{detectedMaterial !== null ? `Keep detected: ${detectedMaterial}` : "— Select material —"}</option>
                   {KNOWN_MATERIALS.map((m) => <option key={m} value={m}>{m}</option>)}
                   <option value="__custom__">Other (enter manually)…</option>
                 </select>
                 {materialOverride === "__custom__" && (
-                  <input type="text" placeholder="e.g. EN31 Steel, Bronze, AISI 4140" value={customMaterial} onChange={(e) => { setCustomMaterial(e.target.value); setMaterialPrice(null); }} className="w-full px-3 py-2.5 border border-[#2A3140] rounded-lg bg-[#1C2235] text-sm text-[#E2E8F0] outline-none" />
+                  <input type="text" placeholder="e.g. EN31 Steel, Bronze, AISI 4140" value={customMaterial} onChange={(e) => { setCustomMaterial(e.target.value); setMaterialPrice(null); }} className="w-full px-3 py-2.5 border border-slate-200 rounded-lg bg-slate-50 text-sm text-slate-900 outline-none" />
                 )}
                 <div className="flex items-center gap-3">
-                  <button onClick={handleFetchPrice} disabled={!activeMaterial || fetchingPrice} className="text-sm text-[#22D3EE] hover:text-[#06B6D4] font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                  <button onClick={handleFetchPrice} disabled={!activeMaterial || fetchingPrice} className="text-sm text-cyan-600 hover:text-cyan-700 font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
                     {fetchingPrice ? "Fetching…" : "Look up market price (INR/kg)"}
                   </button>
                   {materialPrice !== null && (
-                    <span className="text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>
+                    <span className="text-sm font-medium text-slate-900" style={{ fontFamily: "var(--font-mono)" }}>
                       ₹{materialPrice.price_inr.toLocaleString("en-IN")}/kg
-                      <span className="text-xs text-[#475569] ml-1">({materialPrice.source})</span>
+                      <span className="text-xs text-slate-400 ml-1">({materialPrice.source})</span>
                     </span>
                   )}
                 </div>
@@ -622,24 +622,24 @@ export default function NewEstimatePage() {
             )}
           </div>
 
-          <div className="bg-[#161B27] rounded-xl border border-[#2A3140] p-6 mb-6 space-y-2">
+          <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6 space-y-2">
             <div className="flex justify-between">
-              <span className="text-sm text-[#64748B]">Processes</span>
-              <span className="text-sm font-medium text-[#E2E8F0]">{(extractedData.suggested_processes as string[] || []).join(", ")}</span>
+              <span className="text-sm text-slate-500">Processes</span>
+              <span className="text-sm font-medium text-slate-900">{(extractedData.suggested_processes as string[] || []).join(", ")}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-sm text-[#64748B]">AI Confidence</span>
-              <span className="text-sm font-medium text-[#E2E8F0] capitalize">{String(extractedData.confidence || "—")}</span>
+              <span className="text-sm text-slate-500">AI Confidence</span>
+              <span className="text-sm font-medium text-slate-900 capitalize">{String(extractedData.confidence || "—")}</span>
             </div>
           </div>
 
           {error && <div role="alert" className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-4">{error}</div>}
 
           <div className="flex gap-3">
-            <button onClick={handleCalculate} disabled={needsMaterialInput && !activeMaterial} className="flex-1 bg-[#22D3EE] text-[#0F1117] py-3.5 rounded-lg font-semibold hover:bg-[#06B6D4] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+            <button onClick={handleCalculate} disabled={needsMaterialInput && !activeMaterial} className="flex-1 bg-cyan-600 text-white py-3.5 rounded-lg font-semibold hover:bg-cyan-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
               Calculate Cost
             </button>
-            <button onClick={() => setStep("upload")} className="px-6 py-3.5 border border-[#2A3140] rounded-lg hover:bg-[#1C2235] text-sm font-medium text-[#94A3B8] transition-colors">
+            <button onClick={() => setStep("upload")} className="px-6 py-3.5 border border-slate-200 rounded-lg hover:bg-slate-50 text-sm font-medium text-slate-600 transition-colors">
               Re-upload
             </button>
           </div>
@@ -654,46 +654,46 @@ export default function NewEstimatePage() {
 
   if (step === "result" && result) {
     return (
-      <div className="min-h-screen bg-[#0F1117]">
+      <div className="min-h-screen bg-[#F8F8F6]">
         <AppNav />
         <div className="max-w-3xl mx-auto px-4 sm:px-8 py-8">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-3xl tracking-tight">Should-Cost Estimate</h1>
-              <p className="text-[#64748B] text-sm mt-1">{result.material_name} &middot; {result.quantity} unit{result.quantity > 1 ? "s" : ""}</p>
+              <p className="text-slate-500 text-sm mt-1">{result.material_name} &middot; {result.quantity} unit{result.quantity > 1 ? "s" : ""}</p>
             </div>
             {confidenceBadge(result.confidence_tier)}
           </div>
 
           {/* Uncertainty band callout */}
-          <div className="bg-[#161B27] border border-[#2A3140] rounded-xl px-6 py-5 mb-4">
+          <div className="bg-white border border-slate-200 rounded-xl px-6 py-5 mb-4">
             <div className="flex items-end justify-between gap-4">
               <div>
-                <p className="text-xs text-[#64748B] uppercase tracking-wider mb-1" style={{ fontFamily: "var(--font-mono)" }}>Should-Cost Range (±{result.uncertainty_pct}%)</p>
-                <p className="text-2xl font-bold text-[#22D3EE]" style={{ fontFamily: "var(--font-mono)" }}>
+                <p className="text-xs text-slate-500 uppercase tracking-wider mb-1" style={{ fontFamily: "var(--font-mono)" }}>Should-Cost Range (±{result.uncertainty_pct}%)</p>
+                <p className="text-2xl font-bold text-cyan-600" style={{ fontFamily: "var(--font-mono)" }}>
                   {result.currency} {fmt(result.unit_cost_low)} – {fmt(result.unit_cost_high)}
                 </p>
-                <p className="text-sm text-[#475569] mt-1">Physics estimate: <span className="text-[#94A3B8] font-medium">{result.currency} {fmt(result.unit_cost)}</span> per unit</p>
+                <p className="text-sm text-slate-400 mt-1">Physics estimate: <span className="text-slate-600 font-medium">{result.currency} {fmt(result.unit_cost)}</span> per unit</p>
               </div>
               {result.quantity > 1 && (
                 <div className="text-right">
-                  <p className="text-xs text-[#64748B] uppercase tracking-wider mb-1" style={{ fontFamily: "var(--font-mono)" }}>Order ({result.quantity} units)</p>
-                  <p className="text-xl font-bold text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{result.currency} {fmt(result.order_cost)}</p>
+                  <p className="text-xs text-slate-500 uppercase tracking-wider mb-1" style={{ fontFamily: "var(--font-mono)" }}>Order ({result.quantity} units)</p>
+                  <p className="text-xl font-bold text-slate-900" style={{ fontFamily: "var(--font-mono)" }}>{result.currency} {fmt(result.order_cost)}</p>
                 </div>
               )}
             </div>
-            <p className="text-xs text-[#475569] mt-3">Use the lower bound as your negotiation target. Supplier price above the upper bound = overpriced.</p>
+            <p className="text-xs text-slate-400 mt-3">Use the lower bound as your negotiation target. Supplier price above the upper bound = overpriced.</p>
           </div>
 
-          <div className="bg-[#161B27] rounded-xl border border-[#2A3140] overflow-hidden mb-4">
+          <div className="bg-white rounded-xl border border-slate-200 overflow-hidden mb-4">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-[#2A3140] bg-[#1C2235]">
-                  <th className="text-left px-6 py-3.5 text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Cost Component</th>
-                  <th className="text-right px-6 py-3.5 text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Amount ({result.currency})</th>
+                <tr className="border-b border-slate-200 bg-slate-50">
+                  <th className="text-left px-6 py-3.5 text-xs font-medium text-slate-500 uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Cost Component</th>
+                  <th className="text-right px-6 py-3.5 text-xs font-medium text-slate-500 uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Amount ({result.currency})</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#2A3140]">
+              <tbody className="divide-y divide-slate-100">
                 {[
                   [`Material (${result.material_name})`, result.material_cost],
                   ["Machining", result.total_machining_cost],
@@ -704,8 +704,8 @@ export default function NewEstimatePage() {
                   ["Profit (20%)", result.profit],
                 ].map(([label, val]) => (
                   <tr key={String(label)}>
-                    <td className="px-6 py-3.5 text-sm text-[#94A3B8]">{label}</td>
-                    <td className="px-6 py-3.5 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(Number(val))}</td>
+                    <td className="px-6 py-3.5 text-sm text-slate-600">{label}</td>
+                    <td className="px-6 py-3.5 text-right text-sm font-medium text-slate-900" style={{ fontFamily: "var(--font-mono)" }}>{fmt(Number(val))}</td>
                   </tr>
                 ))}
               </tbody>
@@ -713,22 +713,22 @@ export default function NewEstimatePage() {
           </div>
 
           {/* Supplier quote capture */}
-          <div className="bg-[#161B27] border border-[#2A3140] rounded-xl px-6 py-5 mb-4">
-            <p className="text-sm font-medium text-[#E2E8F0] mb-1">What did the supplier actually quote?</p>
-            <p className="text-xs text-[#475569] mb-3">Optional — helps us calibrate accuracy over time.</p>
+          <div className="bg-white border border-slate-200 rounded-xl px-6 py-5 mb-4">
+            <p className="text-sm font-medium text-slate-900 mb-1">What did the supplier actually quote?</p>
+            <p className="text-xs text-slate-400 mb-3">Optional — helps us calibrate accuracy over time.</p>
             {supplierQuoteSaved ? (
               <p className="text-sm text-emerald-400 font-medium">✓ Quote saved. Thank you — this helps improve future estimates.</p>
             ) : (
               <div className="flex gap-3">
                 <div className="relative flex-1">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#475569]">₹</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">₹</span>
                   <input
                     type="number"
                     min="0"
                     placeholder="e.g. 3800"
                     value={supplierQuoteStr}
                     onChange={(e) => setSupplierQuoteStr(e.target.value)}
-                    className="w-full pl-7 pr-3 py-2.5 border border-[#2A3140] rounded-lg bg-[#1C2235] text-sm text-[#E2E8F0] outline-none focus:border-[#22D3EE] transition-colors"
+                    className="w-full pl-7 pr-3 py-2.5 border border-slate-200 rounded-lg bg-slate-50 text-sm text-slate-900 outline-none focus:border-cyan-300 transition-colors"
                   />
                 </div>
                 <button
@@ -741,7 +741,7 @@ export default function NewEstimatePage() {
                     } catch { /* non-critical */ }
                   }}
                   disabled={!supplierQuoteStr || !parseFloat(supplierQuoteStr)}
-                  className="px-5 py-2.5 bg-[#22D3EE] text-[#0F1117] rounded-lg text-sm font-semibold hover:bg-[#06B6D4] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="px-5 py-2.5 bg-cyan-600 text-white rounded-lg text-sm font-semibold hover:bg-cyan-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   Save
                 </button>
@@ -749,7 +749,7 @@ export default function NewEstimatePage() {
             )}
           </div>
 
-          <button onClick={() => setExpanded(!expanded)} className="flex items-center gap-2 text-[#22D3EE] hover:text-[#06B6D4] text-sm font-medium mb-4 transition-colors">
+          <button onClick={() => setExpanded(!expanded)} className="flex items-center gap-2 text-cyan-600 hover:text-cyan-700 text-sm font-medium mb-4 transition-colors">
             <svg className={`w-4 h-4 transition-transform ${expanded ? "rotate-90" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
@@ -757,25 +757,25 @@ export default function NewEstimatePage() {
           </button>
 
           {expanded && (
-            <div className="bg-[#161B27] rounded-xl border border-[#2A3140] overflow-hidden mb-6 overflow-x-auto">
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden mb-6 overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[#2A3140] bg-[#1C2235]">
+                  <tr className="border-b border-slate-200 bg-slate-50">
                     {["Process", "Time", "Machine", "Setup", "Tooling", "Labour", "Power"].map((h) => (
-                      <th key={h} className={`${h === "Process" ? "text-left" : "text-right"} px-4 py-3 text-xs font-medium text-[#64748B] uppercase tracking-wider`} style={{ fontFamily: "var(--font-mono)" }}>{h}</th>
+                      <th key={h} className={`${h === "Process" ? "text-left" : "text-right"} px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider`} style={{ fontFamily: "var(--font-mono)" }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#2A3140]">
+                <tbody className="divide-y divide-slate-100">
                   {result.process_lines.map((pl) => (
-                    <tr key={pl.process_id} className="hover:bg-[#1C2235] transition-colors">
-                      <td className="px-4 py-3 font-medium text-[#E2E8F0]">{pl.process_name}</td>
-                      <td className="px-4 py-3 text-right text-[#64748B]" style={{ fontFamily: "var(--font-mono)" }}>{pl.time_min.toFixed(1)} min</td>
-                      <td className="px-4 py-3 text-right text-[#64748B]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(pl.machine_cost)}</td>
-                      <td className="px-4 py-3 text-right text-[#64748B]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(pl.setup_cost_per_unit)}</td>
-                      <td className="px-4 py-3 text-right text-[#64748B]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(pl.tooling_cost)}</td>
-                      <td className="px-4 py-3 text-right text-[#64748B]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(pl.labour_cost)}</td>
-                      <td className="px-4 py-3 text-right text-[#64748B]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(pl.power_cost)}</td>
+                    <tr key={pl.process_id} className="hover:bg-slate-50 transition-colors">
+                      <td className="px-4 py-3 font-medium text-slate-900">{pl.process_name}</td>
+                      <td className="px-4 py-3 text-right text-slate-500" style={{ fontFamily: "var(--font-mono)" }}>{pl.time_min.toFixed(1)} min</td>
+                      <td className="px-4 py-3 text-right text-slate-500" style={{ fontFamily: "var(--font-mono)" }}>{fmt(pl.machine_cost)}</td>
+                      <td className="px-4 py-3 text-right text-slate-500" style={{ fontFamily: "var(--font-mono)" }}>{fmt(pl.setup_cost_per_unit)}</td>
+                      <td className="px-4 py-3 text-right text-slate-500" style={{ fontFamily: "var(--font-mono)" }}>{fmt(pl.tooling_cost)}</td>
+                      <td className="px-4 py-3 text-right text-slate-500" style={{ fontFamily: "var(--font-mono)" }}>{fmt(pl.labour_cost)}</td>
+                      <td className="px-4 py-3 text-right text-slate-500" style={{ fontFamily: "var(--font-mono)" }}>{fmt(pl.power_cost)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -784,10 +784,10 @@ export default function NewEstimatePage() {
           )}
 
           <div className="flex gap-3 mt-6">
-            <button onClick={() => router.push("/dashboard")} className="flex-1 border border-[#2A3140] py-3.5 rounded-lg hover:bg-[#1C2235] text-sm font-medium text-[#94A3B8] transition-colors">
+            <button onClick={() => router.push("/dashboard")} className="flex-1 border border-slate-200 py-3.5 rounded-lg hover:bg-slate-50 text-sm font-medium text-slate-600 transition-colors">
               Back to Dashboard
             </button>
-            <button onClick={() => { setStep("type"); setResult(null); setExtractedData(null); setFile(null); setSupplierQuoteStr(""); setSupplierQuoteSaved(false); }} className="flex-1 bg-[#22D3EE] text-[#0F1117] py-3.5 rounded-lg font-semibold hover:bg-[#06B6D4] transition-colors">
+            <button onClick={() => { setStep("type"); setResult(null); setExtractedData(null); setFile(null); setSupplierQuoteStr(""); setSupplierQuoteSaved(false); }} className="flex-1 bg-cyan-600 text-white py-3.5 rounded-lg font-semibold hover:bg-cyan-700 transition-colors">
               New Estimate
             </button>
           </div>
@@ -801,16 +801,16 @@ export default function NewEstimatePage() {
   if (step === "assembly-upload") {
     const canAnalyze = asmComponents.length >= 2;
     return (
-      <div className="min-h-screen bg-[#0F1117]">
+      <div className="min-h-screen bg-[#F8F8F6]">
         <AppNav />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-12">
-          <button onClick={() => setStep("type")} className="flex items-center gap-2 text-[#64748B] hover:text-[#94A3B8] text-sm mb-6 transition-colors">
+          <button onClick={() => setStep("type")} className="flex items-center gap-2 text-slate-500 hover:text-slate-600 text-sm mb-6 transition-colors">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
             Change type
           </button>
 
           <h1 className="text-3xl mb-2 tracking-tight">Assembly Drawing</h1>
-          <p className="text-[#64748B] mb-8 text-sm">
+          <p className="text-slate-500 mb-8 text-sm">
             Upload one drawing per component. Add at least 2 components, then label each one.
           </p>
 
@@ -818,18 +818,18 @@ export default function NewEstimatePage() {
           {asmComponents.length > 0 && (
             <div className="space-y-3 mb-6">
               {asmComponents.map((comp, i) => (
-                <div key={comp.id} className="bg-[#161B27] border border-[#2A3140] rounded-xl px-5 py-4 flex items-center gap-4">
-                  <span className="text-xs font-medium text-[#475569] w-5 text-center" style={{ fontFamily: "var(--font-mono)" }}>{i + 1}</span>
+                <div key={comp.id} className="bg-white border border-slate-200 rounded-xl px-5 py-4 flex items-center gap-4">
+                  <span className="text-xs font-medium text-slate-400 w-5 text-center" style={{ fontFamily: "var(--font-mono)" }}>{i + 1}</span>
                   <div className="flex-1 min-w-0">
                     <input
                       value={comp.name}
                       onChange={(e) => updateAsmComponent(comp.id, { name: e.target.value })}
-                      className="w-full bg-transparent text-sm font-medium text-[#E2E8F0] outline-none border-b border-transparent hover:border-[#2A3140] focus:border-[#22D3EE] transition-colors py-0.5"
+                      className="w-full bg-transparent text-sm font-medium text-slate-900 outline-none border-b border-transparent hover:border-slate-200 focus:border-cyan-300 transition-colors py-0.5"
                       placeholder="Component name"
                     />
-                    <p className="text-xs text-[#475569] mt-1 truncate" style={{ fontFamily: "var(--font-mono)" }}>{comp.file.name}</p>
+                    <p className="text-xs text-slate-400 mt-1 truncate" style={{ fontFamily: "var(--font-mono)" }}>{comp.file.name}</p>
                   </div>
-                  <button onClick={() => handleAsmRemoveComponent(comp.id)} className="text-[#475569] hover:text-red-400 transition-colors p-1">
+                  <button onClick={() => handleAsmRemoveComponent(comp.id)} className="text-slate-400 hover:text-red-400 transition-colors p-1">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                   </button>
                 </div>
@@ -839,31 +839,31 @@ export default function NewEstimatePage() {
 
           {/* Add more files */}
           <div
-            className="border-2 border-dashed border-[#2A3140] rounded-xl p-8 text-center mb-6 hover:border-[#22D3EE]/50 hover:bg-[#22D3EE]/5 transition-colors cursor-pointer"
+            className="border-2 border-dashed border-slate-200 rounded-xl p-8 text-center mb-6 hover:border-cyan-400/50 hover:bg-cyan-100/5 transition-colors cursor-pointer"
             role="button"
             tabIndex={0}
             onClick={() => document.getElementById("asm-file-input")?.click()}
             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); document.getElementById("asm-file-input")?.click(); } }}
-            onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-[#22D3EE]", "bg-[#22D3EE]/5"); }}
-            onDragLeave={(e) => { e.currentTarget.classList.remove("border-[#22D3EE]", "bg-[#22D3EE]/5"); }}
-            onDrop={(e) => { e.preventDefault(); e.currentTarget.classList.remove("border-[#22D3EE]", "bg-[#22D3EE]/5"); handleAsmFilesAdded(e.dataTransfer.files); }}
+            onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-cyan-300", "bg-cyan-50/50"); }}
+            onDragLeave={(e) => { e.currentTarget.classList.remove("border-cyan-300", "bg-cyan-50/50"); }}
+            onDrop={(e) => { e.preventDefault(); e.currentTarget.classList.remove("border-cyan-300", "bg-cyan-50/50"); handleAsmFilesAdded(e.dataTransfer.files); }}
           >
-            <div className="w-10 h-10 bg-[#22D3EE]/10 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <svg className="w-5 h-5 text-[#22D3EE]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <div className="w-10 h-10 bg-cyan-50 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <svg className="w-5 h-5 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
               </svg>
             </div>
-            <p className="text-sm text-[#94A3B8]">{asmComponents.length === 0 ? "Add component drawings" : "Add more components"}</p>
-            <p className="text-xs text-[#475569] mt-1">PDF, PNG, or JPG — one file per component</p>
+            <p className="text-sm text-slate-600">{asmComponents.length === 0 ? "Add component drawings" : "Add more components"}</p>
+            <p className="text-xs text-slate-400 mt-1">PDF, PNG, or JPG — one file per component</p>
             <input id="asm-file-input" type="file" accept=".pdf,.png,.jpg,.jpeg,.dxf,.dwg,.step,.stp" multiple onChange={(e) => handleAsmFilesAdded(e.target.files)} className="hidden" />
           </div>
 
           <div className="flex items-center gap-4 mb-6">
-            <label className="text-sm font-medium text-[#94A3B8]">Quantity (assemblies):</label>
+            <label className="text-sm font-medium text-slate-600">Quantity (assemblies):</label>
             <input
               type="number" min={1} value={quantity}
               onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-              className="w-24 px-3 py-2.5 border border-[#2A3140] rounded-lg bg-[#1C2235] outline-none text-sm text-[#E2E8F0]"
+              className="w-24 px-3 py-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none text-sm text-slate-900"
               style={{ fontFamily: "var(--font-mono)" }}
             />
           </div>
@@ -876,7 +876,7 @@ export default function NewEstimatePage() {
           <button
             onClick={handleAsmExtractAll}
             disabled={!canAnalyze}
-            className="w-full bg-[#22D3EE] text-[#0F1117] py-3.5 rounded-lg font-semibold hover:bg-[#06B6D4] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="w-full bg-cyan-600 text-white py-3.5 rounded-lg font-semibold hover:bg-cyan-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             Analyze All Components ({asmComponents.length})
           </button>
@@ -889,9 +889,9 @@ export default function NewEstimatePage() {
 
   if (step === "assembly-extracting") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0F1117]">
+      <div className="min-h-screen flex items-center justify-center bg-[#F8F8F6]">
         <div className="w-full max-w-md px-8">
-          <p className="text-xs font-medium text-[#475569] uppercase tracking-widest mb-5" style={{ fontFamily: "var(--font-mono)" }}>
+          <p className="text-xs font-medium text-slate-400 uppercase tracking-widest mb-5" style={{ fontFamily: "var(--font-mono)" }}>
             ANALYZING ASSEMBLY
           </p>
           <div className="space-y-4">
@@ -907,16 +907,16 @@ export default function NewEstimatePage() {
                     ) : isDone ? (
                       <span className="text-emerald-400 text-base leading-none">✓</span>
                     ) : isActive ? (
-                      <span className="text-[#22D3EE] text-base leading-none">›</span>
+                      <span className="text-cyan-600 text-base leading-none">›</span>
                     ) : (
-                      <span className="text-[#2A3140] text-base leading-none">·</span>
+                      <span className="text-slate-300 text-base leading-none">·</span>
                     )}
                   </div>
                   <div>
-                    <p className={`text-sm font-medium ${isDone && !comp.error ? "text-[#475569]" : isActive ? "text-[#E2E8F0]" : isPending ? "text-[#2A3140]" : "text-[#E2E8F0]"}`} style={{ fontFamily: "var(--font-mono)" }}>
+                    <p className={`text-sm font-medium ${isDone && !comp.error ? "text-slate-400" : isActive ? "text-slate-900" : isPending ? "text-slate-300" : "text-slate-900"}`} style={{ fontFamily: "var(--font-mono)" }}>
                       {comp.name}
                     </p>
-                    <p className={`text-xs mt-0.5 ${comp.error ? "text-red-400" : isDone ? "text-emerald-400/60" : isActive ? "text-[#475569]" : "text-[#2A3140]"}`} style={{ fontFamily: "var(--font-mono)" }}>
+                    <p className={`text-xs mt-0.5 ${comp.error ? "text-red-400" : isDone ? "text-emerald-400/60" : isActive ? "text-slate-400" : "text-slate-300"}`} style={{ fontFamily: "var(--font-mono)" }}>
                       {comp.error ? comp.error : isDone ? "extracted" : isActive ? "extracting…" : "pending"}
                     </p>
                   </div>
@@ -936,11 +936,11 @@ export default function NewEstimatePage() {
     const hasErrors = asmComponents.some((c) => c.error !== "");
 
     return (
-      <div className="min-h-screen bg-[#0F1117]">
+      <div className="min-h-screen bg-[#F8F8F6]">
         <AppNav />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-8">
           <h1 className="text-3xl mb-2 tracking-tight">Review Components</h1>
-          <p className="text-[#64748B] text-sm mb-6">
+          <p className="text-slate-500 text-sm mb-6">
             Verify extracted data and correct materials where needed.
           </p>
 
@@ -952,35 +952,35 @@ export default function NewEstimatePage() {
               const needsMat = detectedMat === null || matConf === "low";
 
               return (
-                <div key={comp.id} className="bg-[#161B27] border border-[#2A3140] rounded-xl overflow-hidden">
+                <div key={comp.id} className="bg-white border border-slate-200 rounded-xl overflow-hidden">
                   <button
                     onClick={() => setExpandedComponent(expandedComponent === comp.id ? null : comp.id)}
-                    className="w-full flex items-center justify-between px-5 py-4 hover:bg-[#1C2235] transition-colors"
+                    className="w-full flex items-center justify-between px-5 py-4 hover:bg-slate-50 transition-colors"
                   >
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-[#475569] w-4 text-center" style={{ fontFamily: "var(--font-mono)" }}>{i + 1}</span>
-                      <span className="text-sm font-semibold text-[#E2E8F0]">{comp.name}</span>
+                      <span className="text-xs text-slate-400 w-4 text-center" style={{ fontFamily: "var(--font-mono)" }}>{i + 1}</span>
+                      <span className="text-sm font-semibold text-slate-900">{comp.name}</span>
                       {comp.error && <span className="text-xs text-red-400 bg-red-950/40 border border-red-900/50 px-2 py-0.5 rounded-full">Extraction failed</span>}
                       {needsMat && !comp.error && <span className="text-xs text-amber-400 bg-amber-950/40 border border-amber-900/50 px-2 py-0.5 rounded-full">Material needed</span>}
                     </div>
-                    <svg className={`w-4 h-4 text-[#475569] transition-transform ${expandedComponent === comp.id ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <svg className={`w-4 h-4 text-slate-400 transition-transform ${expandedComponent === comp.id ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>
 
                   {expandedComponent === comp.id && (
-                    <div className="px-5 pb-5 border-t border-[#2A3140] pt-4 space-y-4">
+                    <div className="px-5 pb-5 border-t border-slate-200 pt-4 space-y-4">
                       {comp.error ? (
                         <p className="text-sm text-red-400">{comp.error}</p>
                       ) : (
                         <>
                           <div>
-                            <p className="text-xs font-medium text-[#64748B] uppercase tracking-wider mb-2" style={{ fontFamily: "var(--font-mono)" }}>Dimensions</p>
+                            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2" style={{ fontFamily: "var(--font-mono)" }}>Dimensions</p>
                             <div className="space-y-1">
                               {Object.entries(dims).filter(([, v]) => v != null).map(([k, v]) => (
                                 <div key={k} className="flex justify-between text-sm">
-                                  <span className="text-[#64748B] capitalize">{k.replace(/_/g, " ")}</span>
-                                  <span className="text-[#E2E8F0] font-medium" style={{ fontFamily: "var(--font-mono)" }}>{String(v)}</span>
+                                  <span className="text-slate-500 capitalize">{k.replace(/_/g, " ")}</span>
+                                  <span className="text-slate-900 font-medium" style={{ fontFamily: "var(--font-mono)" }}>{String(v)}</span>
                                 </div>
                               ))}
                             </div>
@@ -988,9 +988,9 @@ export default function NewEstimatePage() {
 
                           <div>
                             <div className="flex items-center justify-between mb-2">
-                              <p className="text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Material</p>
+                              <p className="text-xs font-medium text-slate-500 uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Material</p>
                               {detectedMat && matConf === "high" && (
-                                <span className="text-sm text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{detectedMat}</span>
+                                <span className="text-sm text-slate-900" style={{ fontFamily: "var(--font-mono)" }}>{detectedMat}</span>
                               )}
                             </div>
                             {needsMat && (
@@ -998,7 +998,7 @@ export default function NewEstimatePage() {
                                 <select
                                   value={comp.materialOverride}
                                   onChange={(e) => updateAsmComponent(comp.id, { materialOverride: e.target.value })}
-                                  className="w-full px-3 py-2.5 border border-[#2A3140] rounded-lg bg-[#1C2235] text-sm text-[#E2E8F0] outline-none"
+                                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg bg-slate-50 text-sm text-slate-900 outline-none"
                                 >
                                   <option value="">{detectedMat ? `Keep: ${detectedMat}` : "— Select material —"}</option>
                                   {KNOWN_MATERIALS.map((m) => <option key={m} value={m}>{m}</option>)}
@@ -1010,15 +1010,15 @@ export default function NewEstimatePage() {
                                     placeholder="e.g. EN31 Steel"
                                     value={comp.customMaterial}
                                     onChange={(e) => updateAsmComponent(comp.id, { customMaterial: e.target.value })}
-                                    className="w-full px-3 py-2.5 border border-[#2A3140] rounded-lg bg-[#1C2235] text-sm text-[#E2E8F0] outline-none"
+                                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg bg-slate-50 text-sm text-slate-900 outline-none"
                                   />
                                 )}
                               </div>
                             )}
                           </div>
 
-                          <div className="text-sm text-[#64748B]">
-                            <span className="font-medium text-[#94A3B8]">Processes: </span>
+                          <div className="text-sm text-slate-500">
+                            <span className="font-medium text-slate-600">Processes: </span>
                             {(comp.extractedData?.suggested_processes as string[] || []).join(", ")}
                           </div>
                         </>
@@ -1041,11 +1041,11 @@ export default function NewEstimatePage() {
             <button
               onClick={() => setStep("assembly-joining")}
               disabled={!allExtracted || hasErrors}
-              className="flex-1 bg-[#22D3EE] text-[#0F1117] py-3.5 rounded-lg font-semibold hover:bg-[#06B6D4] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="flex-1 bg-cyan-600 text-white py-3.5 rounded-lg font-semibold hover:bg-cyan-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               Next: Joining Method
             </button>
-            <button onClick={() => setStep("assembly-upload")} className="px-6 py-3.5 border border-[#2A3140] rounded-lg hover:bg-[#1C2235] text-sm font-medium text-[#94A3B8] transition-colors">
+            <button onClick={() => setStep("assembly-upload")} className="px-6 py-3.5 border border-slate-200 rounded-lg hover:bg-slate-50 text-sm font-medium text-slate-600 transition-colors">
               Back
             </button>
           </div>
@@ -1058,28 +1058,28 @@ export default function NewEstimatePage() {
 
   if (step === "assembly-joining") {
     return (
-      <div className="min-h-screen bg-[#0F1117]">
+      <div className="min-h-screen bg-[#F8F8F6]">
         <AppNav />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-8">
           <h1 className="text-3xl mb-2 tracking-tight">Joining Method</h1>
-          <p className="text-[#64748B] text-sm mb-8">
+          <p className="text-slate-500 text-sm mb-8">
             How are the {asmComponents.length} components joined together?
           </p>
 
-          <div className="bg-[#161B27] rounded-xl border border-[#2A3140] p-6 mb-4 space-y-5">
+          <div className="bg-white rounded-xl border border-slate-200 p-6 mb-4 space-y-5">
             <div>
-              <label className="text-sm font-medium text-[#94A3B8] block mb-2">Joining process</label>
+              <label className="text-sm font-medium text-slate-600 block mb-2">Joining process</label>
               <select
                 value={joiningMethod}
                 onChange={(e) => setJoiningMethod(e.target.value)}
-                className="w-full px-3 py-2.5 border border-[#2A3140] rounded-lg bg-[#1C2235] text-sm text-[#E2E8F0] outline-none"
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg bg-slate-50 text-sm text-slate-900 outline-none"
               >
                 {JOINING_METHODS.map((m) => <option key={m.id} value={m.id}>{m.label}</option>)}
               </select>
             </div>
 
             <div>
-              <label className="text-sm font-medium text-[#94A3B8] block mb-2">
+              <label className="text-sm font-medium text-slate-600 block mb-2">
                 {joiningMethod === "mig_welding" || joiningMethod === "tig_welding" ? "Number of weld joints" :
                  joiningMethod === "spot_welding" ? "Number of spot welds" :
                  joiningMethod === "bolting" ? "Number of bolts" :
@@ -1091,28 +1091,28 @@ export default function NewEstimatePage() {
                 min={1}
                 value={numJoints}
                 onChange={(e) => setNumJoints(parseInt(e.target.value) || 1)}
-                className="w-32 px-3 py-2.5 border border-[#2A3140] rounded-lg bg-[#1C2235] outline-none text-sm text-[#E2E8F0]"
+                className="w-32 px-3 py-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none text-sm text-slate-900"
                 style={{ fontFamily: "var(--font-mono)" }}
               />
             </div>
           </div>
 
           {/* Component summary */}
-          <div className="bg-[#161B27] rounded-xl border border-[#2A3140] p-5 mb-6">
-            <p className="text-xs font-medium text-[#64748B] uppercase tracking-wider mb-3" style={{ fontFamily: "var(--font-mono)" }}>Assembly summary</p>
+          <div className="bg-white rounded-xl border border-slate-200 p-5 mb-6">
+            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-3" style={{ fontFamily: "var(--font-mono)" }}>Assembly summary</p>
             <div className="space-y-1.5">
               {asmComponents.map((c, i) => (
                 <div key={c.id} className="flex items-center gap-2 text-sm">
-                  <span className="text-[#475569] w-4 text-center" style={{ fontFamily: "var(--font-mono)" }}>{i + 1}</span>
-                  <span className="text-[#E2E8F0]">{c.name}</span>
-                  <span className="text-[#475569]">·</span>
-                  <span className="text-[#64748B]" style={{ fontFamily: "var(--font-mono)" }}>
+                  <span className="text-slate-400 w-4 text-center" style={{ fontFamily: "var(--font-mono)" }}>{i + 1}</span>
+                  <span className="text-slate-900">{c.name}</span>
+                  <span className="text-slate-400">·</span>
+                  <span className="text-slate-500" style={{ fontFamily: "var(--font-mono)" }}>
                     {c.materialOverride === "__custom__" ? c.customMaterial :
                      c.materialOverride || (c.extractedData?.material as string) || "unknown material"}
                   </span>
                 </div>
               ))}
-              <div className="border-t border-[#2A3140] pt-2 mt-2 flex items-center gap-2 text-sm text-[#475569]">
+              <div className="border-t border-slate-200 pt-2 mt-2 flex items-center gap-2 text-sm text-slate-400">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
                 </svg>
@@ -1126,11 +1126,11 @@ export default function NewEstimatePage() {
           <div className="flex gap-3">
             <button
               onClick={handleAsmCalculate}
-              className="flex-1 bg-[#22D3EE] text-[#0F1117] py-3.5 rounded-lg font-semibold hover:bg-[#06B6D4] transition-colors"
+              className="flex-1 bg-cyan-600 text-white py-3.5 rounded-lg font-semibold hover:bg-cyan-700 transition-colors"
             >
               Calculate Assembly Cost
             </button>
-            <button onClick={() => setStep("assembly-review")} className="px-6 py-3.5 border border-[#2A3140] rounded-lg hover:bg-[#1C2235] text-sm font-medium text-[#94A3B8] transition-colors">
+            <button onClick={() => setStep("assembly-review")} className="px-6 py-3.5 border border-slate-200 rounded-lg hover:bg-slate-50 text-sm font-medium text-slate-600 transition-colors">
               Back
             </button>
           </div>
@@ -1144,12 +1144,12 @@ export default function NewEstimatePage() {
   if (step === "assembly-result" && assemblyResult) {
     const r = assemblyResult;
     return (
-      <div className="min-h-screen bg-[#0F1117]">
+      <div className="min-h-screen bg-[#F8F8F6]">
         <AppNav />
         <div className="max-w-3xl mx-auto px-4 sm:px-8 py-8">
           <div className="mb-6">
             <h1 className="text-3xl tracking-tight">Assembly Should-Cost</h1>
-            <p className="text-[#64748B] text-sm mt-1">
+            <p className="text-slate-500 text-sm mt-1">
               {r.components.length} components &middot; {r.joining_method_label} &middot; {r.quantity} unit{r.quantity > 1 ? "s" : ""}
             </p>
           </div>
@@ -1157,26 +1157,26 @@ export default function NewEstimatePage() {
           {/* Per-component accordion */}
           <div className="space-y-3 mb-6">
             {r.components.map((comp) => (
-              <div key={comp.name} className="bg-[#161B27] border border-[#2A3140] rounded-xl overflow-hidden">
+              <div key={comp.name} className="bg-white border border-slate-200 rounded-xl overflow-hidden">
                 <button
                   onClick={() => setExpandedComponent(expandedComponent === comp.name ? null : comp.name)}
-                  className="w-full flex items-center justify-between px-5 py-4 hover:bg-[#1C2235] transition-colors"
+                  className="w-full flex items-center justify-between px-5 py-4 hover:bg-slate-50 transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-sm font-semibold text-[#E2E8F0]">{comp.name}</span>
-                    <span className="text-xs text-[#475569]" style={{ fontFamily: "var(--font-mono)" }}>{comp.material_name}</span>
+                    <span className="text-sm font-semibold text-slate-900">{comp.name}</span>
+                    <span className="text-xs text-slate-400" style={{ fontFamily: "var(--font-mono)" }}>{comp.material_name}</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-sm font-semibold text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>₹ {fmt(comp.unit_cost)}</span>
-                    <svg className={`w-4 h-4 text-[#475569] transition-transform ${expandedComponent === comp.name ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <span className="text-sm font-semibold text-slate-900" style={{ fontFamily: "var(--font-mono)" }}>₹ {fmt(comp.unit_cost)}</span>
+                    <svg className={`w-4 h-4 text-slate-400 transition-transform ${expandedComponent === comp.name ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
                 </button>
                 {expandedComponent === comp.name && (
-                  <div className="border-t border-[#2A3140]">
+                  <div className="border-t border-slate-200">
                     <table className="w-full text-sm">
-                      <tbody className="divide-y divide-[#2A3140]">
+                      <tbody className="divide-y divide-slate-100">
                         {[
                           [`Material (${comp.material_name})`, comp.material_cost],
                           ["Machining", comp.machining_cost],
@@ -1186,8 +1186,8 @@ export default function NewEstimatePage() {
                           ["Power", comp.power_cost],
                         ].map(([label, val]) => (
                           <tr key={String(label)}>
-                            <td className="px-5 py-2.5 text-[#64748B]">{label}</td>
-                            <td className="px-5 py-2.5 text-right text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(Number(val))}</td>
+                            <td className="px-5 py-2.5 text-slate-500">{label}</td>
+                            <td className="px-5 py-2.5 text-right text-slate-900" style={{ fontFamily: "var(--font-mono)" }}>{fmt(Number(val))}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -1199,43 +1199,43 @@ export default function NewEstimatePage() {
           </div>
 
           {/* Assembly rollup table */}
-          <div className="bg-[#161B27] rounded-xl border border-[#2A3140] overflow-hidden mb-6">
+          <div className="bg-white rounded-xl border border-slate-200 overflow-hidden mb-6">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-[#2A3140] bg-[#1C2235]">
-                  <th className="text-left px-6 py-3.5 text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Assembly Cost Rollup</th>
-                  <th className="text-right px-6 py-3.5 text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>INR</th>
+                <tr className="border-b border-slate-200 bg-slate-50">
+                  <th className="text-left px-6 py-3.5 text-xs font-medium text-slate-500 uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Assembly Cost Rollup</th>
+                  <th className="text-right px-6 py-3.5 text-xs font-medium text-slate-500 uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>INR</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#2A3140]">
+              <tbody className="divide-y divide-slate-100">
                 {r.components.map((comp) => (
                   <tr key={comp.name}>
-                    <td className="px-6 py-3 text-sm text-[#94A3B8]">{comp.name}</td>
-                    <td className="px-6 py-3 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(comp.subtotal)}</td>
+                    <td className="px-6 py-3 text-sm text-slate-600">{comp.name}</td>
+                    <td className="px-6 py-3 text-right text-sm font-medium text-slate-900" style={{ fontFamily: "var(--font-mono)" }}>{fmt(comp.subtotal)}</td>
                   </tr>
                 ))}
-                <tr className="bg-[#1C2235]">
-                  <td className="px-6 py-3 text-sm text-[#94A3B8]">
+                <tr className="bg-slate-50">
+                  <td className="px-6 py-3 text-sm text-slate-600">
                     {r.joining_method_label} ({r.joining_cost > 0 ? `material ₹${fmt(r.joining_material_cost)} + machine ₹${fmt(r.joining_machine_cost)} + labour ₹${fmt(r.joining_labour_cost)}` : "no consumables"})
                   </td>
-                  <td className="px-6 py-3 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(r.joining_cost)}</td>
+                  <td className="px-6 py-3 text-right text-sm font-medium text-slate-900" style={{ fontFamily: "var(--font-mono)" }}>{fmt(r.joining_cost)}</td>
                 </tr>
                 <tr>
-                  <td className="px-6 py-3 text-sm text-[#64748B]">Overhead (15%)</td>
-                  <td className="px-6 py-3 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(r.overhead)}</td>
+                  <td className="px-6 py-3 text-sm text-slate-500">Overhead (15%)</td>
+                  <td className="px-6 py-3 text-right text-sm font-medium text-slate-900" style={{ fontFamily: "var(--font-mono)" }}>{fmt(r.overhead)}</td>
                 </tr>
                 <tr>
-                  <td className="px-6 py-3 text-sm text-[#64748B]">Profit (20%)</td>
-                  <td className="px-6 py-3 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(r.profit)}</td>
+                  <td className="px-6 py-3 text-sm text-slate-500">Profit (20%)</td>
+                  <td className="px-6 py-3 text-right text-sm font-medium text-slate-900" style={{ fontFamily: "var(--font-mono)" }}>{fmt(r.profit)}</td>
                 </tr>
               </tbody>
               <tfoot>
-                <tr className="bg-[#22D3EE] text-[#0F1117]">
+                <tr className="bg-cyan-600 text-white">
                   <td className="px-6 py-4 font-bold text-sm" style={{ fontFamily: "var(--font-mono)" }}>TOTAL ASSEMBLY (per unit)</td>
                   <td className="px-6 py-4 text-right font-bold text-lg" style={{ fontFamily: "var(--font-mono)" }}>₹ {fmt(r.unit_cost)}</td>
                 </tr>
                 {r.quantity > 1 && (
-                  <tr className="bg-[#06B6D4] text-[#0F1117]">
+                  <tr className="bg-cyan-700 text-white">
                     <td className="px-6 py-4 font-bold text-sm" style={{ fontFamily: "var(--font-mono)" }}>ORDER TOTAL ({r.quantity} assemblies)</td>
                     <td className="px-6 py-4 text-right font-bold text-lg" style={{ fontFamily: "var(--font-mono)" }}>₹ {fmt(r.order_cost)}</td>
                   </tr>
@@ -1245,12 +1245,12 @@ export default function NewEstimatePage() {
           </div>
 
           <div className="flex gap-3">
-            <button onClick={() => router.push("/dashboard")} className="flex-1 border border-[#2A3140] py-3.5 rounded-lg hover:bg-[#1C2235] text-sm font-medium text-[#94A3B8] transition-colors">
+            <button onClick={() => router.push("/dashboard")} className="flex-1 border border-slate-200 py-3.5 rounded-lg hover:bg-slate-50 text-sm font-medium text-slate-600 transition-colors">
               Back to Dashboard
             </button>
             <button
               onClick={() => { setStep("type"); setAssemblyResult(null); setAsmComponents([]); setResult(null); setFile(null); }}
-              className="flex-1 bg-[#22D3EE] text-[#0F1117] py-3.5 rounded-lg font-semibold hover:bg-[#06B6D4] transition-colors"
+              className="flex-1 bg-cyan-600 text-white py-3.5 rounded-lg font-semibold hover:bg-cyan-700 transition-colors"
             >
               New Estimate
             </button>

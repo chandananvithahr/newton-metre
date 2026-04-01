@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 @theme {
-  /* Dark surface palette */
-  --color-surface-bg:     #0F1117;
-  --color-surface-card:   #161B27;
-  --color-surface-panel:  #1C2235;
-  --color-surface-border: #2A3140;
+  /* Light surface palette */
+  --color-surface-bg:     #F8F8F6;
+  --color-surface-card:   #FFFFFF;
+  --color-surface-panel:  #F1F5F9;
+  --color-surface-border: #E2E8F0;
 
   /* Cyan accent */
   --color-accent:         #22D3EE;
@@ -40,8 +40,8 @@
 /* ── Base ── */
 body {
   font-family: var(--font-sans);
-  background-color: #0F1117;
-  color: #E2E8F0;
+  background-color: #F8F8F6;
+  color: #1E293B;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -165,12 +165,12 @@ button:active:not(:disabled) {
 [role="status"].skeleton {
   display: block;
   border-radius: 4px;
-  background-color: #1C2235;
+  background-color: #E2E8F0;
   background-image: linear-gradient(
     90deg,
-    #1C2235 0%,
-    #2A3140 50%,
-    #1C2235 100%
+    #E2E8F0 0%,
+    #F1F5F9 50%,
+    #E2E8F0 100%
   );
   background-size: 200% 100%;
   animation: skeleton-sweep 1.6s ease-in-out infinite;
@@ -203,10 +203,10 @@ button:active:not(:disabled) {
   pointer-events: auto;
   padding: 0.75rem 1rem;
   border-radius: 6px;
-  border: 1px solid #2A3140;
+  border: 1px solid #E2E8F0;
   border-left-width: 3px;
-  background-color: #161B27;
-  color: #E2E8F0;
+  background-color: #FFFFFF;
+  color: #1E293B;
   font-size: 0.875rem;
   box-shadow: 0 4px 12px rgba(0,0,0,0.4);
   min-width: 220px;

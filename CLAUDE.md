@@ -11,7 +11,7 @@ Always pull the screen screenshot alongside the HTML and match it pixel-for-pixe
 
 ## Project Overview
 
-Costrich — "Know what it costs. Before they quote." An AI-powered procurement negotiation intelligence tool. Gives line-by-line should-cost breakdowns (±5-10% accuracy) for mechanical parts, sheet metal parts, PCB assemblies, and cable assemblies. Built for Indian manufacturing job shop economics (₹ currency, INR pricing).
+Newton-Metre — "Know what it costs. Before they quote." An AI-powered procurement negotiation intelligence tool. Gives line-by-line should-cost breakdowns (±5-10% accuracy) for mechanical parts, sheet metal parts, PCB assemblies, and cable assemblies. Built for Indian manufacturing job shop economics (₹ currency, INR pricing).
 
 **Target industries:** Defense, Aerospace, Automobile
 **Target part types:** Turned, Milled, Sheet metal
@@ -27,6 +27,7 @@ Costrich — "Know what it costs. Before they quote." An AI-powered procurement 
 | **Backend API** | https://costimize-api-production.up.railway.app |
 | **API Health** | https://costimize-api-production.up.railway.app/api/health |
 | **Supabase** | project ypzeffbhlslonqmqiaeh |
+| **GitHub** | https://github.com/chandananvithahr/costimize-mvp (PUBLIC — made public 2026-03-31 for YC Startup School India) |
 
 ## Repository Structure
 
@@ -100,6 +101,7 @@ cd costimize-v2 && python -m pytest tests/ -v # Run all 164 tests
 - **Frontend:** Vercel auto-deploys from GitHub master. Manual: `cd frontend && vercel --prod`
 - **Backend:** Railway deploys from `C:\Users\chand\costimize-deploy` (~705KB clean directory with only API essentials)
 - **Git note:** books/, papers/, sandvik/ stripped from git history. Do NOT re-add large PDFs to git
+- **Docker build cache:** Dockerfile uses `--mount=type=cache,target=/root/.cache/pip` (BuildKit). `cadquery-ocp` (~500MB) downloads once, cached on subsequent builds. Do NOT use `--no-cache-dir` — it defeats caching. `railway.toml` sets builder=dockerfile explicitly.
 
 ---
 
@@ -305,6 +307,8 @@ costimize-v2/
 - **Self-hosted VLM roadmap** — Gemini API now → Qwen2.5-VL-7B self-hosted → fine-tuned on-premise (defense clients won't use cloud APIs)
 - **No silent tracking** — cost estimation and similarity search are separate features with no data sharing
 - **Dual pipeline strategy** — keep VLM-only (working) alongside any future YOLO+VLM pipeline, benchmark to decide
+- **Native parsing over rasterization** — DXF/DWG: parse entities with `ezdxf` (exact coordinates). STEP: parse geometry with OCP. PDF: extract text with pdfplumber first. NEVER convert to image for extraction — PNG only as last resort for scanned PDFs at 300+ DPI minimum. No external CAD software needed.
+- **VLM fine-tuning dataset** — User's own Indian manufacturing drawings (DWG/DXF/STEP/PDF) are the training data. Pipeline: convert to PNG (300+ DPI, never JPEG) → auto-annotate with GPT-4o → LoRA fine-tune Qwen2.5-VL-7B (~$10-20). Supplement with: TechING (HuggingFace), DeepCAD (178K models), ABC Dataset (1M STEP).
 
 ---
 

@@ -41,8 +41,8 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Costrich — Should-Cost Intelligence",
-  description: "AI-powered should-cost breakdowns for mechanical parts. Physics-based, line-by-line, accurate to ±10%.",
+  title: "Newton-Metre — Should-Cost Intelligence",
+  description: "Not a dashboard. Not a copilot. Newton-Metre does the work — reads your drawing, calculates every cost line, hands you the answer. Built for Indian manufacturing.",
 };
 
 export default function RootLayout({

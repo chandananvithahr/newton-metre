@@ -10,8 +10,8 @@ export default function LandingPage() {
       <nav className="bg-[#F8F8F6]/90 backdrop-blur-md flex justify-between items-center w-full px-6 lg:px-10 h-16 lg:h-20 fixed top-0 z-50 border-b border-slate-200">
         <div className="flex items-center gap-10">
           <Link href="/" className="flex items-center gap-2.5">
-            <Image src="/costrich-logo.png" alt="Costrich" width={44} height={44} className="rounded-xl" />
-            <span className="font-heading text-2xl text-cyan-600 tracking-tight">Costrich</span>
+            <Image src="/newton-metre-logo.png" alt="Newton-Metre" width={44} height={44} className="rounded-xl" />
+            <span className="font-heading text-2xl text-cyan-600 tracking-tight">Newton-Metre</span>
           </Link>
           <div className="hidden md:flex items-center gap-8">
             {[["How it works", "#how-it-works"], ["Features", "#features"], ["Pricing", "#pricing"]].map(([l, h]) => (
@@ -39,7 +39,7 @@ export default function LandingPage() {
 
             {/* Logo mark */}
             <div className="flex justify-center">
-              <Image src="/costrich-logo.png" alt="Costrich" width={88} height={88} className="rounded-2xl shadow-lg" />
+              <Image src="/newton-metre-logo.png" alt="Newton-Metre" width={88} height={88} className="rounded-2xl shadow-lg" />
             </div>
 
             {/* Badge */}
@@ -54,7 +54,7 @@ export default function LandingPage() {
             </h1>
 
             <p className="max-w-xl mx-auto font-sans text-lg text-slate-500 leading-relaxed">
-              AI-powered should-cost breakdowns for mechanical parts. Line-by-line, physics-based, built for Indian manufacturing economics.
+              Not a dashboard. Not a copilot. A tool that does the work — reads your drawing, calculates every cost line, and hands you the answer. You just upload and negotiate.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
@@ -83,7 +83,7 @@ export default function LandingPage() {
               From drawing to negotiation-ready<br className="hidden md:block" /> in under 60 seconds.
             </h2>
             <p className="font-sans text-base text-slate-500 mb-12 max-w-2xl leading-relaxed">
-              Physics-based math, Indian manufacturing rates.
+              Upload a drawing. Newton-Metre does the rest — no prompting, no configuring, no learning curve. Physics-based math, Indian manufacturing rates.
             </p>
 
             <div className="grid md:grid-cols-3 gap-8">
@@ -126,9 +126,12 @@ export default function LandingPage() {
         <section id="features" className="py-20">
           <div className="max-w-5xl mx-auto px-6 lg:px-10">
             <p className="font-mono text-[11px] text-cyan-600 uppercase tracking-widest mb-3">Capabilities</p>
-            <h2 className="font-heading text-[clamp(28px,4vw,44px)] text-slate-900 tracking-tight mb-12">
-              Not another <span className="text-cyan-600 italic">AI wrapper.</span>
+            <h2 className="font-heading text-[clamp(28px,4vw,44px)] text-slate-900 tracking-tight mb-4">
+              It does the work.<br className="hidden md:block" /> <span className="text-cyan-600 italic">You negotiate.</span>
             </h2>
+            <p className="font-sans text-base text-slate-500 mb-12 max-w-2xl leading-relaxed">
+              Newton-Metre isn&apos;t a dashboard you stare at or a copilot you prompt. It reads the drawing, finds the history, runs the numbers, and hands you the answer.
+            </p>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
@@ -157,7 +160,7 @@ export default function LandingPage() {
                   Make every purchase<br />order count.
                 </h2>
                 <p className="font-sans text-base text-slate-500 leading-relaxed mb-8">
-                  When you know what a part should cost, you negotiate from facts. Costrich gives procurement teams the data to close better deals — every time.
+                  Newton-Metre is the cost analyst your team doesn&apos;t have. It does the homework — material rates, cycle times, finishing costs, overhead — so you walk into every supplier negotiation already knowing the answer.
                 </p>
                 <div className="flex flex-wrap gap-4">
                   <Link href="/login" className="px-6 py-3 bg-cyan-600 text-white font-sans font-semibold rounded-md hover:bg-cyan-700 transition-colors">
@@ -251,7 +254,7 @@ export default function LandingPage() {
               Upload a drawing and get a full should-cost breakdown in under 60 seconds. No credit card, no setup.
             </p>
             <Link href="/login" className="inline-flex items-center justify-center px-8 py-4 bg-cyan-600 text-white font-sans font-semibold rounded-md hover:bg-cyan-700 transition-colors">
-              Try Costrich free →
+              Try Newton-Metre free →
             </Link>
             <p className="mt-4 font-sans text-sm text-slate-400">No credit card · No setup · Just upload and go</p>
           </div>
@@ -265,11 +268,11 @@ export default function LandingPage() {
           <div className="flex flex-col md:flex-row justify-between items-start gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2.5 mb-3">
-                <Image src="/costrich-logo.png" alt="Costrich" width={40} height={40} className="rounded-xl" />
-                <span className="font-heading text-xl text-cyan-600">Costrich</span>
+                <Image src="/newton-metre-logo.png" alt="Newton-Metre" width={40} height={40} className="rounded-xl" />
+                <span className="font-heading text-xl text-cyan-600">Newton-Metre</span>
               </div>
               <p className="font-sans text-sm text-slate-500 max-w-xs leading-relaxed">
-                Engineered for manufacturing procurement teams. Physics-based should-cost intelligence for India.
+                The tool that does the homework your procurement team doesn&apos;t have time for. Physics-based should-cost intelligence, built for Indian manufacturing.
               </p>
             </div>
             <div className="grid grid-cols-2 gap-x-12 gap-y-2">
@@ -283,7 +286,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="border-t border-slate-200 pt-6 font-mono text-[10px] text-slate-400 uppercase tracking-widest">
-            © 2026 Costrich. All rights reserved.
+            © 2026 Newton-Metre. All rights reserved.
           </div>
         </div>
       </footer>

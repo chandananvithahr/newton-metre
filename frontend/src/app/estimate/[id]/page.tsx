@@ -27,10 +27,10 @@ export default function ViewEstimatePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0F1117]">
+      <div className="min-h-screen flex items-center justify-center bg-[#F8F8F6]">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-[#2A3140] border-t-[#22D3EE] rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-[#64748B] text-sm">Loading estimate...</p>
+          <div className="w-8 h-8 border-2 border-slate-200 border-t-cyan-600 rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-slate-500 text-sm">Loading estimate...</p>
         </div>
       </div>
     );
@@ -38,8 +38,8 @@ export default function ViewEstimatePage() {
 
   if (!data) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0F1117]">
-        <p className="text-[#64748B]">Estimate not found.</p>
+      <div className="min-h-screen flex items-center justify-center bg-[#F8F8F6]">
+        <p className="text-slate-500">Estimate not found.</p>
       </div>
     );
   }
@@ -47,22 +47,22 @@ export default function ViewEstimatePage() {
   const breakdown = data.cost_breakdown as Record<string, unknown> | undefined;
   const confidenceTier = data.confidence_tier as string | null;
   const confidenceStyle =
-    confidenceTier === "high"   ? "bg-emerald-950/60 text-emerald-400 border-emerald-800" :
-    confidenceTier === "medium" ? "bg-amber-950/60 text-amber-400 border-amber-800" :
-    confidenceTier === "low"    ? "bg-red-950/60 text-red-400 border-red-800" :
-    "bg-[#1C2235] text-[#64748B] border-[#2A3140]";
+    confidenceTier === "high"   ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
+    confidenceTier === "medium" ? "bg-amber-50 text-amber-700 border-amber-200" :
+    confidenceTier === "low"    ? "bg-red-50 text-red-700 border-red-200" :
+    "bg-slate-50 text-slate-500 border-slate-200";
 
   const fmt = (v: unknown) => Number(v ?? 0).toLocaleString("en-IN", { maximumFractionDigits: 0 });
   const currency = (data.currency as string) || "INR";
   const hasBreakdownRows = breakdown && Object.values(breakdown).some((v) => v != null);
 
   return (
-    <div className="min-h-screen bg-[#0F1117]">
+    <div className="min-h-screen bg-[#F8F8F6]">
       <AppNav />
 
       <div className="max-w-3xl mx-auto px-4 sm:px-8 py-8">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl tracking-tight">Estimate Details</h1>
+          <h1 className="text-3xl tracking-tight text-slate-900">Estimate Details</h1>
           {confidenceTier && (
             <span className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${confidenceStyle}`} style={{ fontFamily: "var(--font-mono)" }}>
               {confidenceTier.toUpperCase()}
@@ -70,29 +70,28 @@ export default function ViewEstimatePage() {
           )}
         </div>
 
-        {/* Meta table — Kailash Nadh pattern: dl/table beats 3-column grid for labelled values */}
-        <div className="bg-[#161B27] rounded-xl border border-[#2A3140] overflow-hidden mb-4">
+        {/* Meta table */}
+        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden mb-4">
           <table className="w-full text-sm">
-            <tbody className="divide-y divide-[#2A3140]">
+            <tbody className="divide-y divide-slate-100">
               <tr>
-                <td className="px-5 py-3 text-[#64748B] w-36" style={{ fontFamily: "var(--font-mono)" }}>Created</td>
-                <td className="px-5 py-3 text-[#E2E8F0] font-medium">
+                <td className="px-5 py-3 text-slate-500 w-36" style={{ fontFamily: "var(--font-mono)" }}>Created</td>
+                <td className="px-5 py-3 text-slate-900 font-medium">
                   {new Date(data.created_at as string).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
                 </td>
               </tr>
               <tr>
-                <td className="px-5 py-3 text-[#64748B]" style={{ fontFamily: "var(--font-mono)" }}>Part type</td>
-                <td className="px-5 py-3 text-[#E2E8F0] font-medium capitalize">
+                <td className="px-5 py-3 text-slate-500" style={{ fontFamily: "var(--font-mono)" }}>Part type</td>
+                <td className="px-5 py-3 text-slate-900 font-medium capitalize">
                   {(data.part_type as string) || "mechanical"}
                 </td>
               </tr>
               <tr>
-                <td className="px-5 py-3 text-[#64748B]" style={{ fontFamily: "var(--font-mono)" }}>Total cost</td>
+                <td className="px-5 py-3 text-slate-500" style={{ fontFamily: "var(--font-mono)" }}>Total cost</td>
                 <td className="px-5 py-3">
-                  {/* click-to-copy — Skill #2 from skills.md */}
                   <CopyValue
                     value={`${data.currency} ${Number(data.total_cost).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`}
-                    className="text-lg font-medium text-[#E2E8F0] rounded px-1 -mx-1"
+                    className="text-lg font-medium text-slate-900 rounded px-1 -mx-1"
                   >
                     <span style={{ fontFamily: "var(--font-mono)" }}>
                       {data.currency as string} {Number(data.total_cost).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
@@ -105,62 +104,61 @@ export default function ViewEstimatePage() {
         </div>
 
         {hasBreakdownRows && (
-          <div className="bg-[#161B27] rounded-xl border border-[#2A3140] overflow-hidden mb-6">
+          <div className="bg-white rounded-xl border border-slate-200 overflow-hidden mb-6">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-[#2A3140] bg-[#1C2235]">
-                  <th className="text-left px-6 py-3.5 text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Cost Component</th>
-                  <th className="text-right px-6 py-3.5 text-xs font-medium text-[#64748B] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Amount ({currency})</th>
+                <tr className="border-b border-slate-100 bg-slate-50">
+                  <th className="text-left px-6 py-3.5 text-xs font-medium text-slate-500 uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Cost Component</th>
+                  <th className="text-right px-6 py-3.5 text-xs font-medium text-slate-500 uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Amount ({currency})</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#2A3140]">
+              <tbody className="divide-y divide-slate-100">
                 {breakdown.material_cost != null && (
                   <tr>
-                    <td className="px-6 py-3.5 text-sm text-[#94A3B8]">Material</td>
-                    <td className="px-6 py-3.5 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(breakdown.material_cost)}</td>
+                    <td className="px-6 py-3.5 text-sm text-slate-600">Material</td>
+                    <td className="px-6 py-3.5 text-right text-sm font-medium text-slate-900" style={{ fontFamily: "var(--font-mono)" }}>{fmt(breakdown.material_cost)}</td>
                   </tr>
                 )}
                 {breakdown.total_machining_cost != null && (
                   <tr>
-                    <td className="px-6 py-3.5 text-sm text-[#94A3B8]">Machining</td>
-                    <td className="px-6 py-3.5 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(breakdown.total_machining_cost)}</td>
+                    <td className="px-6 py-3.5 text-sm text-slate-600">Machining</td>
+                    <td className="px-6 py-3.5 text-right text-sm font-medium text-slate-900" style={{ fontFamily: "var(--font-mono)" }}>{fmt(breakdown.total_machining_cost)}</td>
                   </tr>
                 )}
                 {(breakdown.total_setup_cost != null || breakdown.total_tooling_cost != null) && (
                   <tr>
-                    <td className="px-6 py-3.5 text-sm text-[#94A3B8]">Setup & Tooling</td>
-                    <td className="px-6 py-3.5 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(Number(breakdown.total_setup_cost ?? 0) + Number(breakdown.total_tooling_cost ?? 0))}</td>
+                    <td className="px-6 py-3.5 text-sm text-slate-600">Setup & Tooling</td>
+                    <td className="px-6 py-3.5 text-right text-sm font-medium text-slate-900" style={{ fontFamily: "var(--font-mono)" }}>{fmt(Number(breakdown.total_setup_cost ?? 0) + Number(breakdown.total_tooling_cost ?? 0))}</td>
                   </tr>
                 )}
                 {breakdown.total_labour_cost != null && (
                   <tr>
-                    <td className="px-6 py-3.5 text-sm text-[#94A3B8]">Labour</td>
-                    <td className="px-6 py-3.5 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(breakdown.total_labour_cost)}</td>
+                    <td className="px-6 py-3.5 text-sm text-slate-600">Labour</td>
+                    <td className="px-6 py-3.5 text-right text-sm font-medium text-slate-900" style={{ fontFamily: "var(--font-mono)" }}>{fmt(breakdown.total_labour_cost)}</td>
                   </tr>
                 )}
                 {breakdown.total_power_cost != null && (
                   <tr>
-                    <td className="px-6 py-3.5 text-sm text-[#94A3B8]">Power</td>
-                    <td className="px-6 py-3.5 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(breakdown.total_power_cost)}</td>
+                    <td className="px-6 py-3.5 text-sm text-slate-600">Power</td>
+                    <td className="px-6 py-3.5 text-right text-sm font-medium text-slate-900" style={{ fontFamily: "var(--font-mono)" }}>{fmt(breakdown.total_power_cost)}</td>
                   </tr>
                 )}
                 {breakdown.overhead != null && (
                   <tr>
-                    <td className="px-6 py-3.5 text-sm text-[#94A3B8]">Overhead</td>
-                    <td className="px-6 py-3.5 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(breakdown.overhead)}</td>
+                    <td className="px-6 py-3.5 text-sm text-slate-600">Overhead</td>
+                    <td className="px-6 py-3.5 text-right text-sm font-medium text-slate-900" style={{ fontFamily: "var(--font-mono)" }}>{fmt(breakdown.overhead)}</td>
                   </tr>
                 )}
                 {breakdown.profit != null && (
                   <tr>
-                    <td className="px-6 py-3.5 text-sm text-[#94A3B8]">Profit</td>
-                    <td className="px-6 py-3.5 text-right text-sm font-medium text-[#E2E8F0]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(breakdown.profit)}</td>
+                    <td className="px-6 py-3.5 text-sm text-slate-600">Profit</td>
+                    <td className="px-6 py-3.5 text-right text-sm font-medium text-slate-900" style={{ fontFamily: "var(--font-mono)" }}>{fmt(breakdown.profit)}</td>
                   </tr>
                 )}
               </tbody>
               <tfoot>
-                <tr className="bg-[#22D3EE] text-[#0F1117]">
+                <tr className="bg-cyan-600 text-white">
                   <td className="px-6 py-4 font-bold text-sm" style={{ fontFamily: "var(--font-mono)" }}>TOTAL (per unit)</td>
-                  {/* click-to-copy on total — Skill #2 from skills.md */}
                   <CopyValue
                     as="td"
                     value={`${currency} ${fmt(breakdown.unit_cost ?? data.total_cost)}`}
@@ -178,7 +176,7 @@ export default function ViewEstimatePage() {
 
         <button
           onClick={() => router.push("/dashboard")}
-          className="border border-[#2A3140] px-6 py-3 rounded-lg hover:bg-[#1C2235] text-sm font-medium text-[#94A3B8] transition-colors"
+          className="border border-slate-200 px-6 py-3 rounded-lg hover:bg-slate-50 text-sm font-medium text-slate-600 transition-colors"
         >
           Back to Dashboard
         </button>

@@ -95,7 +95,7 @@ function CopyCell({ value }: { value: string }) {
 
 **Pattern:** Let typography do the design work. Don't rely on gradients or decorations.
 
-| Property | dns.toys | listmonk | Costrich |
+| Property | dns.toys | listmonk | Newton-Metre |
 |---|---|---|---|
 | Base font | Inter | Inter | Source Sans 3 |
 | Base size | 17px | 16px | 16px |
@@ -118,7 +118,7 @@ function CopyCell({ value }: { value: string }) {
 |---|---|
 | dns.toys | `#166ab9` (blue) |
 | listmonk | `#0055d4` (blue) |
-| Costrich | `#22D3EE` (cyan) |
+| Newton-Metre | `#22D3EE` (cyan) |
 
 **Rules:**
 - Don't use accent for decorative purposes (backgrounds, gradients, borders on cards)
@@ -132,7 +132,7 @@ function CopyCell({ value }: { value: string }) {
 **Pattern:** `box-shadow: 2px 2px 0 #f3f3f3` (listmonk) or `2px 2px 2px #eee` (dns.toys).
 Two pixels, one shade lighter than background. Not `0 20px 60px rgba(0,0,0,0.5)`.
 
-**For dark theme (Costrich):**
+**For dark theme (Newton-Metre):**
 - Borders: `1px solid #2A3140` — not thick, not coloured
 - Cards: `bg-[#161B27]` + `border border-[#2A3140]` — no glow, no shadow
 - Hover state: `hover:bg-[#1C2235]` — subtle, not dramatic
@@ -157,7 +157,7 @@ Two pixels, one shade lighter than background. Not `0 20px 60px rgba(0,0,0,0.5)`
 - Button press (`scale(0.98)` on `:active`)
 - Form focus rings
 
-**Remove:** `animate-fade-in-up`, `animate-fade-in-up-delay-1/2/3` from hero and hero CTA. These were removed in the Costrich landing page update.
+**Remove:** `animate-fade-in-up`, `animate-fade-in-up-delay-1/2/3` from hero and hero CTA. These were removed in the Newton-Metre landing page update.
 
 ---
 
@@ -166,7 +166,7 @@ Two pixels, one shade lighter than background. Not `0 20px 60px rgba(0,0,0,0.5)`
 **Pattern:** Before/After is always better as one table than two side-by-side cards.
 
 ```
-| Metric          | Without       | With Costrich         |
+| Metric          | Without       | With Newton-Metre         |
 |-----------------|---------------|-----------------------|
 | Time            | 2–3 days      | Under 60 seconds      |
 | Accuracy        | Unknown       | ±5–10% physics-based  |
@@ -187,9 +187,9 @@ Two pixels, one shade lighter than background. Not `0 20px 60px rgba(0,0,0,0.5)`
 **dns.toys headline:** `"Useful utilities and services over DNS"` — literally what it is.
 **listmonk tagline:** `"High performance, self-hosted newsletter and mailing list manager."` — exactly what it does.
 
-**Rules for Costrich:**
+**Rules for Newton-Metre:**
 - Lead with what the user gets, not what the product is
-- Use second person ("you", "your") not product-centric ("Costrich gives you")
+- Use second person ("you", "your") not product-centric ("Newton-Metre gives you")
 - Specific > vague: "₹800/hr CNC turning rate" not "competitive rates"
 - Numbers when you have them: "±5–10%" not "accurate"
 
@@ -216,7 +216,7 @@ Two pixels, one shade lighter than background. Not `0 20px 60px rgba(0,0,0,0.5)`
 
 **Anti-pattern to avoid:** Big hero section → 3-item "how it works" with large icons → 4 feature cards that each say one sentence → pricing. That's 12 visual elements communicating 8 actual facts.
 
-**Costrich pattern:**
+**Newton-Metre pattern:**
 - Stats bar: 4 numbers, one line each
 - How it works: table with 3 rows, each row has full detail
 - Features: table, scannable in 20 seconds
@@ -244,7 +244,7 @@ input:focus {
 ```
 
 ```css
-/* Costrich equivalent */
+/* Newton-Metre equivalent */
 input:focus {
   border-color: #22D3EE;
   box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.15);
@@ -264,7 +264,7 @@ input:focus {
 **Pattern:** Don't build custom spinner divs. Set `aria-busy="true"` on the container — oat injects the spinner via CSS `::before`. Semantic AND visual.
 
 ```tsx
-// ✗ Current Costrich pattern — custom div
+// ✗ Current Newton-Metre pattern — custom div
 <div className="w-8 h-8 border-2 border-t-[#22D3EE] rounded-full animate-spin" />
 
 // ✓ oat pattern — HTML attribute drives spinner
@@ -273,7 +273,7 @@ input:focus {
 </div>
 ```
 
-**In Tailwind (Costrich adaptation):**
+**In Tailwind (Newton-Metre adaptation):**
 ```tsx
 // Container shows spinner automatically when loading
 <div
@@ -299,7 +299,7 @@ The key insight: **loading state is a semantic state, not a visual component**. 
 <span class="badge danger">LOW</span>
 ```
 
-**Costrich currently:**
+**Newton-Metre currently:**
 ```tsx
 // ✗ Function returning hardcoded className strings
 const confidenceColor = (tier) => {
@@ -325,7 +325,7 @@ const TIER_CLASS: Record<string, string> = {
 **Pattern:** Use `role="alert"` on status messages so screen readers announce them automatically. No extra ARIA needed.
 
 ```tsx
-// ✗ Current Costrich pattern
+// ✗ Current Newton-Metre pattern
 <div className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm">
   {error}
 </div>
@@ -355,7 +355,7 @@ border-width: 1px 3px 3px 1px;  /* dont.build pattern */
 box-shadow: 3px 3px 0px var(--secondary);
 ```
 
-The diagonal movement only makes sense when paired with an offset shadow. For Costrich's flat buttons (no shadow), `scale(0.98)` is fine. **Use `translate(1px, 1px)` only when there's a visible offset shadow to "sink into".**
+The diagonal movement only makes sense when paired with an offset shadow. For Newton-Metre's flat buttons (no shadow), `scale(0.98)` is fine. **Use `translate(1px, 1px)` only when there's a visible offset shadow to "sink into".**
 
 ---
 
@@ -373,7 +373,7 @@ The diagonal movement only makes sense when paired with an offset shadow. For Co
 --space-10: 2.5rem;   /* 40px */
 ```
 
-**Tailwind equivalent already in Costrich** — use Tailwind's spacing scale (`p-4`, `gap-6`, `py-8`) consistently instead of arbitrary values (`py-2.5`, `px-5`, `gap-3.5`). The existing code already does this well.
+**Tailwind equivalent already in Newton-Metre** — use Tailwind's spacing scale (`p-4`, `gap-6`, `py-8`) consistently instead of arbitrary values (`py-2.5`, `px-5`, `gap-3.5`). The existing code already does this well.
 
 ---
 
@@ -389,7 +389,7 @@ The diagonal movement only makes sense when paired with an offset shadow. For Co
 background-color: color-mix(in srgb, var(--danger) 8%, transparent);
 ```
 
-**Applied to Costrich:** Instead of hardcoding `#06B6D4` as the hover state of `#22D3EE`, use:
+**Applied to Newton-Metre:** Instead of hardcoding `#06B6D4` as the hover state of `#22D3EE`, use:
 ```css
 --accent-hover: color-mix(in srgb, #22D3EE, black 15%);
 ```
@@ -413,9 +413,9 @@ const params = [
 ]
 ```
 
-**For Costrich product decisions:** Run any proposed feature through this model before building. The weights reflect Zerodha's priorities: user value (40% combined) > risk avoidance (35%) > reach (10%).
+**For Newton-Metre product decisions:** Run any proposed feature through this model before building. The weights reflect Zerodha's priorities: user value (40% combined) > risk avoidance (35%) > reach (10%).
 
-**Also applies to the confidence tier display:** Costrich's 4 confidence tiers (HIGH/MEDIUM/LOW/INSUFFICIENT) follow the same idea — weighted signals produce a single score, score maps to a tier, tier drives UI (badge color, CTA shown).
+**Also applies to the confidence tier display:** Newton-Metre's 4 confidence tiers (HIGH/MEDIUM/LOW/INSUFFICIENT) follow the same idea — weighted signals produce a single score, score maps to a tier, tier drives UI (badge color, CTA shown).
 
 ---
 
@@ -428,7 +428,7 @@ const params = [
 - `data-default` attribute to set the default tab
 - `data-name` attribute on section for the tab label
 
-**Applied to Costrich:** If adding tabs to the estimate page (e.g. Mechanical / Sheet Metal / PCB), use this pattern:
+**Applied to Newton-Metre:** If adding tabs to the estimate page (e.g. Mechanical / Sheet Metal / PCB), use this pattern:
 ```tsx
 // Section with id = tab ID, data-name = tab label
 <div className="tab-section" id="mechanical" data-name="Mechanical" data-default>

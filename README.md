@@ -1,10 +1,10 @@
-# Costrich
+# Newton-Metre
 
 > **Know what it costs. Before they quote.**
 
 AI-powered procurement negotiation intelligence for Indian manufacturing. Gives procurement teams line-by-line should-cost breakdowns for manufactured parts — so you walk into every supplier negotiation knowing exactly what the part should cost, process by process.
 
-**Live:** [costrich.app](https://frontend-theta-ecru-95.vercel.app) · [API](https://costimize-api-production.up.railway.app/api/health)
+**Live:** [newton-metre.ai](https://frontend-theta-ecru-95.vercel.app) · [API](https://costimize-api-production.up.railway.app/api/health)
 
 ---
 
@@ -126,7 +126,7 @@ NEXT_PUBLIC_API_URL=
 
 Indian manufacturers in **Defense · Aerospace · Automobile** — procurement teams negotiating with suppliers for custom turned, milled, and sheet metal parts.
 
-The problem: suppliers know buyers don't understand manufacturing costs. Margins get padded 30-40% and nobody can prove it. Costrich closes that information gap.
+The problem: suppliers know buyers don't understand manufacturing costs. Margins get padded 30-40% and nobody can prove it. Newton-Metre closes that information gap.
 
 ---
 
