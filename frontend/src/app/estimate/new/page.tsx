@@ -574,7 +574,7 @@ export default function NewEstimatePage() {
             <button
               onClick={handleUpload}
               disabled={!file}
-              className="w-full bg-cyan-600 text-white py-3.5 rounded-lg font-semibold hover:bg-cyan-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="w-full bg-slate-900 text-white py-3.5 rounded-full font-medium hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
             >
               {extraSheets.length > 0 ? `Analyze ${extraSheets.length + 1} Sheets` : "Analyze Drawing"}
             </button>
@@ -675,7 +675,7 @@ export default function NewEstimatePage() {
           {error && <div role="alert" className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-red-600 text-sm mb-4">{error}</div>}
 
           <div className="flex gap-3">
-            <button onClick={handleCalculate} disabled={needsMaterialInput && !activeMaterial} className="flex-1 bg-cyan-600 text-white py-3.5 rounded-lg font-semibold hover:bg-cyan-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+            <button onClick={handleCalculate} disabled={needsMaterialInput && !activeMaterial} className="flex-1 bg-slate-900 text-white py-3.5 rounded-full font-medium hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200">
               Calculate Cost
             </button>
             <button onClick={() => setStep("upload")} className="px-6 py-3.5 border border-slate-200 rounded-lg hover:bg-slate-50 text-sm font-medium text-slate-600 transition-colors">
@@ -781,7 +781,7 @@ export default function NewEstimatePage() {
                     } catch { /* non-critical */ }
                   }}
                   disabled={!supplierQuoteStr || !parseFloat(supplierQuoteStr)}
-                  className="px-5 py-2.5 bg-cyan-600 text-white rounded-lg text-sm font-semibold hover:bg-cyan-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="px-5 py-2.5 bg-slate-900 text-white rounded-full text-sm font-medium hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
                 >
                   Save
                 </button>
@@ -827,7 +827,7 @@ export default function NewEstimatePage() {
             <button onClick={() => router.push("/dashboard")} className="flex-1 border border-slate-200 py-3.5 rounded-lg hover:bg-slate-50 text-sm font-medium text-slate-600 transition-colors">
               Back to Dashboard
             </button>
-            <button onClick={() => { setStep("type"); setResult(null); setExtractedData(null); setFile(null); setSupplierQuoteStr(""); setSupplierQuoteSaved(false); }} className="flex-1 bg-cyan-600 text-white py-3.5 rounded-lg font-semibold hover:bg-cyan-700 transition-colors">
+            <button onClick={() => { setStep("type"); setResult(null); setExtractedData(null); setFile(null); setSupplierQuoteStr(""); setSupplierQuoteSaved(false); }} className="flex-1 bg-slate-900 text-white py-3.5 rounded-full font-medium hover:bg-slate-800 transition-all duration-200">
               New Estimate
             </button>
           </div>
@@ -921,7 +921,7 @@ export default function NewEstimatePage() {
           <button
             onClick={handleAsmExtractAll}
             disabled={!canAnalyze}
-            className="w-full bg-cyan-600 text-white py-3.5 rounded-lg font-semibold hover:bg-cyan-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="w-full bg-slate-900 text-white py-3.5 rounded-full font-medium hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
           >
             Analyze All Components ({asmComponents.length})
           </button>
@@ -1086,7 +1086,7 @@ export default function NewEstimatePage() {
             <button
               onClick={() => setStep("assembly-joining")}
               disabled={!allExtracted || hasErrors}
-              className="flex-1 bg-cyan-600 text-white py-3.5 rounded-lg font-semibold hover:bg-cyan-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="flex-1 bg-slate-900 text-white py-3.5 rounded-full font-medium hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
             >
               Next: Joining Method
             </button>
@@ -1171,7 +1171,7 @@ export default function NewEstimatePage() {
           <div className="flex gap-3">
             <button
               onClick={handleAsmCalculate}
-              className="flex-1 bg-cyan-600 text-white py-3.5 rounded-lg font-semibold hover:bg-cyan-700 transition-colors"
+              className="flex-1 bg-slate-900 text-white py-3.5 rounded-full font-medium hover:bg-slate-800 transition-all duration-200"
             >
               Calculate Assembly Cost
             </button>
@@ -1275,7 +1275,7 @@ export default function NewEstimatePage() {
                 </tr>
               </tbody>
               <tfoot>
-                <tr className="bg-cyan-600 text-white">
+                <tr className="bg-slate-900 text-white">
                   <td className="px-6 py-4 font-bold text-sm" style={{ fontFamily: "var(--font-mono)" }}>TOTAL ASSEMBLY (per unit)</td>
                   <td className="px-6 py-4 text-right font-bold text-lg" style={{ fontFamily: "var(--font-mono)" }}>₹ {fmt(r.unit_cost)}</td>
                 </tr>
@@ -1295,7 +1295,7 @@ export default function NewEstimatePage() {
             </button>
             <button
               onClick={() => { setStep("type"); setAssemblyResult(null); setAsmComponents([]); setResult(null); setFile(null); }}
-              className="flex-1 bg-cyan-600 text-white py-3.5 rounded-lg font-semibold hover:bg-cyan-700 transition-colors"
+              className="flex-1 bg-slate-900 text-white py-3.5 rounded-full font-medium hover:bg-slate-800 transition-all duration-200"
             >
               New Estimate
             </button>

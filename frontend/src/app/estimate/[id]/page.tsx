@@ -157,7 +157,7 @@ export default function ViewEstimatePage() {
                 )}
               </tbody>
               <tfoot>
-                <tr className="bg-cyan-600 text-white">
+                <tr className="bg-slate-900 text-white">
                   <td className="px-6 py-4 font-bold text-sm" style={{ fontFamily: "var(--font-mono)" }}>TOTAL (per unit)</td>
                   <CopyValue
                     as="td"

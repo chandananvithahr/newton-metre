@@ -45,10 +45,10 @@ export default function SimilarPartsPage() {
       <div className="min-h-screen bg-[#F8F8F6]">
         <AppNav />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-12">
-          <h1 className="text-3xl mb-2 tracking-tight text-slate-900">Similar Parts Search</h1>
-          <p className="text-slate-500 mb-8 text-sm">Upload 2 or more engineering drawings to find similar parts and compare costs.</p>
+          <h1 style={{ fontFamily: "var(--font-heading)" }} className="text-[32px] tracking-tight text-slate-900 mb-2">Similar Parts</h1>
+          <p className="text-slate-400 mb-8 text-[14px]" style={{ fontFamily: "var(--font-sans)" }}>Upload 2 or more drawings to find similar parts from your company&apos;s history.</p>
 
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
+          <div className="bg-white rounded-2xl border border-slate-200/80 p-8">
             <div
               className="border-2 border-dashed border-slate-200 rounded-xl p-10 text-center mb-6 hover:border-cyan-300 hover:bg-cyan-50/50 transition-colors cursor-pointer"
               role="button"
@@ -98,7 +98,8 @@ export default function SimilarPartsPage() {
             <button
               onClick={handleSearch}
               disabled={loading || files.length < 2}
-              className="w-full bg-cyan-600 text-white py-3.5 rounded-lg font-semibold hover:bg-cyan-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="w-full bg-slate-900 text-white py-3.5 rounded-full font-medium hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 text-[14px]"
+            style={{ fontFamily: "var(--font-sans)" }}
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -125,8 +126,8 @@ export default function SimilarPartsPage() {
         </button>
       </AppNav>
       <div className="max-w-3xl mx-auto px-4 sm:px-8 py-8">
-        <h1 className="text-3xl mb-1 tracking-tight text-slate-900">Similarity Results</h1>
-        <p className="text-slate-500 text-sm mb-6" style={{ fontFamily: "var(--font-mono)" }}>{matches.length} match{matches.length !== 1 ? "es" : ""} found</p>
+        <h1 style={{ fontFamily: "var(--font-heading)" }} className="text-[32px] tracking-tight text-slate-900 mb-1">Similar Parts</h1>
+        <p className="text-slate-400 text-[13px] mb-6" style={{ fontFamily: "var(--font-mono)" }}>{matches.length} match{matches.length !== 1 ? "es" : ""} found</p>
 
         {matches.length === 0 ? (
           <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">

@@ -428,7 +428,7 @@ export default function LandingPage() {
                     </div>
                   ))}
                 </div>
-                <Link href="/login" className="block text-center bg-slate-900 text-white px-6 py-3.5 rounded-lg font-medium hover:bg-slate-800 transition-colors text-[14px]" style={{ fontFamily: "var(--font-sans)" }}>
+                <Link href="/login" className="block text-center bg-slate-900 text-white px-6 py-3.5 rounded-full font-medium hover:bg-slate-800 transition-colors text-[14px]" style={{ fontFamily: "var(--font-sans)" }}>
                   Upload a drawing
                 </Link>
               </div>

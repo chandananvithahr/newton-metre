@@ -285,7 +285,7 @@ function LoginContent() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-cyan-600 text-white py-3 rounded-lg font-semibold hover:bg-cyan-700 disabled:opacity-50 transition-colors mt-2"
+                    className="w-full bg-slate-900 text-white py-3 rounded-full font-medium hover:bg-slate-800 disabled:opacity-30 transition-all duration-200 mt-2"
                   >
                     {loading ? (
                       <span className="flex items-center justify-center gap-2">
