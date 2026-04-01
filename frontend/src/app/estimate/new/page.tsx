@@ -515,18 +515,15 @@ export default function NewEstimatePage() {
             <div className="flex items-center gap-4 mb-6">
               <label className="text-sm font-medium text-slate-600">Quantity:</label>
               <input
-                type="number" min={1} value={quantity || ""}
+                type="text" inputMode="numeric" pattern="[0-9]*"
+                value={quantity}
                 onChange={(e) => {
-                  const n = parseInt(e.target.value);
-                  if (!isNaN(n) && n >= 1) setQuantity(n);
-                  else if (e.target.value === "") setQuantity(1);
-                }}
-                onBlur={(e) => {
-                  const n = parseInt(e.target.value);
-                  setQuantity(isNaN(n) || n < 1 ? 1 : n);
+                  const raw = e.target.value.replace(/[^0-9]/g, "");
+                  if (raw === "") return;
+                  setQuantity(parseInt(raw));
                 }}
                 placeholder="e.g. 500"
-                className="w-28 px-3 py-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none text-sm text-slate-900 placeholder-slate-400"
+                className="w-28 px-3 py-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none text-sm text-slate-900 placeholder-slate-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 style={{ fontFamily: "var(--font-mono)" }}
               />
             </div>
@@ -861,9 +858,14 @@ export default function NewEstimatePage() {
           <div className="flex items-center gap-4 mb-6">
             <label className="text-sm font-medium text-slate-600">Quantity (assemblies):</label>
             <input
-              type="number" min={1} value={quantity}
-              onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-              className="w-24 px-3 py-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none text-sm text-slate-900"
+              type="text" inputMode="numeric" pattern="[0-9]*"
+              value={quantity}
+              onChange={(e) => {
+                const raw = e.target.value.replace(/[^0-9]/g, "");
+                if (raw === "") return;
+                setQuantity(parseInt(raw));
+              }}
+              className="w-24 px-3 py-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none text-sm text-slate-900 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               style={{ fontFamily: "var(--font-mono)" }}
             />
           </div>
