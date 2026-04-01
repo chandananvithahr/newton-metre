@@ -125,7 +125,6 @@ export default function DashboardPage() {
           </Link>
           <nav className="hidden md:flex items-center gap-6">
             <span className="text-[13px] font-medium text-slate-900" style={{ fontFamily: "var(--font-sans)" }}>Dashboard</span>
-            <button onClick={() => router.push("/estimate/new")} className="text-[13px] text-slate-400 hover:text-slate-700 transition-colors" style={{ fontFamily: "var(--font-sans)" }}>New Estimate</button>
             <button onClick={() => router.push("/similar")} className="text-[13px] text-slate-400 hover:text-slate-700 transition-colors" style={{ fontFamily: "var(--font-sans)" }}>Similar Parts</button>
           </nav>
         </div>
@@ -149,16 +148,6 @@ export default function DashboardPage() {
 
       {/* ── Sidebar ─────────────────────────────────────────────────────────── */}
       <aside className="bg-white border-r border-slate-200/80 h-screen w-56 fixed left-0 top-16 hidden md:flex flex-col pt-6 z-40">
-        <div className="px-4 mb-6">
-          <button
-            onClick={() => router.push("/estimate/new")}
-            className="w-full bg-slate-900 text-white py-2.5 px-4 rounded-full text-[12px] font-medium hover:bg-slate-800 transition-all duration-200"
-            style={{ fontFamily: "var(--font-sans)" }}
-          >
-            + New estimate
-          </button>
-        </div>
-
         <nav className="flex-1 px-3 space-y-0.5">
           {[
             { label: "Dashboard", icon: <IconSquares />, active: true, path: "/dashboard" },
