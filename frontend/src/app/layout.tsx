@@ -41,8 +41,8 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Newton-Metre — Should-Cost Intelligence",
-  description: "Know what it costs. Find what you've made. Newton-Metre reads your drawing, calculates every cost line, and searches thousands of drawings to find similar parts — your company's brain, searchable in seconds.",
+  title: "Costrich — Should-Cost Intelligence",
+  description: "Know what it costs. Before they quote. Costrich reads your drawing, breaks down every cost line — material, machining, finishing, margin — like a senior cost analyst. Then searches your company's history for similar parts.",
 };
 
 export default function RootLayout({

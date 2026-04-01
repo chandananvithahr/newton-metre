@@ -149,9 +149,9 @@ function LoginContent() {
       {/* Nav */}
       <nav className="flex items-center px-8 py-5 border-b border-slate-200 bg-white">
         <Link href="/" className="flex items-center gap-2.5">
-          <Image src="/newton-metre-logo.png" alt="Newton-Metre" width={36} height={36} className="rounded-xl" />
-          <span className="text-xl tracking-tight text-cyan-600 py-2" style={{ fontFamily: "var(--font-heading)" }}>
-            Newton-Metre
+          <Image src="/newton-metre-logo.png" alt="Costrich" width={40} height={40} className="rounded-xl" />
+          <span className="text-[22px] tracking-tight text-cyan-600 py-2" style={{ fontFamily: "var(--font-heading)" }}>
+            Costrich
           </span>
         </Link>
       </nav>
