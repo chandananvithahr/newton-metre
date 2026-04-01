@@ -1,13 +1,39 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase";
 
+function friendlyAuthError(message: string): string {
+  const lower = message.toLowerCase();
+  if (lower.includes("invalid login credentials"))
+    return "Incorrect email or password. Please try again.";
+  if (lower.includes("email not confirmed"))
+    return "Please confirm your email before logging in. Check your inbox (and spam folder).";
+  if (lower.includes("user already registered"))
+    return "This email is already registered. Try logging in instead.";
+  if (lower.includes("password") && lower.includes("characters"))
+    return "Password must be at least 6 characters.";
+  if (lower.includes("rate limit") || lower.includes("too many"))
+    return "Too many attempts. Please wait a moment and try again.";
+  if (lower.includes("network") || lower.includes("fetch"))
+    return "Connection error. Please check your internet and try again.";
+  return message;
+}
+
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginContent />
+    </Suspense>
+  );
+}
+
+function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isSignUp, setIsSignUp] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,54 +42,96 @@ export default function LoginPage() {
   const [country, setCountry] = useState("India");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+
+  // Pick up error from auth callback redirect
+  useEffect(() => {
+    const callbackError = searchParams.get("error");
+    if (callbackError) {
+      setError(callbackError);
+      setIsSignUp(false);
+    }
+  }, [searchParams]);
 
   const countries = [
     "India", "China", "Vietnam", "Thailand", "Taiwan",
     "South Korea", "Japan", "Germany", "USA", "UK", "Other",
   ];
 
+  async function handleResendConfirmation() {
+    setResending(true);
+    setError("");
+    try {
+      const supabase = createClient();
+      const { error: resendError } = await supabase.auth.resend({
+        type: "signup",
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      if (resendError) {
+        setError(friendlyAuthError(resendError.message));
+      }
+    } catch {
+      setError("Failed to resend. Please try again in a moment.");
+    } finally {
+      setResending(false);
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setLoading(true);
 
-    const supabase = createClient();
+    try {
+      const supabase = createClient();
 
-    if (isSignUp) {
-      const { error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-          data: {
-            full_name: fullName,
-            company,
-            sourcing_country: country,
+      if (isSignUp) {
+        const { data, error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
+            data: {
+              full_name: fullName,
+              company,
+              sourcing_country: country,
+            },
           },
-        },
-      });
-      if (signUpError) {
-        setError(signUpError.message);
-        setLoading(false);
+        });
+        if (signUpError) {
+          setError(friendlyAuthError(signUpError.message));
+          return;
+        }
+        // Supabase returns a user with no identities when the email already exists
+        // (to prevent user enumeration). Detect this and show a helpful message.
+        if (data.user && data.user.identities && data.user.identities.length === 0) {
+          setError("This email is already registered. Try logging in instead, or check your inbox for a confirmation link.");
+          setIsSignUp(false);
+          return;
+        }
+        setEmailSent(true);
         return;
+      } else {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (signInError) {
+          setError(friendlyAuthError(signInError.message));
+          return;
+        }
       }
-      setLoading(false);
-      setEmailSent(true);
-      return;
-    } else {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (signInError) {
-        setError(signInError.message);
-        setLoading(false);
-        return;
-      }
-    }
 
-    router.push("/dashboard");
+      router.push("/dashboard");
+    } catch {
+      setError("Something went wrong. Please check your connection and try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -89,16 +157,33 @@ export default function LoginPage() {
                   </svg>
                 </div>
                 <h1 className="text-2xl mb-2 tracking-tight text-slate-900">Check your email</h1>
-                <p className="text-slate-500 text-sm mb-6">
+                <p className="text-slate-500 text-sm mb-2">
                   We sent a confirmation link to <span className="font-medium text-slate-700">{email}</span>.
                   Click the link to activate your account, then come back to log in.
                 </p>
-                <button
-                  onClick={() => { setEmailSent(false); setIsSignUp(false); }}
-                  className="text-cyan-600 hover:text-cyan-700 text-sm font-medium transition-colors"
-                >
-                  Back to log in
-                </button>
+                <p className="text-slate-400 text-xs mb-6">
+                  Don&apos;t see it? Check your spam/junk folder.
+                </p>
+                <div className="flex flex-col items-center gap-3">
+                  <button
+                    onClick={handleResendConfirmation}
+                    disabled={resending}
+                    className="text-cyan-600 hover:text-cyan-700 text-sm font-medium transition-colors disabled:opacity-50"
+                  >
+                    {resending ? "Sending..." : "Resend confirmation email"}
+                  </button>
+                  <button
+                    onClick={() => { setEmailSent(false); setIsSignUp(false); setError(""); }}
+                    className="text-slate-500 hover:text-slate-700 text-sm transition-colors"
+                  >
+                    Back to log in
+                  </button>
+                </div>
+                {error && (
+                  <div role="alert" className="mt-4 bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-red-600 text-sm">
+                    {error}
+                  </div>
+                )}
               </div>
             ) : (
               <>

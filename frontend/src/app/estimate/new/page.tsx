@@ -335,35 +335,74 @@ export default function NewEstimatePage() {
 
   // ─── Shared UI ────────────────────────────────────────────────────────────
 
-  function MissionLog({ lines }: { lines: string[] }) {
+  const SINGLE_STEPS = ["Upload", "Review", "Result"];
+  const ASM_STEPS = ["Upload", "Review", "Joining", "Result"];
+
+  function stepIndex(): number {
+    if (step === "type" || step === "upload" || step === "assembly-upload") return 0;
+    if (step === "extracting" || step === "assembly-extracting" || step === "review" || step === "assembly-review") return 1;
+    if (step === "calculating" || step === "assembly-joining") return 2;
+    if (step === "result") return 2;
+    if (step === "assembly-result") return 3;
+    return 0;
+  }
+
+  function StepProgress() {
+    const steps = drawingType === "assembly" ? ASM_STEPS : SINGLE_STEPS;
+    const current = stepIndex();
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F8F8F6]">
-        <div className="w-full max-w-md px-8">
-          <p
-            className="text-xs font-medium text-slate-400 uppercase tracking-widest mb-5"
-            style={{ fontFamily: "var(--font-mono)" }}
-          >
-            MISSION INTAKE
-          </p>
-          <div className="space-y-3">
-            {lines.map((line, i) => {
-              const isLast = i === lines.length - 1;
-              return (
-                <div
-                  key={line}
-                  className={`flex items-center gap-3 text-sm ${isLast ? "log-line-active" : "log-line-done"}`}
-                  style={{ animationDelay: `${i * 0.35}s`, fontFamily: "var(--font-mono)" }}
-                >
-                  {isLast ? (
-                    <span className="text-cyan-600 text-base leading-none">›</span>
-                  ) : (
-                    <span className="text-emerald-400 text-base leading-none">✓</span>
-                  )}
-                  <span className={isLast ? "text-slate-900" : "text-slate-400"}>{line}</span>
-                  {isLast && <span className="cursor-blink" />}
-                </div>
-              );
-            })}
+      <div className="flex items-center gap-2 mb-8">
+        {steps.map((s, i) => (
+          <div key={s} className="flex items-center gap-2">
+            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+              i < current ? "bg-cyan-50 text-cyan-700" :
+              i === current ? "bg-cyan-600 text-white" :
+              "bg-slate-100 text-slate-400"
+            }`} style={{ fontFamily: "var(--font-mono)" }}>
+              {i < current ? (
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+              ) : (
+                <span>{i + 1}</span>
+              )}
+              {s}
+            </div>
+            {i < steps.length - 1 && (
+              <div className={`w-8 h-px ${i < current ? "bg-cyan-300" : "bg-slate-200"}`} />
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  function MissionLog({ lines, subtitle }: { lines: string[]; subtitle?: string }) {
+    return (
+      <div className="min-h-screen bg-[#F8F8F6]">
+        <AppNav />
+        <div className="max-w-2xl mx-auto px-4 sm:px-8 py-12">
+          <StepProgress />
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-10">
+            <p className="text-sm font-medium text-slate-900 mb-1">Newton-Metre is working...</p>
+            <p className="text-xs text-slate-400 mb-6">{subtitle || "Sit back — this takes a few seconds."}</p>
+            <div className="space-y-3">
+              {lines.map((line, i) => {
+                const isLast = i === lines.length - 1;
+                return (
+                  <div
+                    key={line}
+                    className={`flex items-center gap-3 text-sm ${isLast ? "log-line-active" : "log-line-done"}`}
+                    style={{ animationDelay: `${i * 0.35}s`, fontFamily: "var(--font-mono)" }}
+                  >
+                    {isLast ? (
+                      <span className="w-4 h-4 border-2 border-slate-200 border-t-cyan-600 rounded-full animate-spin shrink-0" />
+                    ) : (
+                      <span className="text-emerald-500 text-base leading-none shrink-0">✓</span>
+                    )}
+                    <span className={isLast ? "text-slate-900" : "text-slate-400"}>{line}</span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
@@ -377,9 +416,9 @@ export default function NewEstimatePage() {
       <div className="min-h-screen bg-[#F8F8F6]">
         <AppNav />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-12">
-          <h1 className="text-3xl mb-2 tracking-tight">New Estimate</h1>
-          <p className="text-slate-500 mb-8 text-sm">
-            What type of drawing are you uploading?
+          <h1 className="font-heading text-4xl mb-2 tracking-tight text-slate-900">What are we costing?</h1>
+          <p className="text-slate-500 mb-8 text-base leading-relaxed">
+            Upload a drawing. Newton-Metre reads it, calculates every cost line, and hands you a negotiation-ready breakdown.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <button
@@ -424,17 +463,19 @@ export default function NewEstimatePage() {
       <div className="min-h-screen bg-[#F8F8F6]">
         <AppNav />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-12">
+          <StepProgress />
           <button
             onClick={() => setStep("type")}
-            className="flex items-center gap-2 text-slate-500 hover:text-slate-600 text-sm mb-6 transition-colors"
+            className="flex items-center gap-2 text-slate-400 hover:text-slate-600 text-xs mb-4 transition-colors"
+            style={{ fontFamily: "var(--font-mono)" }}
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
-            Change type
+            BACK
           </button>
-          <h1 className="text-3xl mb-2 tracking-tight">Single Part</h1>
-          <p className="text-slate-500 mb-8 text-sm">Upload one or more sheets of the same part drawing.</p>
+          <h1 className="font-heading text-4xl mb-2 tracking-tight text-slate-900">Upload your drawing</h1>
+          <p className="text-slate-500 mb-8 text-base leading-relaxed">Newton-Metre will read the drawing, extract dimensions, material, and processes — no templates, no manual entry.</p>
 
           <div className="bg-white rounded-2xl border border-slate-200 p-8">
 
@@ -528,7 +569,7 @@ export default function NewEstimatePage() {
               />
             </div>
 
-            {error && <div role="alert" className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-4">{error}</div>}
+            {error && <div role="alert" className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-red-600 text-sm mb-4">{error}</div>}
 
             <button
               onClick={handleUpload}
@@ -543,7 +584,7 @@ export default function NewEstimatePage() {
     );
   }
 
-  if (step === "extracting") return <MissionLog lines={EXTRACT_LOG} />;
+  if (step === "extracting") return <MissionLog lines={EXTRACT_LOG} subtitle="Reading your drawing and extracting every detail automatically." />;
 
   // ─── Step: single-part review ─────────────────────────────────────────────
 
@@ -561,8 +602,9 @@ export default function NewEstimatePage() {
       <div className="min-h-screen bg-[#F8F8F6]">
         <AppNav />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-8">
-          <h1 className="text-3xl mb-2 tracking-tight">Review Extracted Data</h1>
-          <p className="text-slate-500 text-sm mb-6">Verify AI-extracted data before calculating costs.</p>
+          <StepProgress />
+          <h1 className="font-heading text-4xl mb-2 tracking-tight text-slate-900">Here&apos;s what we found</h1>
+          <p className="text-slate-500 text-base mb-6 leading-relaxed">Newton-Metre extracted these details from your drawing. Confirm and we&apos;ll calculate the should-cost.</p>
 
           <div className="bg-white rounded-xl border border-slate-200 p-6 mb-4">
             <h2 className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-4" style={{ fontFamily: "var(--font-mono)" }}>Dimensions</h2>
@@ -586,14 +628,14 @@ export default function NewEstimatePage() {
               {detectedMaterial !== null && matConfidence === "high" ? (
                 <span className="text-sm font-medium text-slate-900" style={{ fontFamily: "var(--font-mono)" }}>{detectedMaterial}</span>
               ) : (
-                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${detectedMaterial === null ? "bg-amber-950/60 text-amber-400 border border-amber-800" : "bg-amber-950/40 text-amber-400 border border-amber-900"}`} style={{ fontFamily: "var(--font-mono)" }}>
+                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${detectedMaterial === null ? "bg-amber-50 text-amber-700 border border-amber-200" : "bg-amber-50 text-amber-600 border border-amber-200"}`} style={{ fontFamily: "var(--font-mono)" }}>
                   {detectedMaterial === null ? "Not detected" : "Low confidence"}
                 </span>
               )}
             </div>
             {needsMaterialInput && (
               <div className="space-y-3">
-                <div className="bg-amber-950/30 border border-amber-900/50 rounded-lg px-3 py-2.5 text-amber-400 text-sm">
+                <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5 text-amber-700 text-sm">
                   {detectedMaterial === null ? "Material not found in the drawing. Select from the list or enter manually." : `AI detected "${detectedMaterial}" with low confidence. Please confirm or correct it.`}
                 </div>
                 <select value={materialOverride} onChange={(e) => { setMaterialOverride(e.target.value); setMaterialPrice(null); }} className="w-full px-3 py-2.5 border border-slate-200 rounded-lg bg-slate-50 text-sm text-slate-900 outline-none">
@@ -630,7 +672,7 @@ export default function NewEstimatePage() {
             </div>
           </div>
 
-          {error && <div role="alert" className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-4">{error}</div>}
+          {error && <div role="alert" className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-red-600 text-sm mb-4">{error}</div>}
 
           <div className="flex gap-3">
             <button onClick={handleCalculate} disabled={needsMaterialInput && !activeMaterial} className="flex-1 bg-cyan-600 text-white py-3.5 rounded-lg font-semibold hover:bg-cyan-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
@@ -645,7 +687,7 @@ export default function NewEstimatePage() {
     );
   }
 
-  if (step === "calculating") return <MissionLog lines={CALC_LOG} />;
+  if (step === "calculating") return <MissionLog lines={CALC_LOG} subtitle="Running physics-based cost models with real Indian manufacturing rates." />;
 
   // ─── Step: single-part result ─────────────────────────────────────────────
 
@@ -654,10 +696,11 @@ export default function NewEstimatePage() {
       <div className="min-h-screen bg-[#F8F8F6]">
         <AppNav />
         <div className="max-w-3xl mx-auto px-4 sm:px-8 py-8">
+          <StepProgress />
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-3xl tracking-tight">Should-Cost Estimate</h1>
-              <p className="text-slate-500 text-sm mt-1">{result.material_name} &middot; {result.quantity} unit{result.quantity > 1 ? "s" : ""}</p>
+              <h1 className="font-heading text-4xl tracking-tight text-slate-900">Your should-cost is ready</h1>
+              <p className="text-slate-500 text-base mt-1 leading-relaxed">{result.material_name} · {result.quantity} unit{result.quantity > 1 ? "s" : ""} — use this breakdown to negotiate line by line.</p>
             </div>
             {confidenceBadge(result.confidence_tier)}
           </div>
@@ -873,7 +916,7 @@ export default function NewEstimatePage() {
           {!canAnalyze && asmComponents.length > 0 && (
             <p className="text-amber-400 text-sm mb-4">Add at least one more component to proceed.</p>
           )}
-          {error && <div role="alert" className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-4">{error}</div>}
+          {error && <div role="alert" className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-red-600 text-sm mb-4">{error}</div>}
 
           <button
             onClick={handleAsmExtractAll}
@@ -962,8 +1005,8 @@ export default function NewEstimatePage() {
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-slate-400 w-4 text-center" style={{ fontFamily: "var(--font-mono)" }}>{i + 1}</span>
                       <span className="text-sm font-semibold text-slate-900">{comp.name}</span>
-                      {comp.error && <span className="text-xs text-red-400 bg-red-950/40 border border-red-900/50 px-2 py-0.5 rounded-full">Extraction failed</span>}
-                      {needsMat && !comp.error && <span className="text-xs text-amber-400 bg-amber-950/40 border border-amber-900/50 px-2 py-0.5 rounded-full">Material needed</span>}
+                      {comp.error && <span className="text-xs text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full">Extraction failed</span>}
+                      {needsMat && !comp.error && <span className="text-xs text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">Material needed</span>}
                     </div>
                     <svg className={`w-4 h-4 text-slate-400 transition-transform ${expandedComponent === comp.id ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
@@ -1033,11 +1076,11 @@ export default function NewEstimatePage() {
           </div>
 
           {hasErrors && (
-            <div className="bg-amber-950/30 border border-amber-900/50 rounded-lg px-4 py-3 text-amber-400 text-sm mb-4">
+            <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-amber-700 text-sm mb-4">
               Some components failed extraction. Go back to re-upload those drawings.
             </div>
           )}
-          {error && <div role="alert" className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-4">{error}</div>}
+          {error && <div role="alert" className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-red-600 text-sm mb-4">{error}</div>}
 
           <div className="flex gap-3">
             <button
@@ -1123,7 +1166,7 @@ export default function NewEstimatePage() {
             </div>
           </div>
 
-          {error && <div role="alert" className="bg-red-950/50 border border-red-900/50 rounded-lg px-4 py-3 text-red-400 text-sm mb-4">{error}</div>}
+          {error && <div role="alert" className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-red-600 text-sm mb-4">{error}</div>}
 
           <div className="flex gap-3">
             <button
