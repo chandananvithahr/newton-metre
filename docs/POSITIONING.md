@@ -6,9 +6,9 @@
 
 ## What Newton-Metre Is
 
-Newton-Metre is the tool that does the homework your procurement team doesn't have time for — breaking down every part into what it actually costs to make, and finding similar parts you've already bought.
+Newton-Metre is your company's brain for manufactured parts — it knows what everything costs and remembers every part you've ever made.
 
-Newton-Metre isn't a dashboard you look at. It's the analyst that does the work — reads the drawing, finds the history, runs the numbers, hands you the answer. You just upload and negotiate.
+Upload a drawing. Get a line-by-line should-cost breakdown. Search thousands of drawings to find similar parts across every department — design, procurement, sales, quality. Newton-Metre does the work. You just upload and negotiate.
 
 ---
 
@@ -36,30 +36,46 @@ None of these are data-backed. None of them scale. And every overpaid part compo
 
 ## Two Superpowers, One Platform
 
-### 1. Similarity Search — The Designer's Assistant
+### 1. Similarity Search — Your Company's Brain
+
+**The core idea:**
+
+Every drawing your company has ever made — designed, costed, manufactured, delivered — is sitting in shared drives, inboxes, ERP systems, and filing cabinets. Thousands of drawings. Decades of knowledge. Completely unsearchable.
+
+Newton-Metre turns that into a searchable brain. Upload any drawing and find every similar part your company has ever made — with cost history, supplier data, quality records, and who designed it. In seconds, not days.
 
 **The problem:**
 
 A designer sits down to design a mounting bracket. She opens a blank screen and starts from scratch. Three days later, the design is done.
 
-What she didn't know: her colleague designed a nearly identical bracket 18 months ago. It was tested, approved, manufactured, and delivered. The drawing is sitting in a folder somewhere on a shared drive — but nobody told her, and she didn't know to look.
+What she didn't know: her colleague designed a nearly identical bracket 18 months ago. It was tested, approved, manufactured, and delivered. The drawing is buried on a shared drive — nobody told her, and she didn't know to look.
 
-This happens every week in every manufacturing company. Designers reinvent parts that already exist. The senior engineer who remembered everything retired last year. The knowledge walked out the door with him.
+This happens every week in every manufacturing company. The senior engineer who remembered everything retired last year. The knowledge walked out the door with him.
 
 **What Newton-Metre does (the work):**
 
-1. **Designer uploads her new drawing** — before spending 3 days on it
-2. **Newton-Metre searches the entire part library** — every drawing the company has ever made
-3. **Shows matches** — "This looks 87% similar to Part #4521, designed by Rajesh in October 2024. Material: EN8. Processes: turning + milling + chrome plating. Manufactured by Supplier X."
-4. **Designer decides** — reuse the existing design as-is, modify it slightly for the new application, or confirm it's genuinely new and proceed
+1. **Anyone uploads a drawing** — from any department
+2. **Newton-Metre searches the entire part library** — thousands of drawings, every part ever made
+3. **Shows matches** — "This looks 92% similar to Part #4521, designed by Rajesh in October 2024. Material: EN8. Processes: turning + milling + chrome plating. Cost: ₹1,180/unit. Manufactured by Supplier X."
+4. **The right person decides** — reuse, modify, or confirm it's genuinely new
 
-Newton-Metre is the designer's assistant that remembers every part the company has ever made. No more "has someone already done this?" — the answer is instant. No more lost knowledge when people leave — it's in the system.
+**Every department uses it:**
+
+| Department | How they use it | What it replaces |
+|-----------|----------------|------------------|
+| **Design** | Find existing parts before designing from scratch. Reuse tested, approved designs. | 3 days reinventing a bracket that already exists |
+| **Procurement** | Find what you paid last time for a similar part. Never negotiate from zero. | "We made something like this once... I think..." |
+| **Sales & Marketing** | Pull historical cost data to quote faster and more accurately. | Days of back-and-forth to build a quote |
+| **Quality** | Trace similar parts back to tested, approved designs. Avoid repeating past failures. | Tribal knowledge in retired engineers' heads |
+| **Management** | See what the company has made, what it cost, and where the knowledge sits. | No visibility into institutional memory |
 
 **The result:**
-- Weeks of redundant design work eliminated
+- Weeks of redundant design work — eliminated
 - Proven, tested designs reused instead of reinvented
-- Institutional knowledge captured permanently — not stored in someone's head
-- Faster time-to-production because you're starting from something that already works
+- Knowledge stays in the system — not in someone's head
+- Every department has instant access to the company's full history
+- No more "has someone already done this?" — the answer is instant
+- No more knowledge walking out the door when people leave
 
 ### 2. Should-Cost Breakdown — The Procurement Team's Analyst
 
@@ -117,13 +133,19 @@ Newton-Metre is the cost analyst your procurement team doesn't have. It does the
 ## One-Liners (Pick Your Audience)
 
 **For procurement teams:**
-> Upload a drawing. Get a line-by-line should-cost breakdown. Negotiate with data, not gut feel.
+> Upload a drawing. Get a line-by-line should-cost breakdown. Find what you paid last time for similar parts. Negotiate with data, not gut feel.
+
+**For design teams:**
+> Stop reinventing parts that already exist. Search thousands of drawings. Find similar parts in seconds. Your company's brain, searchable.
 
 **For engineering managers:**
-> Find similar parts from your history before designing from scratch. Know what it costs before anyone quotes.
+> Find similar parts from your history before designing from scratch. Know what it costs before anyone quotes. Every department uses the same brain.
+
+**For sales teams:**
+> Pull historical cost data for similar parts. Quote faster. Win more. No more days of back-and-forth.
 
 **For CXOs:**
-> Your procurement team is overpaying because they don't have cost data. Newton-Metre fixes that.
+> Your company's knowledge is trapped in shared drives and retired engineers' heads. Newton-Metre turns it into a searchable brain — costs, designs, suppliers, all in one place.
 
 **General:**
-> Newton-Metre does the homework your procurement team doesn't have time for — breaking down every part into what it actually costs to make, and finding similar parts you've already bought.
+> Newton-Metre is your company's brain for manufactured parts. Search thousands of drawings. Get should-cost breakdowns. Every department — design, procurement, sales, quality — uses the same searchable history.

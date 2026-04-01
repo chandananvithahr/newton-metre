@@ -337,7 +337,7 @@ export default function DashboardPage() {
                 <div className="text-xs font-bold text-slate-500 uppercase tracking-widest">Parts Matched</div>
               </div>
               <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-[10px] text-slate-400 font-mono">Visual similarity searches</span>
+                <span className="text-[10px] text-slate-400 font-mono">Your company&apos;s brain — searchable</span>
                 <IconSearch />
               </div>
             </div>

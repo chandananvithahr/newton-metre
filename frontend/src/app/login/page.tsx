@@ -43,6 +43,7 @@ function LoginContent() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
 
   // Pick up error from auth callback redirect
@@ -62,6 +63,7 @@ function LoginContent() {
   async function handleResendConfirmation() {
     setResending(true);
     setError("");
+    setResendSuccess(false);
     try {
       const supabase = createClient();
       const { error: resendError } = await supabase.auth.resend({
@@ -73,6 +75,10 @@ function LoginContent() {
       });
       if (resendError) {
         setError(friendlyAuthError(resendError.message));
+      } else {
+        setError("");
+        setResendSuccess(true);
+        setTimeout(() => setResendSuccess(false), 5000);
       }
     } catch {
       setError("Failed to resend. Please try again in a moment.");
@@ -104,6 +110,7 @@ function LoginContent() {
         });
         if (signUpError) {
           setError(friendlyAuthError(signUpError.message));
+          setLoading(false);
           return;
         }
         // Supabase returns a user with no identities when the email already exists
@@ -111,25 +118,28 @@ function LoginContent() {
         if (data.user && data.user.identities && data.user.identities.length === 0) {
           setError("This email is already registered. Try logging in instead, or check your inbox for a confirmation link.");
           setIsSignUp(false);
+          setLoading(false);
           return;
         }
+        setLoading(false);
         setEmailSent(true);
         return;
-      } else {
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        if (signInError) {
-          setError(friendlyAuthError(signInError.message));
-          return;
-        }
       }
 
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (signInError) {
+        setError(friendlyAuthError(signInError.message));
+        setLoading(false);
+        return;
+      }
+
+      // Successful login — keep button disabled during navigation
       router.push("/dashboard");
     } catch {
       setError("Something went wrong. Please check your connection and try again.");
-    } finally {
       setLoading(false);
     }
   }
@@ -179,6 +189,11 @@ function LoginContent() {
                     Back to log in
                   </button>
                 </div>
+                {resendSuccess && (
+                  <div className="mt-4 bg-green-50 border border-green-200 rounded-lg px-4 py-3 text-green-700 text-sm">
+                    Confirmation email resent. Check your inbox.
+                  </div>
+                )}
                 {error && (
                   <div role="alert" className="mt-4 bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-red-600 text-sm">
                     {error}

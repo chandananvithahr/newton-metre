@@ -42,7 +42,7 @@ const ibmPlexMono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   title: "Newton-Metre — Should-Cost Intelligence",
-  description: "Not a dashboard. Not a copilot. Newton-Metre does the work — reads your drawing, calculates every cost line, hands you the answer. Built for Indian manufacturing.",
+  description: "Know what it costs. Find what you've made. Newton-Metre reads your drawing, calculates every cost line, and searches thousands of drawings to find similar parts — your company's brain, searchable in seconds.",
 };
 
 export default function RootLayout({
