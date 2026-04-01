@@ -23,7 +23,7 @@ export default function LandingPage() {
           <Link href="/login" className="hidden sm:block text-[13px] text-slate-400 hover:text-slate-700 transition-colors" style={{ fontFamily: "var(--font-sans)" }}>
             Sign in
           </Link>
-          <Link href="/login" className="px-5 py-2 bg-slate-900 text-white text-[13px] font-medium rounded-lg hover:bg-slate-800 transition-colors" style={{ fontFamily: "var(--font-sans)" }}>
+          <Link href="/login" className="px-5 py-2 bg-slate-900 text-white text-[13px] font-medium rounded-full hover:bg-slate-800 transition-all duration-200 hover:shadow-lg" style={{ fontFamily: "var(--font-sans)" }}>
             Get started
           </Link>
         </div>
@@ -51,12 +51,43 @@ export default function LandingPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link href="/login" className="w-full sm:w-auto px-8 py-3.5 bg-slate-900 text-white text-[15px] font-medium rounded-lg hover:bg-slate-800 transition-colors" style={{ fontFamily: "var(--font-sans)" }}>
+              <Link href="/login" className="w-full sm:w-auto px-8 py-3.5 bg-slate-900 text-white text-[15px] font-medium rounded-full hover:bg-slate-800 transition-all duration-200 hover:shadow-lg hover:scale-[1.02]" style={{ fontFamily: "var(--font-sans)" }}>
                 Upload a drawing — free
               </Link>
               <a href="#demo" className="w-full sm:w-auto px-8 py-3.5 text-slate-400 text-[15px] font-medium hover:text-slate-600 transition-colors" style={{ fontFamily: "var(--font-sans)" }}>
                 See a live estimate ↓
               </a>
+            </div>
+          </div>
+        </section>
+
+        {/* ════════════════════════════════════════════════════════════
+            TRUST BAR — credibility signal below hero
+            ════════════════════════════════════════════════════════════ */}
+        <section className="py-10 border-y border-slate-200/60">
+          <div className="max-w-4xl mx-auto px-6 text-center">
+            <p className="text-[11px] text-slate-300 uppercase tracking-[0.25em] mb-6" style={{ fontFamily: "var(--font-mono)" }}>
+              Built for Indian manufacturing procurement
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
+              {[
+                { val: "18", label: "Machining processes" },
+                { val: "40+", label: "Surface treatments" },
+                { val: "164", label: "Physics tests passing" },
+                { val: "4", label: "Part types supported" },
+              ].map((item) => (
+                <div key={item.label} className="flex items-center gap-2">
+                  <span className="text-[15px] font-bold text-slate-900" style={{ fontFamily: "var(--font-mono)" }}>{item.val}</span>
+                  <span className="text-[11px] text-slate-300" style={{ fontFamily: "var(--font-sans)" }}>{item.label}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+              {["Defense", "Aerospace", "Automobile"].map((industry) => (
+                <span key={industry} className="text-[10px] text-slate-400 uppercase tracking-[0.2em]" style={{ fontFamily: "var(--font-mono)" }}>
+                  {industry}
+                </span>
+              ))}
             </div>
           </div>
         </section>
@@ -438,7 +469,7 @@ export default function LandingPage() {
             <p className="max-w-md mx-auto text-[17px] text-slate-400 leading-[1.7] mb-12" style={{ fontFamily: "var(--font-sans)" }}>
               Upload a drawing. Get a should-cost breakdown + similar parts from your history. Your company&apos;s brain — searchable in seconds.
             </p>
-            <Link href="/login" className="inline-flex px-9 py-4 bg-slate-900 text-white text-[15px] font-medium rounded-lg hover:bg-slate-800 transition-colors" style={{ fontFamily: "var(--font-sans)" }}>
+            <Link href="/login" className="inline-flex px-9 py-4 bg-slate-900 text-white text-[15px] font-medium rounded-full hover:bg-slate-800 transition-all duration-200 hover:shadow-lg" style={{ fontFamily: "var(--font-sans)" }}>
               Upload your first drawing →
             </Link>
             <p className="mt-6 text-[12px] text-slate-300" style={{ fontFamily: "var(--font-mono)" }}>No credit card · No setup · Results in 60 seconds</p>
