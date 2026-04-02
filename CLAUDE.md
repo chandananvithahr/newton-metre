@@ -27,13 +27,13 @@ Newton-Metre — "Know what it costs. Before they quote." An AI-powered procurem
 | **Backend API** | https://costimize-api-production.up.railway.app |
 | **API Health** | https://costimize-api-production.up.railway.app/api/health |
 | **Supabase** | project ypzeffbhlslonqmqiaeh |
-| **GitHub** | https://github.com/chandananvithahr/costimize-mvp (PUBLIC — made public 2026-03-31 for YC Startup School India) |
+| **GitHub** | https://github.com/chandananvithahr/newton-metre (PUBLIC — renamed from costimize-mvp, made public 2026-03-31 for YC Startup School India) |
 
 ## Repository Structure
 
 ### `frontend/` — Next.js Web App (Vercel)
 
-6 pages: landing, login/signup, dashboard, new estimate, estimate detail, similarity search. Tailwind CSS v4 with Stitch-designed deep blue theme. Vercel Analytics enabled.
+7 pages: landing, login/signup, dashboard, new estimate, estimate detail, similarity search, RFQ extraction. Tailwind CSS v4 with "Tactical Elegance" design system (Newsreader + Space Grotesk fonts, deep blue #00288e, tonal surface layering #faf8ff). See `DESIGN.md` for full spec. Vercel Analytics enabled.
 
 ### `costimize-v2/` — Python Engines + FastAPI Backend (Railway)
 
