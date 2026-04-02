@@ -1,31 +1,29 @@
 import type { Metadata } from "next";
-import { Instrument_Serif, Source_Sans_3, DM_Mono, IBM_Plex_Mono, Inter, Geist } from "next/font/google";
+import { Newsreader, Space_Grotesk, DM_Mono, IBM_Plex_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { ToastProvider } from "@/components/Toast";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
-const instrumentSerif = Instrument_Serif({
+const newsreader = Newsreader({
   subsets: ["latin"],
-  weight: ["400"],
+  weight: ["200", "300", "400", "500", "600", "700", "800"],
   style: ["normal", "italic"],
-  variable: "--font-heading",
+  variable: "--font-headline",
   display: "swap",
 });
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-body",
+  display: "swap",
+});
 
 const dmMono = DM_Mono({
   subsets: ["latin"],
   weight: ["400", "500"],
   variable: "--font-mono",
-  display: "swap",
-});
-
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
-  variable: "--font-inter",
   display: "swap",
 });
 
@@ -37,8 +35,8 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Newton-Metre — Should-Cost Intelligence",
-  description: "Know what it costs. Before they quote. Newton-Metre reads your drawing, breaks down every cost line — material, machining, finishing, margin — like a senior cost analyst. Then searches your company's history for similar parts.",
+  title: "Newton-Metre | Precision Sourcing Intelligence",
+  description: "Know what it should cost. Newton-Metre leverages physics-based engines and a Proprietary Geometric Complexity Index to substantiate material grades and manufacturing costs instantly.",
 };
 
 export default function RootLayout({
@@ -49,7 +47,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn(instrumentSerif.variable, dmMono.variable, ibmPlexMono.variable, inter.variable, "font-sans", geist.variable)}
+      className={cn(newsreader.variable, spaceGrotesk.variable, dmMono.variable, ibmPlexMono.variable)}
     >
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
