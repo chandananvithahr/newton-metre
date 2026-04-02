@@ -25,19 +25,23 @@ function Hero() {
             Precision Sourcing Intelligence
           </div>
 
-          <h1 className="text-5xl sm:text-6xl lg:text-[80px] font-medium text-[#1a1a1a] leading-[1.08] mb-6 tracking-tight" style={{ fontFamily: "var(--font-headline)" }}>
-            Know what it <em>should cost.</em>
-            <br />
-            Find where it <em>already exists.</em>
-          </h1>
-
-          <div className="max-w-2xl mx-auto mb-12 space-y-2">
-            <p className="text-[#374151] text-lg leading-relaxed font-medium">
-              Upload any drawing. Get a line-by-line breakdown of material, machining, and finishing costs. Negotiate with the real number.
-            </p>
-            <p className="text-[#6b7280] text-base leading-relaxed">
-              Search your company&apos;s entire history — find similar parts, specs, and contracts in seconds. Stop reinventing the wheel.
-            </p>
+          <div className="max-w-3xl mx-auto mb-12 space-y-8">
+            <div>
+              <h1 className="text-4xl sm:text-5xl lg:text-[64px] font-medium text-[#1a1a1a] leading-[1.1] tracking-tight mb-4" style={{ fontFamily: "var(--font-headline)" }}>
+                Know what it <em className="text-orange-500 not-italic">should</em> cost.
+              </h1>
+              <p className="text-[#374151] text-lg leading-relaxed">
+                Upload any manufacturing drawing. Get a line-by-line breakdown of material, machining, and finishing costs. Negotiate with the real number.
+              </p>
+            </div>
+            <div>
+              <h1 className="text-4xl sm:text-5xl lg:text-[64px] font-medium text-[#1a1a1a] leading-[1.1] tracking-tight mb-4" style={{ fontFamily: "var(--font-headline)" }}>
+                Find where it <em className="text-orange-500 not-italic">already</em> exists.
+              </h1>
+              <p className="text-[#374151] text-lg leading-relaxed">
+                Search your company&apos;s entire history — find similar parts, specs, and contracts in seconds. Stop reinventing the wheel.
+              </p>
+            </div>
           </div>
 
           {/* Prompt-style input bar (Base44 inspired) */}
@@ -210,16 +214,18 @@ function SimilaritySearch() {
             <em className="text-white/60">The Entire Company Database.</em>
           </h2>
           <p className="text-lg text-white/50 leading-relaxed">
-            Big companies work in silos. Newton-Metre breaks them by indexing every technical spec, sales contract, and QA report your company has ever produced.
+            Every department creates knowledge. Most of it gets buried in folders, lost when people leave, or duplicated across teams. Newton-Metre indexes everything and makes it searchable in seconds.
           </p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div className="space-y-10">
             {[
-              { dept: "Engineering & Design", title: "80% of the work is already done", desc: "Find a drawing that\u2019s 90% similar, tweak the last 10%, and ship. Reduce lead times from weeks to hours." },
-              { dept: "Procurement & Legal", title: "Master Every Contract", desc: "Search through thousands of supplier SLAs and master contracts. Identify pricing trends in seconds." },
-              { dept: "Quality & QA", title: "Zero Knowledge Leakage", desc: "When a senior lead leaves, their 20 years of expertise stays indexed and searchable." },
+              { dept: "Design & Engineering", title: "Stop redesigning what already exists", desc: "Your team has drawn 10,000+ parts over the years. Find the one that\u2019s 90% similar, tweak 10%, and ship \u2014 in hours, not weeks." },
+              { dept: "Sourcing & Procurement", title: "Never negotiate blind again", desc: "Search across supplier contracts, POs, and price histories. Know what you paid last time, what the market rate is, and where the leverage sits." },
+              { dept: "Quality & Compliance", title: "Institutional memory that never retires", desc: "When a senior QA lead leaves, their 20 years of inspection reports, test results, and material certs stay indexed and searchable." },
+              { dept: "Cost Engineering", title: "Benchmark every quote in minutes", desc: "Pull up historical should-costs for similar parts. Compare supplier quotes against your own data instead of gut feeling." },
+              { dept: "Manufacturing & Shop Floor", title: "Right process, right machine, first time", desc: "Search past production records to find proven setups, cycle times, and tooling configs for similar geometries." },
             ].map((item, i) => (
               <div key={i} className="relative pl-8 border-l border-white/10 group hover:border-l-orange-400/50 transition-colors">
                 <div className="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-2">{item.dept}</div>
