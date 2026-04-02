@@ -1,4 +1,4 @@
-# Newton-Metre Design System — "Tactical Elegance"
+# Newton-Metre Design System — "Warm Editorial"
 
 > **For Claude Code:** This file is the ground truth for ALL UI implementation.
 > When converting Stitch screens to React/Next.js, treat every value here as a CONSTRAINT, not a suggestion.
@@ -10,10 +10,10 @@
 ## Brand
 
 - **Name:** Newton-Metre
-- **Logo:** `/newton-metre-logo.png` (rounded-lg, 32px in navs, 40px on auth pages)
-- **Tagline:** "Know what it costs. Before they quote."
-- Professional procurement intelligence tool for manufacturing companies
-- Industrial/engineering aesthetic — not consumer SaaS
+- **Logo:** Dark rounded-xl badge with "N·m" in white mono + italic Newsreader "Newton-Metre"
+- **Tagline:** "Know what it should cost. Find where it already exists."
+- Manufacturing cost intelligence platform for defense, aerospace, and automobile companies
+- Bold editorial aesthetic — warm gradients, big serif headlines, dark pill CTAs
 
 ---
 
@@ -25,15 +25,13 @@
 | `--font-body` | Space Grotesk (sans) | Body text, descriptions, form inputs |
 | `--font-label` | Space Grotesk (sans) | Buttons, nav links, section labels (uppercase tracking-widest) |
 | `--font-mono` | DM Mono | Costs, part numbers, tolerances, timestamps, tabular data |
-| `--font-code` | IBM Plex Mono | Code blocks (alternative mono) |
 
 **Font Sizes:**
-- Hero title: `clamp(28px, 4vw, 42px)`
-- Page headings (h1): `text-4xl` (form pages), `text-3xl` (sub-pages)
-- Section headings: `text-[28px]` or `text-2xl`
-- Body: `text-[15px]` or `text-sm` (14px)
+- Hero title: `text-4xl sm:text-5xl lg:text-[64px]`
+- Section headings: `text-4xl sm:text-5xl`
+- Body: `text-base` (16px) or `text-sm` (14px)
 - Labels/caps: `text-[11px]` uppercase tracking-wider font-bold
-- Micro: `text-[10px]` for timestamps, metadata
+- Micro: `text-[10px]` for timestamps, metadata, counters
 
 **Rules:**
 - Use monospace (`font-mono`) for ALL cost values, part numbers, tolerances, measurements
@@ -45,34 +43,37 @@
 
 ## Color Palette
 
-### Surfaces (Tonal Layering)
+### Warm Gradient Backgrounds (Base44-inspired)
 
-| Token | Hex | Usage |
-|-------|-----|-------|
-| `surface` | `#faf8ff` | ALL page backgrounds |
-| `surface-container-low` | `#f4f3fa` | Hover states, table headers, sidebar bg |
-| `surface-container` | `#efedf4` | Inactive/disabled backgrounds |
-| `surface-container-high` | `#e9e7ee` | Heavy disabled |
-| `surface-container-highest` | `#e3e1e8` | — |
-| `surface-lowest` | `#ffffff` | Cards, modals, inputs |
+| Class | Gradient | Usage |
+|-------|----------|-------|
+| `warm-gradient-hero` | `linear-gradient(135deg, #B2EBF2 0%, #FFE0B2 50%, #FFCC80 100%)` | Hero, Should-Cost, How It Works, Pricing, Final CTA |
+| `warm-gradient-subtle` | `linear-gradient(135deg, #D4F5ED 0%, #FFF0DB 50%, #FFE4BC 100%)` | Problem, Silo Breaker, Built for India |
+| `warm-gradient-page` | `linear-gradient(180deg, #D4F5ED 0%, #FFF0DB 30%, #FFE4BC 100%)` | ALL inner pages (login, dashboard, estimate, similar) |
+| `warm-gradient-footer` | `linear-gradient(135deg, #FFECD2 0%, #FFD8A8 40%, #F97316 100%)` | Footer |
+| `warm-gradient-accent` | `linear-gradient(135deg, #FFF7ED 0%, #FFE4E6 100%)` | Pro pricing card |
+
+### Dark Section
+
+- Background: `#1a1a1a` — used for similarity search section and should-cost preview card
+- Subtle glow orbs: `bg-orange-500/10` and `bg-amber-500/5` with blur-3xl
 
 ### Brand Colors
 
 | Token | Hex | Usage |
 |-------|-----|-------|
-| `nm-primary` | `#00288e` | Primary actions, links, brand text, icons, gradient start |
-| `nm-primary-container` | `#1e40af` | Secondary blue, hover states, gradient end |
-| `nm-tertiary` | `#611e00` | Orange accent (sparingly) |
+| Primary text/buttons | `#1a1a1a` | Dark pill CTAs, headings, primary actions |
+| Accent | `orange-500` (`#f97316`) | Highlighted keywords ("should", "already"), hover states |
+| Emerald | `emerald-500` | Confidence badges, checkmarks, match percentages |
 
 ### Text Colors
 
 | Hex | Tailwind | Usage |
 |-----|----------|-------|
-| `#1a1b20` | `text-[#1a1b20]` | Primary text (headings, values, body) |
-| `#444653` | `text-[#444653]` | Secondary text |
-| `#515f74` | `text-[#515f74]` | Descriptive text, subtitles, form labels |
-| `#757684` | `text-[#757684]` | Muted text, placeholders, timestamps |
-| `#c4c5d5` | `text-[#c4c5d5]` | Disabled text, faint dividers |
+| `#1a1a1a` | `text-[#1a1a1a]` | Primary text (headings, values) |
+| `#374151` | `text-[#374151]` | Strong body text |
+| `#6b7280` | `text-[#6b7280]` | Body copy, descriptions |
+| `#9ca3af` | `text-[#9ca3af]` | Muted text, counters, placeholders |
 
 ### Semantic Colors
 
@@ -80,16 +81,14 @@
 - **Warning:** amber-50/600/700 (low confidence, material warnings)
 - **Error:** red-50/200/600 (validation errors)
 
-**Confidence Badges:**
-- `emerald` = HIGH confidence
-- `amber` = MEDIUM confidence
-- `red` = LOW / INSUFFICIENT confidence
-
 ---
 
 ## Roundness
 
-`rounded-xl` for cards and containers, `rounded-lg` for buttons and inputs, `rounded-full` for badges/pills only.
+- `rounded-2xl` for section cards and large containers
+- `rounded-xl` for inner cards and form containers
+- `rounded-lg` for form buttons and inputs
+- `rounded-full` for pill CTAs, badges, and prompt bar
 
 ---
 
@@ -97,31 +96,36 @@
 
 ### Cards
 ```
-bg-white rounded-xl ghost-border
+bg-white/80 border border-black/10 rounded-2xl h-full flex flex-col
 ```
-- `ghost-border`: `border: 1px solid rgba(196, 197, 213, 0.15)`
-- Hover: add `hover:ambient-shadow` for interactive cards
+- Equal height in grids with `h-full flex flex-col`
+- Hover: `hover:bg-white hover:border-black/20 transition-all`
 
-### Primary Buttons (CTA)
+### Primary Buttons (Dark Pill CTA)
 ```
-gradient-cta text-white rounded-lg font-bold tracking-widest uppercase text-sm py-3.5
+dark-pill px-8 py-4 text-xs font-bold uppercase tracking-widest
 ```
-- `gradient-cta`: `linear-gradient(135deg, #00288e 0%, #1e40af 100%)`
+- `dark-pill`: `background-color: #1a1a1a; color: white; border-radius: 9999px;`
+- Hover: `background-color: #333`
 - Disabled: `opacity-30`
-- Style: `fontFamily: var(--font-label)`
+
+### Form Buttons (not pill-shaped)
+```
+bg-[#1a1a1a] hover:bg-[#333] text-white py-3.5 rounded-lg font-bold tracking-widest uppercase text-sm
+```
 
 ### Secondary Buttons
 ```
-border border-[#c4c5d5]/20 rounded-lg hover:bg-[#f4f3fa] text-sm font-medium text-[#515f74]
+border border-black/10 rounded-full bg-white/60 text-sm text-[#374151] hover:bg-white hover:border-black/20
 ```
 
-### Inputs (no-line philosophy)
+### Inputs
 ```
-border-b border-[#c4c5d5]/30 bg-transparent outline-none text-sm text-[#1a1b20]
-placeholder:text-[#c4c5d5] focus:border-[#00288e] transition-colors
+border-b border-black/30 bg-transparent outline-none text-sm text-[#1a1b20]
+placeholder:text-[#c4c5d5] focus:border-[#1a1a1a] transition-colors
 ```
 - Bottom-border only for text inputs
-- Selects/number inputs: full border with `rounded-lg bg-[#f4f3fa]`
+- Selects/number inputs: full border with `rounded-lg bg-[#fafafa]`
 
 ### Labels
 ```
@@ -131,29 +135,28 @@ font-family: var(--font-label)
 
 ### Tables
 ```
-<thead>: bg-[#f4f3fa] border-b border-[#c4c5d5]/20
+<thead>: bg-[#fafafa] border-b border-black/20
 <th>: text-xs font-medium text-[#757684] uppercase tracking-wider (font-mono)
-<tbody>: divide-y divide-[#c4c5d5]/10
 <td>: text-sm, values in font-mono
 ```
 
 ### Navigation
-- Fixed top bar (landing): `bg-[#faf8ff]/90 backdrop-blur-md`
-- Brand: `<Image>` logo (32px rounded-lg) + italic Newsreader "Newton-Metre" in `#00288e`
-- Sidebar (dashboard): `bg-white border-r border-[#c4c5d5]/20` with history items
-
-### Shadows
-- `ambient-shadow`: `0 4px 24px rgba(0, 40, 142, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04)`
+- **Landing (fixed):** `bg-white/80 backdrop-blur-md border-b border-black/5`
+- **Logo:** Dark rounded-xl badge "N·m" + italic Newsreader "Newton-Metre" in `#1a1a1a`
+- **Nav links:** `text-[#6b7280] hover:text-[#1a1a1a]`
+- **CTA:** Dark pill "New Estimate"
+- **Auth-aware:** Shows "Log out" when signed in, "Log in" when not
+- **Inner pages (AppNav):** `bg-white border-b border-black/5`, same logo
+- **Dashboard sidebar:** `bg-white/80 backdrop-blur-sm border-r border-black/10`
 
 ### File Upload Zones
 ```
-border-2 border-dashed border-[#c4c5d5]/20 rounded-xl p-8 text-center
-hover:border-[#00288e]/30 transition-colors cursor-pointer
+border-2 border-dashed border-black/20 rounded-xl p-8 text-center
+hover:border-[#1a1a1a]/30 transition-colors cursor-pointer
 ```
 
 ### Loading States
-- Spinner: `border-2 border-[#c4c5d5]/20 border-t-[#00288e] rounded-full animate-spin`
-- Mission log with step-by-step progress lines
+- Spinner: `border-2 border-black/5 border-t-[#1a1a1a] rounded-full animate-spin`
 
 ---
 
@@ -161,41 +164,47 @@ hover:border-[#00288e]/30 transition-colors cursor-pointer
 
 | Page | Background | Notes |
 |------|------------|-------|
-| `/` (landing) | `#faf8ff` | Fixed nav with backdrop blur |
-| `/login` | `#faf8ff` | Centered card with `ghost-border ambient-shadow` |
-| `/dashboard` | `#faf8ff` | Sidebar + main content |
-| `/estimate/new` | `#faf8ff` | Step progress + form cards |
-| `/estimate/[id]` | `#faf8ff` | Detail view with cost tables |
-| `/similar` | `#faf8ff` | Multi-file upload |
-| `/rfq/new` | `#faf8ff` | RFQ extraction form |
+| `/` (landing) | Alternating `warm-gradient-hero` and `warm-gradient-subtle` | Fixed nav with backdrop blur |
+| `/` similarity section | `bg-[#1a1a1a]` | Dark section with orange glow orbs |
+| `/login` | `warm-gradient-page` | Centered card, nav with `bg-white/60 backdrop-blur-sm` |
+| `/dashboard` | `warm-gradient-page` | Sidebar `bg-white/80 backdrop-blur-sm` |
+| `/estimate/new` | `warm-gradient-page` | Step progress + form cards |
+| `/estimate/[id]` | `warm-gradient-page` | Detail view with cost tables |
+| `/similar` | `warm-gradient-page` | Multi-file upload |
+| `/rfq/new` | `bg-[#0F1117]` | Dark theme (intentionally different) |
 
-**IMPORTANT:** ALL pages use `#faf8ff` background. Never use `#F8F8F6`, `#0F1117`, `bg-gray-*`, or `bg-slate-*` for page backgrounds.
+**IMPORTANT:** ALL pages (except RFQ) use warm gradient backgrounds. Never use flat `#faf8ff`, `#F8F8F6`, `bg-gray-*`, or `bg-slate-*` for page backgrounds.
 
 ---
 
 ## Spacing
 
-- Page max-width: `max-w-[1400px]` (landing), `max-w-2xl` (forms), `max-w-3xl` (results)
-- Page padding: `px-4 sm:px-8 py-8` (inner pages), `py-12` (landing sections)
+- Page max-width: `max-w-[1200px]` (landing), `max-w-2xl` (forms), `max-w-3xl` (results)
+- Section padding: `py-28 px-4 sm:px-8` (landing sections)
+- Page padding: `px-4 sm:px-8 py-8` (inner pages)
 - Card padding: `p-6` or `p-8`
-- Section gap: `mb-4` to `mb-8`
 
 ---
 
 ## Icons
 
-- SVG stroke icons, `strokeWidth={1.5}` or `{2}`
+- Lucide React icons (not inline SVGs)
+- Stroke width: 1.5
 - Sizes: `w-4 h-4` (inline), `w-5 h-5` (in badges), `w-6 h-6` (in feature cards)
-- Icon badges: `w-10 h-10 gradient-cta rounded-lg` or `w-10 h-10 bg-[#1e40af] rounded-lg`
+- Icon badges: `w-10 h-10 bg-[#1a1a1a] rounded-lg` (dark) or `w-12 h-12 bg-[#fafafa] rounded-xl` (light, inverts on hover)
 
 ---
 
-## Tone
+## Tone & Copy Rules
 
-- Professional, not playful
+- Professional, confident, editorial — not playful
 - Numbers and data are the hero — give them space
 - Clear hierarchy: label → value → action
-- Never use decorative elements that obscure data
+- NEVER say "physics-based", "MRR", formulas, or technical implementation details in user-facing copy
+- NEVER show HOW cost lines are calculated (no "Weight × grade price × wastage factor")
+- Sell the ANSWER and OUTCOME, not the method
+- Position for ALL teams: sourcing, cost engineering, design engineering, manufacturing, quality, leadership
+- Similarity search = "company knowledge as a searchable asset"
 
 ---
 
@@ -205,4 +214,4 @@ hover:border-[#00288e]/30 transition-colors cursor-pointer
 2. **Match pixel-for-pixel** — spacing, color hex values, font sizes, border-radius
 3. **Reference this file** for any value not explicitly in the screen HTML
 4. **Do NOT improvise** layout, spacing tokens, or color substitutions
-5. **Do NOT use** old colors (cyan, slate, gray, `#F8F8F6`, `#0F1117`)
+5. **Do NOT use** old colors (`#00288e`, `#1e40af`, `#faf8ff`, cyan, slate, gray, `#F8F8F6`, `#0F1117` except RFQ)
