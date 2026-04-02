@@ -1,6 +1,7 @@
 """CAD file extraction for cost estimation.
 
-DXF / DWG  → structured text via ezdxf entity traversal (exact dimension values)
+DXF        → structured text via ezdxf entity traversal (exact dimension values)
+DWG        → converted to DXF first (ODA File Converter → LibreDWG → error), then ezdxf
 STEP       → structured text via pythonOCC geometry analysis (cadquery-ocp package)
              Falls back to ISO-10303-21 text parsing if OCC is not available.
 
@@ -9,6 +10,8 @@ No PNG conversion — all extraction is direct from file entities.
 from __future__ import annotations
 
 import re
+import shutil
+import subprocess
 import tempfile
 import logging
 from pathlib import Path
@@ -16,10 +19,89 @@ from pathlib import Path
 logger = logging.getLogger("costimize")
 
 
+# ── DWG → DXF conversion ────────────────────────────────────────────────────
+
+def _dwg_to_dxf_bytes(file_bytes: bytes) -> bytes:
+    """Convert DWG binary to DXF bytes using available system converters.
+
+    Tries in order:
+    1. ezdxf odafc addon (wraps ODA File Converter)
+    2. LibreDWG dwg2dxf CLI
+    3. ODAFileConverter CLI directly
+    Raises RuntimeError if no converter is available.
+    """
+    # Strategy 1: ezdxf odafc addon (cleanest)
+    try:
+        from ezdxf.addons import odafc
+        if odafc.is_installed():
+            with tempfile.NamedTemporaryFile(suffix=".dwg", delete=False) as tmp:
+                tmp.write(file_bytes)
+                dwg_path = tmp.name
+            try:
+                doc = odafc.readfile(dwg_path)
+                dxf_path = dwg_path.replace(".dwg", ".dxf")
+                doc.saveas(dxf_path)
+                dxf_bytes = Path(dxf_path).read_bytes()
+                Path(dxf_path).unlink(missing_ok=True)
+                logger.info("DWG→DXF via ODA File Converter (ezdxf odafc)")
+                return dxf_bytes
+            finally:
+                Path(dwg_path).unlink(missing_ok=True)
+    except Exception as exc:
+        logger.debug("odafc not available: %s", exc)
+
+    # Strategy 2: LibreDWG dwg2dxf CLI
+    if shutil.which("dwg2dxf"):
+        with tempfile.NamedTemporaryFile(suffix=".dwg", delete=False) as tmp:
+            tmp.write(file_bytes)
+            dwg_path = tmp.name
+        dxf_path = dwg_path.replace(".dwg", ".dxf")
+        try:
+            subprocess.run(
+                ["dwg2dxf", "-o", dxf_path, dwg_path],
+                check=True, capture_output=True, timeout=30,
+            )
+            dxf_bytes = Path(dxf_path).read_bytes()
+            logger.info("DWG→DXF via LibreDWG dwg2dxf")
+            return dxf_bytes
+        except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired) as exc:
+            logger.warning("dwg2dxf failed: %s", exc)
+        finally:
+            Path(dwg_path).unlink(missing_ok=True)
+            Path(dxf_path).unlink(missing_ok=True)
+
+    # Strategy 3: ODAFileConverter CLI directly
+    oda_cmd = shutil.which("ODAFileConverter")
+    if oda_cmd:
+        with tempfile.TemporaryDirectory() as indir, tempfile.TemporaryDirectory() as outdir:
+            dwg_path = Path(indir) / "input.dwg"
+            dwg_path.write_bytes(file_bytes)
+            try:
+                subprocess.run(
+                    [oda_cmd, indir, outdir, "ACAD2018", "DXF", "0", "1"],
+                    check=True, capture_output=True, timeout=30,
+                )
+                dxf_files = list(Path(outdir).glob("*.dxf"))
+                if dxf_files:
+                    logger.info("DWG→DXF via ODAFileConverter CLI")
+                    return dxf_files[0].read_bytes()
+            except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+                logger.warning("ODAFileConverter failed: %s", exc)
+
+    raise RuntimeError(
+        "No DWG converter available. Install ODA File Converter "
+        "(https://www.opendesign.com/guestfiles/oda_file_converter) "
+        "or LibreDWG (apt install libredwg-tools). "
+        "Alternatively, export as DXF from AutoCAD."
+    )
+
+
 # ── DXF / DWG direct extraction ───────────────────────────────────────────────
 
 def dxf_to_text(file_bytes: bytes, filename: str = "drawing.dxf") -> str:
     """Extract engineering data directly from DXF/DWG using ezdxf entity traversal.
+
+    For DWG files, converts to DXF first using available system converters.
 
     Collects:
     - DIMENSION entities (exact numeric values with units)
@@ -33,6 +115,13 @@ def dxf_to_text(file_bytes: bytes, filename: str = "drawing.dxf") -> str:
         import ezdxf
     except ImportError as exc:
         raise RuntimeError("ezdxf not installed. Run: pip install ezdxf") from exc
+
+    ext = Path(filename).suffix.lower()
+
+    # DWG files need conversion first
+    if ext == ".dwg":
+        file_bytes = _dwg_to_dxf_bytes(file_bytes)
+        filename = filename.rsplit(".", 1)[0] + ".dxf"
 
     with tempfile.NamedTemporaryFile(
         suffix=Path(filename).suffix or ".dxf", delete=False

@@ -42,7 +42,7 @@ export default function SimilarPartsPage() {
 
   if (step === "upload") {
     return (
-      <div className="min-h-screen bg-[#F8F8F6]">
+      <div className="min-h-screen warm-gradient-page">
         <AppNav />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-12">
           <h1 style={{ fontFamily: "var(--font-heading)" }} className="text-[32px] tracking-tight text-slate-900 mb-2">Similar Parts</h1>
@@ -116,7 +116,7 @@ export default function SimilarPartsPage() {
 
   // Results view
   return (
-    <div className="min-h-screen bg-[#F8F8F6]">
+    <div className="min-h-screen warm-gradient-page">
       <AppNav>
         <button
           onClick={() => { setStep("upload"); setMatches([]); setFiles([]); }}

@@ -11,13 +11,15 @@ Always pull the screen screenshot alongside the HTML and match it pixel-for-pixe
 
 ## Project Overview
 
-Newton-Metre — "Know what it costs. Before they quote." An AI-powered procurement negotiation intelligence tool. Gives line-by-line should-cost breakdowns (±5-10% accuracy) for mechanical parts, sheet metal parts, PCB assemblies, and cable assemblies. Built for Indian manufacturing job shop economics (₹ currency, INR pricing).
+Newton-Metre — "Know what it costs. Before they quote." A manufacturing cost intelligence platform. Two superpowers: (1) should-cost breakdowns (±5-10% accuracy) for mechanical parts, sheet metal, PCB, and cable assemblies, and (2) similarity search that turns your company's drawing history into a searchable asset. Built for Indian manufacturing economics (₹ currency, INR pricing).
 
 **Target industries:** Defense, Aerospace, Automobile
 **Target part types:** Turned, Milled, Sheet metal
-**Users:** Procurement teams negotiating with suppliers for custom/proprietary manufactured parts.
+**Users:** Sourcing & procurement, cost engineering, design engineering, and leadership teams at manufacturing companies.
 
-**Core value:** "Here's what this part SHOULD cost, line by line. Now negotiate."
+**Core value:** "Upload a drawing. Get a line-by-line should-cost. Find similar parts from your history. Negotiate with data."
+
+See `docs/POSITIONING.md` for full multi-audience messaging and one-liners.
 
 ## Live Deployment
 
@@ -33,7 +35,7 @@ Newton-Metre — "Know what it costs. Before they quote." An AI-powered procurem
 
 ### `frontend/` — Next.js Web App (Vercel)
 
-7 pages: landing, login/signup, dashboard, new estimate, estimate detail, similarity search, RFQ extraction. Tailwind CSS v4 with "Tactical Elegance" design system (Newsreader + Space Grotesk fonts, deep blue #00288e, tonal surface layering #faf8ff). See `DESIGN.md` for full spec. Vercel Analytics enabled.
+7 pages: landing (aPriori/CADDi-inspired, multi-audience), login/signup, dashboard, new estimate, estimate detail, similarity search, RFQ extraction. Tailwind CSS v4 with "Tactical Elegance" design system (Newsreader + Space Grotesk fonts, deep blue #00288e, tonal surface layering #faf8ff). Landing page has dedicated should-cost section (4 audience cards) and dedicated similarity search section (CADDi-style knowledge-as-asset). See `DESIGN.md` for full spec. Vercel Analytics enabled.
 
 ### `costimize-v2/` — Python Engines + FastAPI Backend (Railway)
 
@@ -114,7 +116,7 @@ frontend/                             # Next.js frontend (Vercel)
 ├── src/app/
 │   ├── layout.tsx                    # Root layout, Google Fonts, Vercel Analytics
 │   ├── globals.css                   # Tailwind v4 + design system tokens
-│   ├── page.tsx                      # Landing page (hero, how-it-works, industries)
+│   ├── page.tsx                      # Landing page (hero, problem, should-cost, similarity search, how-it-works, built-for-india, pricing)
 │   ├── login/page.tsx                # Signup/login with Supabase Auth
 │   ├── dashboard/page.tsx            # Stats, actions, recent estimates table
 │   ├── estimate/new/page.tsx         # Upload → extract → review → calculate → result

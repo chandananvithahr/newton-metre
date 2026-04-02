@@ -27,7 +27,7 @@ export default function ViewEstimatePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F8F8F6]">
+      <div className="min-h-screen flex items-center justify-center warm-gradient-page">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-slate-200 border-t-cyan-600 rounded-full animate-spin mx-auto mb-3" />
           <p className="text-slate-500 text-sm">Loading estimate...</p>
@@ -38,7 +38,7 @@ export default function ViewEstimatePage() {
 
   if (!data) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F8F8F6]">
+      <div className="min-h-screen flex items-center justify-center warm-gradient-page">
         <p className="text-slate-500">Estimate not found.</p>
       </div>
     );
@@ -57,7 +57,7 @@ export default function ViewEstimatePage() {
   const hasBreakdownRows = breakdown && Object.values(breakdown).some((v) => v != null);
 
   return (
-    <div className="min-h-screen bg-[#F8F8F6]">
+    <div className="min-h-screen warm-gradient-page">
       <AppNav />
 
       <div className="max-w-3xl mx-auto px-4 sm:px-8 py-8">

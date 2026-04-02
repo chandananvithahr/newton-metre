@@ -75,16 +75,19 @@ export default function DashboardPage() {
   const { today, yesterday, older } = groupByDate(estimates);
 
   return (
-    <div className="flex h-screen bg-[#faf8ff] overflow-hidden">
+    <div className="flex h-screen warm-gradient-page overflow-hidden">
 
       {/* ── Sidebar — history ─────────────────────────────────── */}
-      <aside className="w-60 bg-white border-r border-[#c4c5d5]/20 flex flex-col h-full shrink-0">
+      <aside className="w-60 bg-white/80 backdrop-blur-sm border-r border-black/10 flex flex-col h-full shrink-0">
 
         {/* Logo */}
-        <div className="px-4 pt-5 pb-4 border-b border-[#c4c5d5]/15">
-          <Link href="/" className="flex items-center gap-2.5">
-            <Image src="/newton-metre-logo.png" alt="Newton-Metre" width={36} height={36} className="rounded-xl" />
-            <span className="text-[20px] text-[#00288e] italic font-semibold tracking-tight" style={{ fontFamily: "var(--font-headline)" }}>Newton-Metre</span>
+        <div className="px-4 pt-5 pb-4 border-b border-black/5">
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="relative w-9 h-9 flex items-center justify-center shrink-0">
+              <div className="absolute inset-0 bg-[#1a1a1a] rounded-xl" />
+              <span className="relative text-white font-mono font-bold text-sm tracking-tighter">N·m</span>
+            </div>
+            <span className="text-[#1a1a1a] text-lg font-semibold tracking-tight" style={{ fontFamily: "var(--font-headline)", fontStyle: "italic" }}>Newton-Metre</span>
           </Link>
         </div>
 
@@ -92,7 +95,7 @@ export default function DashboardPage() {
         <div className="flex-1 overflow-y-auto px-3 py-4 space-y-4">
           {loading ? (
             <div className="flex justify-center py-8">
-              <div className="w-4 h-4 border-2 border-[#c4c5d5] border-t-[#00288e] rounded-full animate-spin" />
+              <div className="w-4 h-4 border-2 border-black/5 border-t-[#1a1a1a] rounded-full animate-spin" />
             </div>
           ) : estimates.length === 0 ? (
             <p className="text-[11px] text-[#757684] text-center py-6" style={{ fontFamily: "var(--font-mono)" }}>
@@ -135,10 +138,10 @@ export default function DashboardPage() {
         </div>
 
         {/* Sign out */}
-        <div className="px-3 pb-4 border-t border-[#c4c5d5]/15 pt-3">
+        <div className="px-3 pb-4 border-t border-black/5/15 pt-3">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] text-[#757684] hover:text-[#1a1b20] hover:bg-[#f4f3fa] transition-colors"
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] text-[#757684] hover:text-[#1a1b20] hover:bg-[#fafafa] transition-colors"
             style={{ fontFamily: "var(--font-body)" }}
           >
             <IconLogout />
@@ -165,18 +168,18 @@ export default function DashboardPage() {
               onClick={() => router.push("/estimate/new")}
               className="group bg-white ghost-border rounded-xl p-8 text-left hover:ambient-shadow transition-all duration-200"
             >
-              <div className="w-10 h-10 gradient-cta rounded-lg flex items-center justify-center mb-5">
+              <div className="w-10 h-10 bg-[#1a1a1a] rounded-lg flex items-center justify-center mb-5">
                 <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                 </svg>
               </div>
-              <h2 className="text-[16px] font-bold text-[#1a1b20] mb-2 group-hover:text-[#00288e]" style={{ fontFamily: "var(--font-body)" }}>
+              <h2 className="text-[16px] font-bold text-[#1a1b20] mb-2 group-hover:text-[#1a1a1a]" style={{ fontFamily: "var(--font-body)" }}>
                 Get a should-cost
               </h2>
               <p className="text-[14px] text-[#515f74] leading-relaxed mb-5" style={{ fontFamily: "var(--font-body)" }}>
                 Upload a drawing. Newton-Metre reads it, calculates every cost line — material, machining, finishing, margin.
               </p>
-              <span className="text-[12px] text-[#00288e] font-bold uppercase tracking-widest group-hover:underline" style={{ fontFamily: "var(--font-label)" }}>
+              <span className="text-[12px] text-[#1a1a1a] font-bold uppercase tracking-widest group-hover:underline" style={{ fontFamily: "var(--font-label)" }}>
                 Upload a drawing →
               </span>
             </button>
@@ -186,18 +189,18 @@ export default function DashboardPage() {
               onClick={() => router.push("/similar")}
               className="group bg-white ghost-border rounded-xl p-8 text-left hover:ambient-shadow transition-all duration-200"
             >
-              <div className="w-10 h-10 bg-[#1e40af] rounded-lg flex items-center justify-center mb-5">
+              <div className="w-10 h-10 bg-[#1a1a1a] rounded-lg flex items-center justify-center mb-5">
                 <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
                 </svg>
               </div>
-              <h2 className="text-[16px] font-bold text-[#1a1b20] mb-2 group-hover:text-[#00288e]" style={{ fontFamily: "var(--font-body)" }}>
+              <h2 className="text-[16px] font-bold text-[#1a1b20] mb-2 group-hover:text-[#1a1a1a]" style={{ fontFamily: "var(--font-body)" }}>
                 Find similar parts
               </h2>
               <p className="text-[14px] text-[#515f74] leading-relaxed mb-5" style={{ fontFamily: "var(--font-body)" }}>
                 Upload drawings, POs, contracts, or QA docs. Newton-Metre searches your company&apos;s history for matches.
               </p>
-              <span className="text-[12px] text-[#00288e] font-bold uppercase tracking-widest group-hover:underline" style={{ fontFamily: "var(--font-label)" }}>
+              <span className="text-[12px] text-[#1a1a1a] font-bold uppercase tracking-widest group-hover:underline" style={{ fontFamily: "var(--font-label)" }}>
                 Search drawings →
               </span>
             </button>
@@ -216,7 +219,7 @@ function HistoryItem({ estimate, onClick }: { estimate: Estimate; onClick: () =>
   return (
     <button
       onClick={onClick}
-      className="w-full text-left px-2 py-2 rounded-lg hover:bg-[#f4f3fa] transition-colors group"
+      className="w-full text-left px-2 py-2 rounded-lg hover:bg-[#fafafa] transition-colors group"
     >
       <p className="text-[12px] text-[#444653] group-hover:text-[#1a1b20] truncate leading-snug" style={{ fontFamily: "var(--font-body)" }}>
         {label}

@@ -80,6 +80,15 @@ async def extract_drawing(
 
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except RuntimeError as e:
+        # DWG converter not available or similar infrastructure issue
+        detail = str(e)
+        if "DWG" in detail or "converter" in detail.lower():
+            raise HTTPException(
+                status_code=400,
+                detail="DWG files require conversion. Please export as DXF from AutoCAD and re-upload.",
+            )
+        raise HTTPException(status_code=500, detail="Failed to analyze drawing. Please try a clearer image.")
     except Exception:
         raise HTTPException(
             status_code=500, detail="Failed to analyze drawing. Please try a clearer image.",

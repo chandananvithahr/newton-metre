@@ -177,7 +177,7 @@ export default function NewEstimatePage() {
       high:         "bg-emerald-50 text-emerald-700 border-emerald-200",
       medium:       "bg-amber-50 text-amber-700 border-amber-200",
       low:          "bg-red-50 text-red-700 border-red-200",
-      insufficient: "bg-[#f4f3fa] text-[#515f74] border-[#c4c5d5]/20",
+      insufficient: "bg-[#fafafa] text-[#515f74] border-black/20",
     };
     return (
       <span
@@ -355,8 +355,8 @@ export default function NewEstimatePage() {
         {steps.map((s, i) => (
           <div key={s} className="flex items-center gap-2">
             <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-              i < current ? "bg-[#00288e]/5 text-[#1e40af]" :
-              i === current ? "bg-[#00288e] text-white" :
+              i < current ? "bg-[#1a1a1a]/5 text-[#374151]" :
+              i === current ? "bg-[#1a1a1a] text-white" :
               "bg-[#efedf4] text-[#757684]"
             }`} style={{ fontFamily: "var(--font-mono)" }}>
               {i < current ? (
@@ -367,7 +367,7 @@ export default function NewEstimatePage() {
               {s}
             </div>
             {i < steps.length - 1 && (
-              <div className={`w-8 h-px ${i < current ? "bg-[#00288e]/40" : "bg-[#c4c5d5]/20"}`} />
+              <div className={`w-8 h-px ${i < current ? "bg-[#1a1a1a]/40" : "bg-[#c4c5d5]/20"}`} />
             )}
           </div>
         ))}
@@ -377,7 +377,7 @@ export default function NewEstimatePage() {
 
   function MissionLog({ lines, subtitle }: { lines: string[]; subtitle?: string }) {
     return (
-      <div className="min-h-screen bg-[#faf8ff]">
+      <div className="min-h-screen warm-gradient-page">
         <AppNav />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-12">
           <StepProgress />
@@ -394,7 +394,7 @@ export default function NewEstimatePage() {
                     style={{ animationDelay: `${i * 0.35}s`, fontFamily: "var(--font-mono)" }}
                   >
                     {isLast ? (
-                      <span className="w-4 h-4 border-2 border-[#c4c5d5]/20 border-t-[#00288e] rounded-full animate-spin shrink-0" />
+                      <span className="w-4 h-4 border-2 border-black/20 border-t-[#1a1a1a] rounded-full animate-spin shrink-0" />
                     ) : (
                       <span className="text-emerald-500 text-base leading-none shrink-0">✓</span>
                     )}
@@ -413,7 +413,7 @@ export default function NewEstimatePage() {
 
   if (step === "type") {
     return (
-      <div className="min-h-screen bg-[#faf8ff]">
+      <div className="min-h-screen warm-gradient-page">
         <AppNav />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-12">
           <h1 className="text-4xl mb-2 tracking-tight text-[#1a1b20]" style={{ fontFamily: "var(--font-headline)" }}>What are we costing?</h1>
@@ -425,8 +425,8 @@ export default function NewEstimatePage() {
               onClick={() => { setDrawingType("single"); setStep("upload"); }}
               className="bg-white ghost-border rounded-xl p-8 text-left hover:ambient-shadow transition-all duration-200 group"
             >
-              <div className="w-12 h-12 bg-[#00288e]/5 rounded-xl flex items-center justify-center mb-5 group-hover:bg-[#00288e]/10 transition-colors">
-                <svg className="w-6 h-6 text-[#00288e]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <div className="w-12 h-12 bg-[#1a1a1a]/5 rounded-xl flex items-center justify-center mb-5 group-hover:bg-[#1a1a1a]/10 transition-colors">
+                <svg className="w-6 h-6 text-[#1a1a1a]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                 </svg>
               </div>
@@ -440,8 +440,8 @@ export default function NewEstimatePage() {
               onClick={() => { setDrawingType("assembly"); setStep("assembly-upload"); }}
               className="bg-white ghost-border rounded-xl p-8 text-left hover:ambient-shadow transition-all duration-200 group"
             >
-              <div className="w-12 h-12 bg-[#00288e]/5 rounded-xl flex items-center justify-center mb-5 group-hover:bg-[#00288e]/10 transition-colors">
-                <svg className="w-6 h-6 text-[#00288e]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <div className="w-12 h-12 bg-[#1a1a1a]/5 rounded-xl flex items-center justify-center mb-5 group-hover:bg-[#1a1a1a]/10 transition-colors">
+                <svg className="w-6 h-6 text-[#1a1a1a]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
                 </svg>
               </div>
@@ -460,7 +460,7 @@ export default function NewEstimatePage() {
 
   if (step === "upload") {
     return (
-      <div className="min-h-screen bg-[#faf8ff]">
+      <div className="min-h-screen warm-gradient-page">
         <AppNav />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-12">
           <StepProgress />
@@ -484,14 +484,14 @@ export default function NewEstimatePage() {
               Sheet 1 {extraSheets.length === 0 ? "(required)" : ""}
             </p>
             <div
-              className="border-2 border-dashed border-[#c4c5d5]/20 rounded-xl p-8 text-center mb-4 hover:border-[#00288e]/30 hover:bg-[#00288e]/10/5 transition-colors cursor-pointer"
+              className="border-2 border-dashed border-black/20 rounded-xl p-8 text-center mb-4 hover:border-[#00288e]/30 hover:bg-[#1a1a1a]/10/5 transition-colors cursor-pointer"
               role="button"
               tabIndex={0}
               onClick={() => document.getElementById("file-input")?.click()}
               onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); document.getElementById("file-input")?.click(); } }}
-              onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-[#00288e]/40", "bg-[#00288e]/5/50"); }}
-              onDragLeave={(e) => { e.currentTarget.classList.remove("border-[#00288e]/40", "bg-[#00288e]/5/50"); }}
-              onDrop={(e) => { e.preventDefault(); e.currentTarget.classList.remove("border-[#00288e]/40", "bg-[#00288e]/5/50"); const f = e.dataTransfer.files[0]; if (f) setFile(f); }}
+              onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-[#00288e]/40", "bg-[#1a1a1a]/5/50"); }}
+              onDragLeave={(e) => { e.currentTarget.classList.remove("border-[#00288e]/40", "bg-[#1a1a1a]/5/50"); }}
+              onDrop={(e) => { e.preventDefault(); e.currentTarget.classList.remove("border-[#00288e]/40", "bg-[#1a1a1a]/5/50"); const f = e.dataTransfer.files[0]; if (f) setFile(f); }}
             >
               {file ? (
                 <p className="text-sm font-medium text-[#1a1b20]" style={{ fontFamily: "var(--font-mono)" }}>{file.name}</p>
@@ -506,7 +506,7 @@ export default function NewEstimatePage() {
 
             {/* Extra sheets */}
             {extraSheets.map((sheet, idx) => (
-              <div key={idx} className="flex items-center gap-3 bg-[#f4f3fa] border border-[#c4c5d5]/20 rounded-lg px-4 py-3 mb-2">
+              <div key={idx} className="flex items-center gap-3 bg-[#fafafa] border border-black/20 rounded-lg px-4 py-3 mb-2">
                 <svg className="w-4 h-4 text-[#757684] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5" />
                 </svg>
@@ -529,7 +529,7 @@ export default function NewEstimatePage() {
               <div className="mb-4">
                 <button
                   onClick={() => document.getElementById("extra-sheet-input")?.click()}
-                  className="flex items-center gap-2 text-[#00288e] text-sm hover:text-[#1e40af] transition-colors"
+                  className="flex items-center gap-2 text-[#1a1a1a] text-sm hover:text-[#374151] transition-colors"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -564,7 +564,7 @@ export default function NewEstimatePage() {
                   setQuantity(parseInt(raw));
                 }}
                 placeholder="e.g. 500"
-                className="w-28 px-3 py-2.5 border border-[#c4c5d5]/20 rounded-lg bg-[#f4f3fa] outline-none text-sm text-[#1a1b20] placeholder-[#c4c5d5] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                className="w-28 px-3 py-2.5 border border-black/20 rounded-lg bg-[#fafafa] outline-none text-sm text-[#1a1b20] placeholder-[#c4c5d5] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 style={{ fontFamily: "var(--font-mono)" }}
               />
             </div>
@@ -574,7 +574,7 @@ export default function NewEstimatePage() {
             <button
               onClick={handleUpload}
               disabled={!file}
-              className="w-full gradient-cta text-white py-3.5 rounded-lg font-bold tracking-widest uppercase text-sm disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
+              className="w-full bg-[#1a1a1a] hover:bg-[#333] text-white py-3.5 rounded-lg font-bold tracking-widest uppercase text-sm disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
             >
               {extraSheets.length > 0 ? `Analyze ${extraSheets.length + 1} Sheets` : "Analyze Drawing"}
             </button>
@@ -599,20 +599,20 @@ export default function NewEstimatePage() {
         : materialOverride || detectedMaterial;
 
     return (
-      <div className="min-h-screen bg-[#faf8ff]">
+      <div className="min-h-screen warm-gradient-page">
         <AppNav />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-8">
           <StepProgress />
           <h1 className="text-4xl mb-2 tracking-tight text-[#1a1b20]" style={{ fontFamily: "var(--font-headline)" }}>Here&apos;s what we found</h1>
           <p className="text-[#515f74] text-base mb-6 leading-relaxed">Newton-Metre extracted these details from your drawing. Confirm and we&apos;ll calculate the should-cost.</p>
 
-          <div className="bg-white rounded-xl border border-[#c4c5d5]/20 p-6 mb-4">
+          <div className="bg-white rounded-xl border border-black/20 p-6 mb-4">
             <h2 className="text-xs font-medium text-[#515f74] uppercase tracking-wider mb-4" style={{ fontFamily: "var(--font-mono)" }}>Dimensions</h2>
             <table className="w-full">
               <tbody>
                 {Object.entries(dims).map(([key, val]) =>
                   val != null ? (
-                    <tr key={key} className="border-b border-[#c4c5d5]/20 last:border-0">
+                    <tr key={key} className="border-b border-black/20 last:border-0">
                       <td className="py-2.5 text-sm text-[#515f74] capitalize">{key.replace(/_/g, " ")}</td>
                       <td className="py-2.5 text-right text-sm font-medium text-[#1a1b20]" style={{ fontFamily: "var(--font-mono)" }}>{String(val)}</td>
                     </tr>
@@ -622,7 +622,7 @@ export default function NewEstimatePage() {
             </table>
           </div>
 
-          <div className="bg-white rounded-xl border border-[#c4c5d5]/20 p-6 mb-4">
+          <div className="bg-white rounded-xl border border-black/20 p-6 mb-4">
             <div className="flex items-start justify-between mb-3">
               <span className="text-sm font-medium text-[#515f74]">Material</span>
               {detectedMaterial !== null && matConfidence === "high" ? (
@@ -638,16 +638,16 @@ export default function NewEstimatePage() {
                 <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5 text-amber-700 text-sm">
                   {detectedMaterial === null ? "Material not found in the drawing. Select from the list or enter manually." : `AI detected "${detectedMaterial}" with low confidence. Please confirm or correct it.`}
                 </div>
-                <select value={materialOverride} onChange={(e) => { setMaterialOverride(e.target.value); setMaterialPrice(null); }} className="w-full px-3 py-2.5 border border-[#c4c5d5]/20 rounded-lg bg-[#f4f3fa] text-sm text-[#1a1b20] outline-none">
+                <select value={materialOverride} onChange={(e) => { setMaterialOverride(e.target.value); setMaterialPrice(null); }} className="w-full px-3 py-2.5 border border-black/20 rounded-lg bg-[#fafafa] text-sm text-[#1a1b20] outline-none">
                   <option value="">{detectedMaterial !== null ? `Keep detected: ${detectedMaterial}` : "— Select material —"}</option>
                   {KNOWN_MATERIALS.map((m) => <option key={m} value={m}>{m}</option>)}
                   <option value="__custom__">Other (enter manually)…</option>
                 </select>
                 {materialOverride === "__custom__" && (
-                  <input type="text" placeholder="e.g. EN31 Steel, Bronze, AISI 4140" value={customMaterial} onChange={(e) => { setCustomMaterial(e.target.value); setMaterialPrice(null); }} className="w-full px-3 py-2.5 border border-[#c4c5d5]/20 rounded-lg bg-[#f4f3fa] text-sm text-[#1a1b20] outline-none" />
+                  <input type="text" placeholder="e.g. EN31 Steel, Bronze, AISI 4140" value={customMaterial} onChange={(e) => { setCustomMaterial(e.target.value); setMaterialPrice(null); }} className="w-full px-3 py-2.5 border border-black/20 rounded-lg bg-[#fafafa] text-sm text-[#1a1b20] outline-none" />
                 )}
                 <div className="flex items-center gap-3">
-                  <button onClick={handleFetchPrice} disabled={!activeMaterial || fetchingPrice} className="text-sm text-[#00288e] hover:text-[#1e40af] font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                  <button onClick={handleFetchPrice} disabled={!activeMaterial || fetchingPrice} className="text-sm text-[#1a1a1a] hover:text-[#374151] font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
                     {fetchingPrice ? "Fetching…" : "Look up market price (INR/kg)"}
                   </button>
                   {materialPrice !== null && (
@@ -661,7 +661,7 @@ export default function NewEstimatePage() {
             )}
           </div>
 
-          <div className="bg-white rounded-xl border border-[#c4c5d5]/20 p-6 mb-6 space-y-2">
+          <div className="bg-white rounded-xl border border-black/20 p-6 mb-6 space-y-2">
             <div className="flex justify-between">
               <span className="text-sm text-[#515f74]">Processes</span>
               <span className="text-sm font-medium text-[#1a1b20]">{(extractedData.suggested_processes as string[] || []).join(", ")}</span>
@@ -675,10 +675,10 @@ export default function NewEstimatePage() {
           {error && <div role="alert" className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-red-600 text-sm mb-4">{error}</div>}
 
           <div className="flex gap-3">
-            <button onClick={handleCalculate} disabled={needsMaterialInput && !activeMaterial} className="flex-1 gradient-cta text-white py-3.5 rounded-lg font-bold tracking-widest uppercase text-sm disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200">
+            <button onClick={handleCalculate} disabled={needsMaterialInput && !activeMaterial} className="flex-1 bg-[#1a1a1a] hover:bg-[#333] text-white py-3.5 rounded-lg font-bold tracking-widest uppercase text-sm disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200">
               Calculate Cost
             </button>
-            <button onClick={() => setStep("upload")} className="px-6 py-3.5 border border-[#c4c5d5]/20 rounded-lg hover:bg-[#f4f3fa] text-sm font-medium text-[#515f74] transition-colors">
+            <button onClick={() => setStep("upload")} className="px-6 py-3.5 border border-black/20 rounded-lg hover:bg-[#fafafa] text-sm font-medium text-[#515f74] transition-colors">
               Re-upload
             </button>
           </div>
@@ -693,7 +693,7 @@ export default function NewEstimatePage() {
 
   if (step === "result" && result) {
     return (
-      <div className="min-h-screen bg-[#faf8ff]">
+      <div className="min-h-screen warm-gradient-page">
         <AppNav />
         <div className="max-w-3xl mx-auto px-4 sm:px-8 py-8">
           <StepProgress />
@@ -706,11 +706,11 @@ export default function NewEstimatePage() {
           </div>
 
           {/* Uncertainty band callout */}
-          <div className="bg-white border border-[#c4c5d5]/20 rounded-xl px-6 py-5 mb-4">
+          <div className="bg-white border border-black/20 rounded-xl px-6 py-5 mb-4">
             <div className="flex items-end justify-between gap-4">
               <div>
                 <p className="text-xs text-[#515f74] uppercase tracking-wider mb-1" style={{ fontFamily: "var(--font-mono)" }}>Should-Cost Range (±{result.uncertainty_pct}%)</p>
-                <p className="text-2xl font-bold text-[#00288e]" style={{ fontFamily: "var(--font-mono)" }}>
+                <p className="text-2xl font-bold text-[#1a1a1a]" style={{ fontFamily: "var(--font-mono)" }}>
                   {result.currency} {fmt(result.unit_cost_low)} – {fmt(result.unit_cost_high)}
                 </p>
                 <p className="text-sm text-[#757684] mt-1">Physics estimate: <span className="text-[#515f74] font-medium">{result.currency} {fmt(result.unit_cost)}</span> per unit</p>
@@ -725,10 +725,10 @@ export default function NewEstimatePage() {
             <p className="text-xs text-[#757684] mt-3">Use the lower bound as your negotiation target. Supplier price above the upper bound = overpriced.</p>
           </div>
 
-          <div className="bg-white rounded-xl border border-[#c4c5d5]/20 overflow-hidden mb-4">
+          <div className="bg-white rounded-xl border border-black/20 overflow-hidden mb-4">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-[#c4c5d5]/20 bg-[#f4f3fa]">
+                <tr className="border-b border-black/20 bg-[#fafafa]">
                   <th className="text-left px-6 py-3.5 text-xs font-medium text-[#515f74] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Cost Component</th>
                   <th className="text-right px-6 py-3.5 text-xs font-medium text-[#515f74] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Amount ({result.currency})</th>
                 </tr>
@@ -753,7 +753,7 @@ export default function NewEstimatePage() {
           </div>
 
           {/* Supplier quote capture */}
-          <div className="bg-white border border-[#c4c5d5]/20 rounded-xl px-6 py-5 mb-4">
+          <div className="bg-white border border-black/20 rounded-xl px-6 py-5 mb-4">
             <p className="text-sm font-medium text-[#1a1b20] mb-1">What did the supplier actually quote?</p>
             <p className="text-xs text-[#757684] mb-3">Optional — helps us calibrate accuracy over time.</p>
             {supplierQuoteSaved ? (
@@ -768,7 +768,7 @@ export default function NewEstimatePage() {
                     placeholder="e.g. 3800"
                     value={supplierQuoteStr}
                     onChange={(e) => setSupplierQuoteStr(e.target.value)}
-                    className="w-full pl-7 pr-3 py-2.5 border border-[#c4c5d5]/20 rounded-lg bg-[#f4f3fa] text-sm text-[#1a1b20] outline-none focus:border-[#00288e]/40 transition-colors"
+                    className="w-full pl-7 pr-3 py-2.5 border border-black/20 rounded-lg bg-[#fafafa] text-sm text-[#1a1b20] outline-none focus:border-[#00288e]/40 transition-colors"
                   />
                 </div>
                 <button
@@ -781,7 +781,7 @@ export default function NewEstimatePage() {
                     } catch { /* non-critical */ }
                   }}
                   disabled={!supplierQuoteStr || !parseFloat(supplierQuoteStr)}
-                  className="px-5 py-2.5 gradient-cta text-white rounded-lg text-sm font-bold tracking-wider uppercase disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
+                  className="px-5 py-2.5 bg-[#1a1a1a] hover:bg-[#333] text-white rounded-lg text-sm font-bold tracking-wider uppercase disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
                 >
                   Save
                 </button>
@@ -789,7 +789,7 @@ export default function NewEstimatePage() {
             )}
           </div>
 
-          <button onClick={() => setExpanded(!expanded)} className="flex items-center gap-2 text-[#00288e] hover:text-[#1e40af] text-sm font-medium mb-4 transition-colors">
+          <button onClick={() => setExpanded(!expanded)} className="flex items-center gap-2 text-[#1a1a1a] hover:text-[#374151] text-sm font-medium mb-4 transition-colors">
             <svg className={`w-4 h-4 transition-transform ${expanded ? "rotate-90" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
@@ -797,10 +797,10 @@ export default function NewEstimatePage() {
           </button>
 
           {expanded && (
-            <div className="bg-white rounded-xl border border-[#c4c5d5]/20 overflow-hidden mb-6 overflow-x-auto">
+            <div className="bg-white rounded-xl border border-black/20 overflow-hidden mb-6 overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[#c4c5d5]/20 bg-[#f4f3fa]">
+                  <tr className="border-b border-black/20 bg-[#fafafa]">
                     {["Process", "Time", "Machine", "Setup", "Tooling", "Labour", "Power"].map((h) => (
                       <th key={h} className={`${h === "Process" ? "text-left" : "text-right"} px-4 py-3 text-xs font-medium text-[#515f74] uppercase tracking-wider`} style={{ fontFamily: "var(--font-mono)" }}>{h}</th>
                     ))}
@@ -808,7 +808,7 @@ export default function NewEstimatePage() {
                 </thead>
                 <tbody className="divide-y divide-[#c4c5d5]/10">
                   {result.process_lines.map((pl) => (
-                    <tr key={pl.process_id} className="hover:bg-[#f4f3fa] transition-colors">
+                    <tr key={pl.process_id} className="hover:bg-[#fafafa] transition-colors">
                       <td className="px-4 py-3 font-medium text-[#1a1b20]">{pl.process_name}</td>
                       <td className="px-4 py-3 text-right text-[#515f74]" style={{ fontFamily: "var(--font-mono)" }}>{pl.time_min.toFixed(1)} min</td>
                       <td className="px-4 py-3 text-right text-[#515f74]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(pl.machine_cost)}</td>
@@ -824,10 +824,10 @@ export default function NewEstimatePage() {
           )}
 
           <div className="flex gap-3 mt-6">
-            <button onClick={() => router.push("/dashboard")} className="flex-1 border border-[#c4c5d5]/20 py-3.5 rounded-lg hover:bg-[#f4f3fa] text-sm font-medium text-[#515f74] transition-colors">
+            <button onClick={() => router.push("/dashboard")} className="flex-1 border border-black/20 py-3.5 rounded-lg hover:bg-[#fafafa] text-sm font-medium text-[#515f74] transition-colors">
               Back to Dashboard
             </button>
-            <button onClick={() => { setStep("type"); setResult(null); setExtractedData(null); setFile(null); setSupplierQuoteStr(""); setSupplierQuoteSaved(false); }} className="flex-1 gradient-cta text-white py-3.5 rounded-lg font-bold tracking-widest uppercase text-sm transition-all duration-200">
+            <button onClick={() => { setStep("type"); setResult(null); setExtractedData(null); setFile(null); setSupplierQuoteStr(""); setSupplierQuoteSaved(false); }} className="flex-1 bg-[#1a1a1a] hover:bg-[#333] text-white py-3.5 rounded-lg font-bold tracking-widest uppercase text-sm transition-all duration-200">
               New Estimate
             </button>
           </div>
@@ -841,7 +841,7 @@ export default function NewEstimatePage() {
   if (step === "assembly-upload") {
     const canAnalyze = asmComponents.length >= 2;
     return (
-      <div className="min-h-screen bg-[#faf8ff]">
+      <div className="min-h-screen warm-gradient-page">
         <AppNav />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-12">
           <button onClick={() => setStep("type")} className="flex items-center gap-2 text-[#515f74] hover:text-[#515f74] text-sm mb-6 transition-colors">
@@ -858,13 +858,13 @@ export default function NewEstimatePage() {
           {asmComponents.length > 0 && (
             <div className="space-y-3 mb-6">
               {asmComponents.map((comp, i) => (
-                <div key={comp.id} className="bg-white border border-[#c4c5d5]/20 rounded-xl px-5 py-4 flex items-center gap-4">
+                <div key={comp.id} className="bg-white border border-black/20 rounded-xl px-5 py-4 flex items-center gap-4">
                   <span className="text-xs font-medium text-[#757684] w-5 text-center" style={{ fontFamily: "var(--font-mono)" }}>{i + 1}</span>
                   <div className="flex-1 min-w-0">
                     <input
                       value={comp.name}
                       onChange={(e) => updateAsmComponent(comp.id, { name: e.target.value })}
-                      className="w-full bg-transparent text-sm font-medium text-[#1a1b20] outline-none border-b border-transparent hover:border-[#c4c5d5]/20 focus:border-[#00288e]/40 transition-colors py-0.5"
+                      className="w-full bg-transparent text-sm font-medium text-[#1a1b20] outline-none border-b border-transparent hover:border-black/20 focus:border-[#00288e]/40 transition-colors py-0.5"
                       placeholder="Component name"
                     />
                     <p className="text-xs text-[#757684] mt-1 truncate" style={{ fontFamily: "var(--font-mono)" }}>{comp.file.name}</p>
@@ -879,17 +879,17 @@ export default function NewEstimatePage() {
 
           {/* Add more files */}
           <div
-            className="border-2 border-dashed border-[#c4c5d5]/20 rounded-xl p-8 text-center mb-6 hover:border-[#00288e]/30 hover:bg-[#00288e]/10/5 transition-colors cursor-pointer"
+            className="border-2 border-dashed border-black/20 rounded-xl p-8 text-center mb-6 hover:border-[#00288e]/30 hover:bg-[#1a1a1a]/10/5 transition-colors cursor-pointer"
             role="button"
             tabIndex={0}
             onClick={() => document.getElementById("asm-file-input")?.click()}
             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); document.getElementById("asm-file-input")?.click(); } }}
-            onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-[#00288e]/40", "bg-[#00288e]/5/50"); }}
-            onDragLeave={(e) => { e.currentTarget.classList.remove("border-[#00288e]/40", "bg-[#00288e]/5/50"); }}
-            onDrop={(e) => { e.preventDefault(); e.currentTarget.classList.remove("border-[#00288e]/40", "bg-[#00288e]/5/50"); handleAsmFilesAdded(e.dataTransfer.files); }}
+            onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-[#00288e]/40", "bg-[#1a1a1a]/5/50"); }}
+            onDragLeave={(e) => { e.currentTarget.classList.remove("border-[#00288e]/40", "bg-[#1a1a1a]/5/50"); }}
+            onDrop={(e) => { e.preventDefault(); e.currentTarget.classList.remove("border-[#00288e]/40", "bg-[#1a1a1a]/5/50"); handleAsmFilesAdded(e.dataTransfer.files); }}
           >
-            <div className="w-10 h-10 bg-[#00288e]/5 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <svg className="w-5 h-5 text-[#00288e]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <div className="w-10 h-10 bg-[#1a1a1a]/5 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <svg className="w-5 h-5 text-[#1a1a1a]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
               </svg>
             </div>
@@ -908,7 +908,7 @@ export default function NewEstimatePage() {
                 if (raw === "") return;
                 setQuantity(parseInt(raw));
               }}
-              className="w-24 px-3 py-2.5 border border-[#c4c5d5]/20 rounded-lg bg-[#f4f3fa] outline-none text-sm text-[#1a1b20] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="w-24 px-3 py-2.5 border border-black/20 rounded-lg bg-[#fafafa] outline-none text-sm text-[#1a1b20] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               style={{ fontFamily: "var(--font-mono)" }}
             />
           </div>
@@ -921,7 +921,7 @@ export default function NewEstimatePage() {
           <button
             onClick={handleAsmExtractAll}
             disabled={!canAnalyze}
-            className="w-full gradient-cta text-white py-3.5 rounded-lg font-bold tracking-widest uppercase text-sm disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
+            className="w-full bg-[#1a1a1a] hover:bg-[#333] text-white py-3.5 rounded-lg font-bold tracking-widest uppercase text-sm disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
           >
             Analyze All Components ({asmComponents.length})
           </button>
@@ -934,7 +934,7 @@ export default function NewEstimatePage() {
 
   if (step === "assembly-extracting") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#faf8ff]">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="w-full max-w-md px-8">
           <p className="text-xs font-medium text-[#757684] uppercase tracking-widest mb-5" style={{ fontFamily: "var(--font-mono)" }}>
             ANALYZING ASSEMBLY
@@ -952,7 +952,7 @@ export default function NewEstimatePage() {
                     ) : isDone ? (
                       <span className="text-emerald-400 text-base leading-none">✓</span>
                     ) : isActive ? (
-                      <span className="text-[#00288e] text-base leading-none">›</span>
+                      <span className="text-[#1a1a1a] text-base leading-none">›</span>
                     ) : (
                       <span className="text-[#c4c5d5] text-base leading-none">·</span>
                     )}
@@ -981,7 +981,7 @@ export default function NewEstimatePage() {
     const hasErrors = asmComponents.some((c) => c.error !== "");
 
     return (
-      <div className="min-h-screen bg-[#faf8ff]">
+      <div className="min-h-screen warm-gradient-page">
         <AppNav />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-8">
           <h1 className="text-3xl mb-2 tracking-tight text-[#1a1b20]" style={{ fontFamily: "var(--font-headline)" }}>Review Components</h1>
@@ -997,10 +997,10 @@ export default function NewEstimatePage() {
               const needsMat = detectedMat === null || matConf === "low";
 
               return (
-                <div key={comp.id} className="bg-white border border-[#c4c5d5]/20 rounded-xl overflow-hidden">
+                <div key={comp.id} className="bg-white border border-black/20 rounded-xl overflow-hidden">
                   <button
                     onClick={() => setExpandedComponent(expandedComponent === comp.id ? null : comp.id)}
-                    className="w-full flex items-center justify-between px-5 py-4 hover:bg-[#f4f3fa] transition-colors"
+                    className="w-full flex items-center justify-between px-5 py-4 hover:bg-[#fafafa] transition-colors"
                   >
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-[#757684] w-4 text-center" style={{ fontFamily: "var(--font-mono)" }}>{i + 1}</span>
@@ -1014,7 +1014,7 @@ export default function NewEstimatePage() {
                   </button>
 
                   {expandedComponent === comp.id && (
-                    <div className="px-5 pb-5 border-t border-[#c4c5d5]/20 pt-4 space-y-4">
+                    <div className="px-5 pb-5 border-t border-black/20 pt-4 space-y-4">
                       {comp.error ? (
                         <p className="text-sm text-red-400">{comp.error}</p>
                       ) : (
@@ -1043,7 +1043,7 @@ export default function NewEstimatePage() {
                                 <select
                                   value={comp.materialOverride}
                                   onChange={(e) => updateAsmComponent(comp.id, { materialOverride: e.target.value })}
-                                  className="w-full px-3 py-2.5 border border-[#c4c5d5]/20 rounded-lg bg-[#f4f3fa] text-sm text-[#1a1b20] outline-none"
+                                  className="w-full px-3 py-2.5 border border-black/20 rounded-lg bg-[#fafafa] text-sm text-[#1a1b20] outline-none"
                                 >
                                   <option value="">{detectedMat ? `Keep: ${detectedMat}` : "— Select material —"}</option>
                                   {KNOWN_MATERIALS.map((m) => <option key={m} value={m}>{m}</option>)}
@@ -1055,7 +1055,7 @@ export default function NewEstimatePage() {
                                     placeholder="e.g. EN31 Steel"
                                     value={comp.customMaterial}
                                     onChange={(e) => updateAsmComponent(comp.id, { customMaterial: e.target.value })}
-                                    className="w-full px-3 py-2.5 border border-[#c4c5d5]/20 rounded-lg bg-[#f4f3fa] text-sm text-[#1a1b20] outline-none"
+                                    className="w-full px-3 py-2.5 border border-black/20 rounded-lg bg-[#fafafa] text-sm text-[#1a1b20] outline-none"
                                   />
                                 )}
                               </div>
@@ -1086,11 +1086,11 @@ export default function NewEstimatePage() {
             <button
               onClick={() => setStep("assembly-joining")}
               disabled={!allExtracted || hasErrors}
-              className="flex-1 gradient-cta text-white py-3.5 rounded-lg font-bold tracking-widest uppercase text-sm disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
+              className="flex-1 bg-[#1a1a1a] hover:bg-[#333] text-white py-3.5 rounded-lg font-bold tracking-widest uppercase text-sm disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
             >
               Next: Joining Method
             </button>
-            <button onClick={() => setStep("assembly-upload")} className="px-6 py-3.5 border border-[#c4c5d5]/20 rounded-lg hover:bg-[#f4f3fa] text-sm font-medium text-[#515f74] transition-colors">
+            <button onClick={() => setStep("assembly-upload")} className="px-6 py-3.5 border border-black/20 rounded-lg hover:bg-[#fafafa] text-sm font-medium text-[#515f74] transition-colors">
               Back
             </button>
           </div>
@@ -1103,7 +1103,7 @@ export default function NewEstimatePage() {
 
   if (step === "assembly-joining") {
     return (
-      <div className="min-h-screen bg-[#faf8ff]">
+      <div className="min-h-screen warm-gradient-page">
         <AppNav />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-8">
           <h1 className="text-3xl mb-2 tracking-tight text-[#1a1b20]" style={{ fontFamily: "var(--font-headline)" }}>Joining Method</h1>
@@ -1111,13 +1111,13 @@ export default function NewEstimatePage() {
             How are the {asmComponents.length} components joined together?
           </p>
 
-          <div className="bg-white rounded-xl border border-[#c4c5d5]/20 p-6 mb-4 space-y-5">
+          <div className="bg-white rounded-xl border border-black/20 p-6 mb-4 space-y-5">
             <div>
               <label className="text-sm font-medium text-[#515f74] block mb-2">Joining process</label>
               <select
                 value={joiningMethod}
                 onChange={(e) => setJoiningMethod(e.target.value)}
-                className="w-full px-3 py-2.5 border border-[#c4c5d5]/20 rounded-lg bg-[#f4f3fa] text-sm text-[#1a1b20] outline-none"
+                className="w-full px-3 py-2.5 border border-black/20 rounded-lg bg-[#fafafa] text-sm text-[#1a1b20] outline-none"
               >
                 {JOINING_METHODS.map((m) => <option key={m.id} value={m.id}>{m.label}</option>)}
               </select>
@@ -1136,14 +1136,14 @@ export default function NewEstimatePage() {
                 min={1}
                 value={numJoints}
                 onChange={(e) => setNumJoints(parseInt(e.target.value) || 1)}
-                className="w-32 px-3 py-2.5 border border-[#c4c5d5]/20 rounded-lg bg-[#f4f3fa] outline-none text-sm text-[#1a1b20]"
+                className="w-32 px-3 py-2.5 border border-black/20 rounded-lg bg-[#fafafa] outline-none text-sm text-[#1a1b20]"
                 style={{ fontFamily: "var(--font-mono)" }}
               />
             </div>
           </div>
 
           {/* Component summary */}
-          <div className="bg-white rounded-xl border border-[#c4c5d5]/20 p-5 mb-6">
+          <div className="bg-white rounded-xl border border-black/20 p-5 mb-6">
             <p className="text-xs font-medium text-[#515f74] uppercase tracking-wider mb-3" style={{ fontFamily: "var(--font-mono)" }}>Assembly summary</p>
             <div className="space-y-1.5">
               {asmComponents.map((c, i) => (
@@ -1157,7 +1157,7 @@ export default function NewEstimatePage() {
                   </span>
                 </div>
               ))}
-              <div className="border-t border-[#c4c5d5]/20 pt-2 mt-2 flex items-center gap-2 text-sm text-[#757684]">
+              <div className="border-t border-black/20 pt-2 mt-2 flex items-center gap-2 text-sm text-[#757684]">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
                 </svg>
@@ -1171,11 +1171,11 @@ export default function NewEstimatePage() {
           <div className="flex gap-3">
             <button
               onClick={handleAsmCalculate}
-              className="flex-1 gradient-cta text-white py-3.5 rounded-lg font-bold tracking-widest uppercase text-sm transition-all duration-200"
+              className="flex-1 bg-[#1a1a1a] hover:bg-[#333] text-white py-3.5 rounded-lg font-bold tracking-widest uppercase text-sm transition-all duration-200"
             >
               Calculate Assembly Cost
             </button>
-            <button onClick={() => setStep("assembly-review")} className="px-6 py-3.5 border border-[#c4c5d5]/20 rounded-lg hover:bg-[#f4f3fa] text-sm font-medium text-[#515f74] transition-colors">
+            <button onClick={() => setStep("assembly-review")} className="px-6 py-3.5 border border-black/20 rounded-lg hover:bg-[#fafafa] text-sm font-medium text-[#515f74] transition-colors">
               Back
             </button>
           </div>
@@ -1189,7 +1189,7 @@ export default function NewEstimatePage() {
   if (step === "assembly-result" && assemblyResult) {
     const r = assemblyResult;
     return (
-      <div className="min-h-screen bg-[#faf8ff]">
+      <div className="min-h-screen warm-gradient-page">
         <AppNav />
         <div className="max-w-3xl mx-auto px-4 sm:px-8 py-8">
           <div className="mb-6">
@@ -1202,10 +1202,10 @@ export default function NewEstimatePage() {
           {/* Per-component accordion */}
           <div className="space-y-3 mb-6">
             {r.components.map((comp) => (
-              <div key={comp.name} className="bg-white border border-[#c4c5d5]/20 rounded-xl overflow-hidden">
+              <div key={comp.name} className="bg-white border border-black/20 rounded-xl overflow-hidden">
                 <button
                   onClick={() => setExpandedComponent(expandedComponent === comp.name ? null : comp.name)}
-                  className="w-full flex items-center justify-between px-5 py-4 hover:bg-[#f4f3fa] transition-colors"
+                  className="w-full flex items-center justify-between px-5 py-4 hover:bg-[#fafafa] transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-sm font-semibold text-[#1a1b20]">{comp.name}</span>
@@ -1219,7 +1219,7 @@ export default function NewEstimatePage() {
                   </div>
                 </button>
                 {expandedComponent === comp.name && (
-                  <div className="border-t border-[#c4c5d5]/20">
+                  <div className="border-t border-black/20">
                     <table className="w-full text-sm">
                       <tbody className="divide-y divide-[#c4c5d5]/10">
                         {[
@@ -1244,10 +1244,10 @@ export default function NewEstimatePage() {
           </div>
 
           {/* Assembly rollup table */}
-          <div className="bg-white rounded-xl border border-[#c4c5d5]/20 overflow-hidden mb-6">
+          <div className="bg-white rounded-xl border border-black/20 overflow-hidden mb-6">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-[#c4c5d5]/20 bg-[#f4f3fa]">
+                <tr className="border-b border-black/20 bg-[#fafafa]">
                   <th className="text-left px-6 py-3.5 text-xs font-medium text-[#515f74] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Assembly Cost Rollup</th>
                   <th className="text-right px-6 py-3.5 text-xs font-medium text-[#515f74] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>INR</th>
                 </tr>
@@ -1259,7 +1259,7 @@ export default function NewEstimatePage() {
                     <td className="px-6 py-3 text-right text-sm font-medium text-[#1a1b20]" style={{ fontFamily: "var(--font-mono)" }}>{fmt(comp.subtotal)}</td>
                   </tr>
                 ))}
-                <tr className="bg-[#f4f3fa]">
+                <tr className="bg-[#fafafa]">
                   <td className="px-6 py-3 text-sm text-[#515f74]">
                     {r.joining_method_label} ({r.joining_cost > 0 ? `material ₹${fmt(r.joining_material_cost)} + machine ₹${fmt(r.joining_machine_cost)} + labour ₹${fmt(r.joining_labour_cost)}` : "no consumables"})
                   </td>
@@ -1275,7 +1275,7 @@ export default function NewEstimatePage() {
                 </tr>
               </tbody>
               <tfoot>
-                <tr className="bg-[#00288e] text-white">
+                <tr className="bg-[#1a1a1a] text-white">
                   <td className="px-6 py-4 font-bold text-sm" style={{ fontFamily: "var(--font-mono)" }}>TOTAL ASSEMBLY (per unit)</td>
                   <td className="px-6 py-4 text-right font-bold text-lg" style={{ fontFamily: "var(--font-mono)" }}>₹ {fmt(r.unit_cost)}</td>
                 </tr>
@@ -1290,12 +1290,12 @@ export default function NewEstimatePage() {
           </div>
 
           <div className="flex gap-3">
-            <button onClick={() => router.push("/dashboard")} className="flex-1 border border-[#c4c5d5]/20 py-3.5 rounded-lg hover:bg-[#f4f3fa] text-sm font-medium text-[#515f74] transition-colors">
+            <button onClick={() => router.push("/dashboard")} className="flex-1 border border-black/20 py-3.5 rounded-lg hover:bg-[#fafafa] text-sm font-medium text-[#515f74] transition-colors">
               Back to Dashboard
             </button>
             <button
               onClick={() => { setStep("type"); setAssemblyResult(null); setAsmComponents([]); setResult(null); setFile(null); }}
-              className="flex-1 gradient-cta text-white py-3.5 rounded-lg font-bold tracking-widest uppercase text-sm transition-all duration-200"
+              className="flex-1 bg-[#1a1a1a] hover:bg-[#333] text-white py-3.5 rounded-lg font-bold tracking-widest uppercase text-sm transition-all duration-200"
             >
               New Estimate
             </button>

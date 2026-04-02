@@ -133,7 +133,7 @@ function LoginContent() {
         return;
       }
 
-      router.push("/dashboard");
+      router.push("/");
     } catch {
       setError("Something went wrong. Please check your connection and try again.");
       setLoading(false);
@@ -141,12 +141,15 @@ function LoginContent() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#faf8ff]">
+    <div className="min-h-screen flex flex-col warm-gradient-page">
       {/* Nav */}
-      <nav className="flex items-center px-8 py-5 border-b border-[#c4c5d5]/20 bg-white">
-        <Link href="/" className="flex items-center gap-2.5">
-          <Image src="/newton-metre-logo.png" alt="Newton-Metre" width={40} height={40} className="rounded-xl" />
-          <span className="text-[22px] tracking-tight text-[#00288e] italic py-2" style={{ fontFamily: "var(--font-headline)" }}>
+      <nav className="flex items-center px-8 py-5 border-b border-black/5 bg-white/60 backdrop-blur-sm">
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="relative w-9 h-9 flex items-center justify-center">
+            <div className="absolute inset-0 bg-[#1a1a1a] rounded-xl" />
+            <span className="relative text-white font-mono font-bold text-sm tracking-tighter">N·m</span>
+          </div>
+          <span className="text-[#1a1a1a] text-xl font-semibold tracking-tight" style={{ fontFamily: "var(--font-headline)", fontStyle: "italic" }}>
             Newton-Metre
           </span>
         </Link>
@@ -157,8 +160,8 @@ function LoginContent() {
           <div className="bg-white rounded-xl ghost-border ambient-shadow p-8">
             {emailSent ? (
               <div className="text-center py-4">
-                <div className="w-12 h-12 bg-[#00288e]/5 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-6 h-6 text-[#00288e]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <div className="w-12 h-12 bg-[#1a1a1a]/5 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-6 h-6 text-[#1a1a1a]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                   </svg>
                 </div>
@@ -174,7 +177,7 @@ function LoginContent() {
                   <button
                     onClick={handleResendConfirmation}
                     disabled={resending}
-                    className="text-[#00288e] hover:text-[#1e40af] text-sm font-medium transition-colors disabled:opacity-50"
+                    className="text-[#1a1a1a] hover:text-[#374151] text-sm font-medium transition-colors disabled:opacity-50"
                     style={{ fontFamily: "var(--font-body)" }}
                   >
                     {resending ? "Sending..." : "Resend confirmation email"}
@@ -217,7 +220,7 @@ function LoginContent() {
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
                           required
-                          className="w-full px-4 py-3 border-b border-[#c4c5d5]/30 bg-transparent outline-none text-sm text-[#1a1b20] placeholder:text-[#c4c5d5] focus:border-[#00288e] transition-colors"
+                          className="w-full px-4 py-3 border-b border-black/30 bg-transparent outline-none text-sm text-[#1a1b20] placeholder:text-[#c4c5d5] focus:border-[#1a1a1a] transition-colors"
                           style={{ fontFamily: "var(--font-body)" }}
                           placeholder="Your full name"
                         />
@@ -229,7 +232,7 @@ function LoginContent() {
                           value={company}
                           onChange={(e) => setCompany(e.target.value)}
                           required
-                          className="w-full px-4 py-3 border-b border-[#c4c5d5]/30 bg-transparent outline-none text-sm text-[#1a1b20] placeholder:text-[#c4c5d5] focus:border-[#00288e] transition-colors"
+                          className="w-full px-4 py-3 border-b border-black/30 bg-transparent outline-none text-sm text-[#1a1b20] placeholder:text-[#c4c5d5] focus:border-[#1a1a1a] transition-colors"
                           style={{ fontFamily: "var(--font-body)" }}
                           placeholder="Company name"
                         />
@@ -239,7 +242,7 @@ function LoginContent() {
                         <select
                           value={country}
                           onChange={(e) => setCountry(e.target.value)}
-                          className="w-full px-4 py-3 border-b border-[#c4c5d5]/30 bg-transparent outline-none text-sm text-[#1a1b20] focus:border-[#00288e] transition-colors"
+                          className="w-full px-4 py-3 border-b border-black/30 bg-transparent outline-none text-sm text-[#1a1b20] focus:border-[#1a1a1a] transition-colors"
                           style={{ fontFamily: "var(--font-body)" }}
                         >
                           {countries.map((c) => (
@@ -257,7 +260,7 @@ function LoginContent() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="w-full px-4 py-3 border-b border-[#c4c5d5]/30 bg-transparent outline-none text-sm text-[#1a1b20] placeholder:text-[#c4c5d5] focus:border-[#00288e] transition-colors"
+                      className="w-full px-4 py-3 border-b border-black/30 bg-transparent outline-none text-sm text-[#1a1b20] placeholder:text-[#c4c5d5] focus:border-[#1a1a1a] transition-colors"
                       style={{ fontFamily: "var(--font-body)" }}
                       placeholder="your@email.com"
                       autoComplete={isSignUp ? "off" : "email"}
@@ -272,7 +275,7 @@ function LoginContent() {
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       minLength={6}
-                      className="w-full px-4 py-3 border-b border-[#c4c5d5]/30 bg-transparent outline-none text-sm text-[#1a1b20] placeholder:text-[#c4c5d5] focus:border-[#00288e] transition-colors"
+                      className="w-full px-4 py-3 border-b border-black/30 bg-transparent outline-none text-sm text-[#1a1b20] placeholder:text-[#c4c5d5] focus:border-[#1a1a1a] transition-colors"
                       style={{ fontFamily: "var(--font-body)" }}
                       placeholder="At least 6 characters"
                       autoComplete={isSignUp ? "new-password" : "current-password"}
@@ -288,7 +291,7 @@ function LoginContent() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full gradient-cta text-white py-3.5 rounded-lg font-bold tracking-widest uppercase text-sm disabled:opacity-30 transition-all duration-200 mt-2"
+                    className="w-full bg-[#1a1a1a] text-white py-3.5 rounded-lg font-bold tracking-widest uppercase text-sm disabled:opacity-30 transition-all duration-200 mt-2 hover:bg-[#333]"
                     style={{ fontFamily: "var(--font-label)" }}
                   >
                     {loading ? (
@@ -303,7 +306,7 @@ function LoginContent() {
                 <div className="mt-6 text-center">
                   <button
                     onClick={() => { setIsSignUp(!isSignUp); setError(""); }}
-                    className="text-[#00288e] hover:text-[#1e40af] text-sm font-medium py-3 px-4 transition-colors"
+                    className="text-[#1a1a1a] hover:text-[#374151] text-sm font-medium py-3 px-4 transition-colors"
                     style={{ fontFamily: "var(--font-body)" }}
                   >
                     {isSignUp ? "Already have an account? Log in" : "Need an account? Sign up"}

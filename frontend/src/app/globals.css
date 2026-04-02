@@ -24,6 +24,13 @@
   --color-nm-tertiary:          #611e00;
   --color-nm-tertiary-container: #872d00;
 
+  /* Text (aliased for Tailwind v4 theme token usage) */
+  --color-text-primary:         #1a1b20;
+  --color-text-secondary:       #444653;
+  --color-text-description:     #515f74;
+  --color-text-muted:           #757684;
+  --color-text-disabled:        #c4c5d5;
+
   /* Semantic */
   --color-nm-on-surface:        #1a1b20;
   --color-nm-on-surface-variant: #444653;
@@ -115,6 +122,33 @@ select:focus {
 .ghost-border { outline: 1px solid rgba(117, 118, 132, 0.15); }
 .ambient-shadow { box-shadow: 0px 20px 40px rgba(0, 40, 142, 0.06); }
 .gradient-cta { background: linear-gradient(135deg, #00288e 0%, #1e40af 100%); }
+.newsreader-italic { font-family: var(--font-headline); font-style: italic; }
+
+/* Base44-inspired warm gradients */
+.warm-gradient-hero {
+  background: linear-gradient(135deg, #E0F7FA 0%, #FFF7ED 50%, #FFECD2 100%);
+}
+.warm-gradient-subtle {
+  background: linear-gradient(135deg, #F0FDFA 0%, #FFFBF5 50%, #FFF7ED 100%);
+}
+.warm-gradient-page {
+  background: linear-gradient(180deg, #F0FDFA 0%, #FFFBF5 30%, #FFF7ED 100%);
+  min-height: 100vh;
+}
+.warm-gradient-footer {
+  background: linear-gradient(135deg, #FFECD2 0%, #FFD8A8 40%, #F97316 100%);
+}
+.warm-gradient-accent {
+  background: linear-gradient(135deg, #FFF7ED 0%, #FFE4E6 100%);
+}
+.dark-pill {
+  background-color: #1a1a1a;
+  color: white;
+  border-radius: 9999px;
+}
+.dark-pill:hover {
+  background-color: #333;
+}
 
 /* ── Tables ── */
 tr {

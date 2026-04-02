@@ -107,7 +107,7 @@ Newton-Metre is the cost analyst your procurement team doesn't have. It does the
 
 ## Who It's For
 
-**Target users:** Procurement teams negotiating with suppliers for custom/proprietary manufactured parts
+**Target users:** Sourcing & procurement, cost engineering, design engineering, and leadership teams at manufacturing companies
 
 **Target industries:** Defense, Aerospace, Automobile
 
