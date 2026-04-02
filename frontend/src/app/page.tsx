@@ -28,7 +28,7 @@ function Hero() {
           <div className="max-w-3xl mx-auto mb-12 space-y-8">
             <div>
               <h1 className="text-4xl sm:text-5xl lg:text-[64px] font-medium text-[#1a1a1a] leading-[1.1] tracking-tight mb-4" style={{ fontFamily: "var(--font-headline)" }}>
-                Know what it <em className="text-orange-500 not-italic">should</em> cost.
+                Know what it <em className="text-orange-500">should</em> cost.
               </h1>
               <p className="text-[#374151] text-lg leading-relaxed">
                 Upload any manufacturing drawing. Get a line-by-line breakdown of material, machining, and finishing costs. Negotiate with the real number.
@@ -36,7 +36,7 @@ function Hero() {
             </div>
             <div>
               <h1 className="text-4xl sm:text-5xl lg:text-[64px] font-medium text-[#1a1a1a] leading-[1.1] tracking-tight mb-4" style={{ fontFamily: "var(--font-headline)" }}>
-                Find where it <em className="text-orange-500 not-italic">already</em> exists.
+                Find where it <em className="text-orange-500">already</em> exists.
               </h1>
               <p className="text-[#374151] text-lg leading-relaxed">
                 Search your company&apos;s entire history — find similar parts, specs, and contracts in seconds. Stop reinventing the wheel.
