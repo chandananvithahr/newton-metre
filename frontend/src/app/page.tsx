@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ScrollReveal, StaggerReveal, StaggerItem } from "@/components/ScrollReveal";
+import { LandingNav } from "@/components/landing-nav";
 
 /* ─────────────────────────────────────────────────────────────
    NEWTON-METRE — Tactical Elegance design system
@@ -27,46 +28,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-[#faf8ff] text-[#1a1b20]">
 
       {/* ── Nav ───────────────────────────────────────────────── */}
-      <nav className="fixed top-0 z-50 w-full bg-[#faf8ff]/90 backdrop-blur-md">
-        <div className="max-w-[1400px] mx-auto flex items-center justify-between px-8 py-4">
-          <div className="flex items-center gap-12">
-            <Link href="/" className="flex items-center gap-3">
-              <Image src="/newton-metre-logo.png" alt="Newton-Metre" width={40} height={40} className="rounded-xl" />
-              <span className="text-[26px] italic text-[#00288e] font-semibold" style={{ fontFamily: "var(--font-headline)" }}>Newton-Metre</span>
-            </Link>
-            <div className="hidden md:flex gap-8">
-              {[
-                ["How it works", "#workflow"],
-                ["Capabilities", "#capabilities"],
-                ["Pricing", "#pricing"],
-              ].map(([label, href]) => (
-                <a
-                  key={label}
-                  href={href}
-                  className="text-[14px] font-medium text-[#515f74] hover:text-[#00288e] transition-colors"
-                  style={{ fontFamily: "var(--font-label)" }}
-                >
-                  {label}
-                </a>
-              ))}
-              <Link
-                href="/login"
-                className="text-[14px] font-medium text-[#515f74] hover:text-[#00288e] transition-colors"
-                style={{ fontFamily: "var(--font-label)" }}
-              >
-                Log in
-              </Link>
-            </div>
-          </div>
-          <Link
-            href="/estimate/new"
-            className="gradient-cta text-white px-6 py-2.5 rounded-lg text-xs font-bold tracking-widest uppercase transition-transform active:scale-95"
-            style={{ fontFamily: "var(--font-label)" }}
-          >
-            New Estimate
-          </Link>
-        </div>
-      </nav>
+      <LandingNav />
 
       <main className="pt-20">
 
