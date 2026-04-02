@@ -412,9 +412,9 @@ function Pricing() {
   return (
     <section id="pricing" className="py-28 px-4 sm:px-8 warm-gradient-hero border-t border-black/5">
       <div className="max-w-[1200px] mx-auto">
-        <div className="grid lg:grid-cols-3 gap-8 items-end">
+        <div className="grid lg:grid-cols-3 gap-8 items-stretch">
           {/* Left: heading */}
-          <div>
+          <div className="flex flex-col justify-center">
             <h2 className="text-4xl font-medium text-[#1a1a1a] tracking-tight mb-4" style={{ fontFamily: "var(--font-headline)" }}>
               Pricing plans<br />for every need
             </h2>
