@@ -20,8 +20,8 @@ function Hero() {
     <section className="pt-36 pb-24 px-4 sm:px-8 warm-gradient-hero">
       <div className="max-w-[1200px] mx-auto text-center">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/60 backdrop-blur-sm text-[#1a1a1a] text-[11px] font-bold uppercase tracking-wider mb-8 border border-black/5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+          <div className="inline-flex items-center gap-3 px-6 py-2.5 rounded-full bg-white/70 backdrop-blur-sm text-[#1a1a1a] text-sm font-bold uppercase tracking-widest mb-10 border border-black/10 shadow-sm">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
             Precision Sourcing Intelligence
           </div>
 
