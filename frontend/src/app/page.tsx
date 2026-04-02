@@ -454,27 +454,6 @@ function Pricing() {
   );
 }
 
-/* ── Final CTA (warm gradient like Base44 footer area) ── */
-function FinalCTA() {
-  return (
-    <section className="py-28 px-4 sm:px-8 warm-gradient-hero relative overflow-hidden">
-      <div className="absolute top-1/4 right-0 w-[400px] h-[400px] bg-orange-300/20 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-1/4 w-[300px] h-[300px] bg-amber-200/20 rounded-full blur-3xl" />
-
-      <div className="max-w-2xl mx-auto text-center relative z-10">
-        <div className="bg-[#faf8f0] rounded-2xl p-10 border border-black/5 inline-block">
-          <h2 className="text-4xl sm:text-5xl font-medium text-[#1a1a1a] mb-6 tracking-tight leading-tight" style={{ fontFamily: "var(--font-headline)" }}>
-            So, what are<br />we building?
-          </h2>
-          <Link href="/estimate/new" className="dark-pill inline-flex items-center gap-2 px-8 py-4 text-xs font-bold uppercase tracking-widest">
-            Get started <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 /* ── Footer (warm gradient) ───────────────────────────── */
 function Footer() {
   return (
@@ -548,7 +527,6 @@ export default function LandingPage() {
         <HowItWorks />
         <BuiltForIndia />
         <Pricing />
-        <FinalCTA />
       </main>
       <Footer />
     </div>
