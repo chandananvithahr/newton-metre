@@ -206,14 +206,14 @@ export default function LandingPage() {
           <StaggerReveal className="grid grid-cols-1 md:grid-cols-5 gap-8" delayStep={80}>
             {WORKFLOW_STEPS.map((step) => (
               <StaggerItem key={step.num}>
-                <div className="relative">
+                <div className="relative text-center">
                   <div
-                    className="text-[#00288e]/10 text-[120px] font-bold absolute -top-10 -left-4 select-none leading-none"
+                    className="text-[#00288e]/10 text-[120px] font-bold select-none leading-none"
                     style={{ fontFamily: "var(--font-headline)" }}
                   >
                     {step.num}
                   </div>
-                  <div className="relative z-10 pt-10">
+                  <div className="relative z-10 -mt-8">
                     <h4 className="font-bold text-xs uppercase tracking-widest text-[#00288e] mb-3" style={{ fontFamily: "var(--font-label)" }}>
                       {step.title}
                     </h4>
