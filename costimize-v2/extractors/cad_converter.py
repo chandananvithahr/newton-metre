@@ -50,15 +50,16 @@ def _dwg_to_dxf_bytes(file_bytes: bytes) -> bytes:
     except Exception as exc:
         logger.debug("odafc not available: %s", exc)
 
-    # Strategy 2: LibreDWG dwg2dxf CLI
-    if shutil.which("dwg2dxf"):
+    # Strategy 2: LibreDWG dwg2dxf CLI (also checks dwg2dxf.exe on Windows)
+    dwg2dxf_cmd = shutil.which("dwg2dxf") or shutil.which("dwg2dxf.exe")
+    if dwg2dxf_cmd:
         with tempfile.NamedTemporaryFile(suffix=".dwg", delete=False) as tmp:
             tmp.write(file_bytes)
             dwg_path = tmp.name
         dxf_path = dwg_path.replace(".dwg", ".dxf")
         try:
             subprocess.run(
-                ["dwg2dxf", "-o", dxf_path, dwg_path],
+                [dwg2dxf_cmd, "-o", dxf_path, dwg_path],
                 check=True, capture_output=True, timeout=30,
             )
             dxf_bytes = Path(dxf_path).read_bytes()
