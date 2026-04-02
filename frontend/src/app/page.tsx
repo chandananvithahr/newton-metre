@@ -126,13 +126,13 @@ export default function LandingPage() {
                 ].map((item) => (
                   <div key={item.label} className="flex items-center gap-2.5">
                     <span className="text-[15px] font-bold text-slate-900" style={{ fontFamily: "var(--font-mono)" }}>{item.val}</span>
-                    <span className="text-[13px] text-slate-300" style={{ fontFamily: "var(--font-sans)" }}>{item.label}</span>
+                    <span className="text-[14px] text-slate-500" style={{ fontFamily: "var(--font-sans)" }}>{item.label}</span>
                   </div>
                 ))}
               </div>
               <div className="mt-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
                 {["Defense", "Aerospace", "Automobile"].map((industry) => (
-                  <span key={industry} className="text-[12px] text-slate-400 uppercase tracking-[0.2em]" style={{ fontFamily: "var(--font-mono)" }}>{industry}</span>
+                  <span key={industry} className="text-[13px] text-slate-500 uppercase tracking-[0.2em]" style={{ fontFamily: "var(--font-mono)" }}>{industry}</span>
                 ))}
               </div>
             </div>
@@ -151,7 +151,7 @@ export default function LandingPage() {
               <h2 style={{ fontFamily: "var(--font-heading)" }} className="text-center text-[clamp(28px,5vw,52px)] text-slate-900 tracking-[-0.02em] leading-tight mb-5">
                 Every rupee, explained.
               </h2>
-              <p className="text-center max-w-lg mx-auto text-[16px] text-slate-400 leading-[1.7] mb-16" style={{ fontFamily: "var(--font-sans)" }}>
+              <p className="text-center max-w-lg mx-auto text-[17px] text-slate-500 leading-[1.7] mb-16" style={{ fontFamily: "var(--font-sans)" }}>
                 From raw billet to finished part. Newton-Metre calculates every process, every cost line, every margin.
               </p>
             </ScrollReveal>
@@ -182,7 +182,7 @@ export default function LandingPage() {
                       <h3 className="text-[18px] font-semibold text-slate-900 mb-2" style={{ fontFamily: "var(--font-sans)" }}>
                         {step.title}
                       </h3>
-                      <p className="text-[14px] text-slate-400 leading-[1.7]" style={{ fontFamily: "var(--font-sans)" }}>
+                      <p className="text-[15px] text-slate-500 leading-[1.7]" style={{ fontFamily: "var(--font-sans)" }}>
                         {step.desc}
                       </p>
                     </div>
@@ -196,7 +196,7 @@ export default function LandingPage() {
               <div className="bg-slate-900 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                  <span className="text-[14px] text-white/60" style={{ fontFamily: "var(--font-sans)" }}>
+                  <span className="text-[15px] text-white/70" style={{ fontFamily: "var(--font-sans)" }}>
                     Total should-cost per unit (qty 100)
                   </span>
                 </div>
@@ -243,8 +243,8 @@ export default function LandingPage() {
                   ["Processes", "Turn · Mill · Drill · Plate"],
                 ].map(([label, val]) => (
                   <div key={label} className="text-center">
-                    <p className="text-[12px] text-white/20 uppercase tracking-[0.2em] mb-1" style={{ fontFamily: "var(--font-mono)" }}>{label}</p>
-                    <p className="text-[14px] text-white/60 font-medium" style={{ fontFamily: "var(--font-sans)" }}>{val}</p>
+                    <p className="text-[13px] text-white/40 uppercase tracking-[0.2em] mb-1" style={{ fontFamily: "var(--font-mono)" }}>{label}</p>
+                    <p className="text-[15px] text-white/70 font-medium" style={{ fontFamily: "var(--font-sans)" }}>{val}</p>
                   </div>
                 ))}
               </div>
@@ -275,7 +275,7 @@ export default function LandingPage() {
                     Stop designing<br />from scratch.
                   </h2>
 
-                  <p className="text-[16px] text-slate-400 leading-[1.8] mb-8" style={{ fontFamily: "var(--font-sans)" }}>
+                  <p className="text-[17px] text-slate-500 leading-[1.8] mb-8" style={{ fontFamily: "var(--font-sans)" }}>
                     Thousands of drawings, POs, contracts, QA reports — buried across shared drives and inboxes.
                     Newton-Metre turns them into one searchable brain. Upload a drawing,
                     find every similar part your company has ever made.
@@ -284,7 +284,7 @@ export default function LandingPage() {
                   {/* Match preview */}
                   <div className="bg-white border border-slate-200/80 rounded-xl overflow-hidden mb-8">
                     <div className="px-5 py-2.5 border-b border-slate-100 flex items-center justify-between">
-                      <span className="text-[12px] text-slate-300 uppercase tracking-[0.2em]" style={{ fontFamily: "var(--font-mono)" }}>Matches found</span>
+                      <span className="text-[13px] text-slate-400 uppercase tracking-[0.2em]" style={{ fontFamily: "var(--font-mono)" }}>Matches found</span>
                       <span className="text-[12px] text-cyan-600 font-medium" style={{ fontFamily: "var(--font-mono)" }}>3 results</span>
                     </div>
                     {[
@@ -297,7 +297,7 @@ export default function LandingPage() {
                         <div key={item.name} className="px-5 py-3 border-b border-slate-100 last:border-0 flex items-center justify-between">
                           <div>
                             <p className="text-[13px] font-medium text-slate-700" style={{ fontFamily: "var(--font-sans)" }}>{item.name}</p>
-                            <p className="text-[12px] text-slate-300 mt-0.5" style={{ fontFamily: "var(--font-mono)" }}>{item.dept} · {item.cost}</p>
+                            <p className="text-[13px] text-slate-400 mt-0.5" style={{ fontFamily: "var(--font-mono)" }}>{item.dept} · {item.cost}</p>
                           </div>
                           <span className={`text-[13px] font-bold tabular-nums ${color}`} style={{ fontFamily: "var(--font-mono)" }}>{item.match}%</span>
                         </div>
@@ -326,7 +326,7 @@ export default function LandingPage() {
               <h2 style={{ fontFamily: "var(--font-heading)" }} className="text-center text-[clamp(28px,4.5vw,48px)] text-slate-900 tracking-[-0.02em] leading-tight mb-5">
                 Stop reinventing what already exists.
               </h2>
-              <p className="text-center max-w-xl mx-auto text-[16px] text-slate-400 leading-[1.7] mb-16" style={{ fontFamily: "var(--font-sans)" }}>
+              <p className="text-center max-w-xl mx-auto text-[17px] text-slate-500 leading-[1.7] mb-16" style={{ fontFamily: "var(--font-sans)" }}>
                 Your company has already designed, costed, and manufactured thousands of parts.
                 Newton-Metre makes that history searchable — for everyone.
               </p>
@@ -343,7 +343,7 @@ export default function LandingPage() {
                   <div className="bg-[#F8F8F6] border border-slate-200/80 rounded-2xl p-8 hover-lift hover:border-cyan-200">
                     <p className="text-[12px] text-cyan-600 uppercase tracking-[0.25em] font-medium mb-4" style={{ fontFamily: "var(--font-mono)" }}>{item.dept}</p>
                     <p className="text-[17px] font-semibold text-slate-900 leading-snug mb-3" style={{ fontFamily: "var(--font-sans)" }}>{item.line}</p>
-                    <p className="text-[14px] text-slate-400 leading-[1.7]" style={{ fontFamily: "var(--font-sans)" }}>{item.detail}</p>
+                    <p className="text-[15px] text-slate-500 leading-[1.7]" style={{ fontFamily: "var(--font-sans)" }}>{item.detail}</p>
                   </div>
                 </StaggerItem>
               ))}
@@ -361,7 +361,7 @@ export default function LandingPage() {
               <h2 style={{ fontFamily: "var(--font-heading)" }} className="text-center text-[clamp(28px,4.5vw,48px)] text-slate-900 tracking-[-0.02em] mb-4">
                 This is the answer.
               </h2>
-              <p className="text-center max-w-md mx-auto text-[15px] text-slate-400 leading-[1.7] mb-12" style={{ fontFamily: "var(--font-sans)" }}>
+              <p className="text-center max-w-md mx-auto text-[16px] text-slate-500 leading-[1.7] mb-12" style={{ fontFamily: "var(--font-sans)" }}>
                 Every cost line. Every assumption visible. Click any value to copy.
               </p>
             </ScrollReveal>
@@ -394,7 +394,7 @@ export default function LandingPage() {
                     {["Call 3 suppliers. Wait 2 weeks.", "Negotiate on gut feel — no cost data.", "\"We made something like this once...\" — nobody can find it.", "Engineer retires. Knowledge walks out the door."].map((text) => (
                       <div key={text} className="flex items-start gap-3">
                         <span className="w-1 h-1 rounded-full bg-red-300 mt-[9px] shrink-0" />
-                        <span className="text-[14px] text-slate-500 leading-[1.6]" style={{ fontFamily: "var(--font-sans)" }}>{text}</span>
+                        <span className="text-[15px] text-slate-500 leading-[1.6]" style={{ fontFamily: "var(--font-sans)" }}>{text}</span>
                       </div>
                     ))}
                   </div>
@@ -402,12 +402,12 @@ export default function LandingPage() {
               </StaggerItem>
               <StaggerItem>
                 <div className="bg-[#F7FBFA] border border-cyan-200/60 rounded-2xl p-8">
-                  <p className="text-[12px] text-cyan-600 uppercase tracking-[0.25em] font-medium mb-8" style={{ fontFamily: "var(--font-mono)" }}>With Newton-Metre</p>
+                  <p className="text-[13px] text-cyan-600 uppercase tracking-[0.25em] font-medium mb-8" style={{ fontFamily: "var(--font-mono)" }}>With Newton-Metre</p>
                   <div className="space-y-5">
                     {["Upload a drawing. Answer in 60 seconds.", "Every cost line: material, machining, finishing, margin.", "Newton-Metre finds similar parts from your entire history.", "Knowledge stays in the system. Searchable forever."].map((text) => (
                       <div key={text} className="flex items-start gap-3">
                         <span className="w-1 h-1 rounded-full bg-cyan-500 mt-[9px] shrink-0" />
-                        <span className="text-[14px] text-slate-600 leading-[1.6]" style={{ fontFamily: "var(--font-sans)" }}>{text}</span>
+                        <span className="text-[15px] text-slate-600 leading-[1.6]" style={{ fontFamily: "var(--font-sans)" }}>{text}</span>
                       </div>
                     ))}
                   </div>
@@ -426,7 +426,7 @@ export default function LandingPage() {
               <h2 style={{ fontFamily: "var(--font-heading)" }} className="text-[clamp(28px,4.5vw,48px)] text-slate-900 tracking-[-0.02em] leading-tight mb-6">
                 Every overpaid part compounds.
               </h2>
-              <p className="max-w-lg mx-auto text-[16px] text-slate-400 leading-[1.7] mb-14" style={{ fontFamily: "var(--font-sans)" }}>
+              <p className="max-w-lg mx-auto text-[17px] text-slate-500 leading-[1.7] mb-14" style={{ fontFamily: "var(--font-sans)" }}>
                 200 parts a month. Overpaying 20% on half of them. That&apos;s lakhs per year — not because your team is bad, because they don&apos;t have the data.
               </p>
             </ScrollReveal>
@@ -440,7 +440,7 @@ export default function LandingPage() {
                 <StaggerItem key={s.label}>
                   <div className="bg-white border border-slate-200/80 rounded-xl p-6 hover-lift">
                     <div className="text-[22px] font-bold text-slate-900 mb-1" style={{ fontFamily: "var(--font-mono)" }}>{s.val}</div>
-                    <div className="text-[13px] text-slate-300 uppercase tracking-[0.15em]" style={{ fontFamily: "var(--font-mono)" }}>{s.label}</div>
+                    <div className="text-[14px] text-slate-400 uppercase tracking-[0.15em]" style={{ fontFamily: "var(--font-mono)" }}>{s.label}</div>
                   </div>
                 </StaggerItem>
               ))}
@@ -448,8 +448,8 @@ export default function LandingPage() {
 
             <ScrollReveal>
               <div className="bg-white border border-slate-200/80 rounded-xl p-6 max-w-sm mx-auto">
-                <p className="text-[14px] text-slate-600 mb-1" style={{ fontFamily: "var(--font-sans)" }}>EN8 Steel Shaft — Ø50×100mm</p>
-                <p className="text-[13px] text-slate-400 mb-2" style={{ fontFamily: "var(--font-sans)" }}>Supplier quoted ₹2,400 — should-cost ₹1,400</p>
+                <p className="text-[15px] text-slate-600 mb-1" style={{ fontFamily: "var(--font-sans)" }}>EN8 Steel Shaft — Ø50×100mm</p>
+                <p className="text-[14px] text-slate-500 mb-2" style={{ fontFamily: "var(--font-sans)" }}>Supplier quoted ₹2,400 — should-cost ₹1,400</p>
                 <span className="text-[15px] font-bold text-emerald-600" style={{ fontFamily: "var(--font-mono)" }}>42% savings identified</span>
               </div>
             </ScrollReveal>
@@ -466,7 +466,7 @@ export default function LandingPage() {
               <h2 style={{ fontFamily: "var(--font-heading)" }} className="text-[clamp(28px,4.5vw,48px)] text-slate-900 tracking-[-0.02em] mb-4">
                 Start free. Pay when it pays for itself.
               </h2>
-              <p className="max-w-md mx-auto text-[15px] text-slate-400 leading-[1.7] mb-16" style={{ fontFamily: "var(--font-sans)" }}>
+              <p className="max-w-md mx-auto text-[16px] text-slate-500 leading-[1.7] mb-16" style={{ fontFamily: "var(--font-sans)" }}>
                 One estimate that catches a 20% overpayment pays for a year of Pro.
               </p>
             </ScrollReveal>
@@ -476,14 +476,14 @@ export default function LandingPage() {
                 <div className="bg-[#F8F8F6] border border-slate-200/80 rounded-2xl p-8 hover-lift">
                   <p className="text-[12px] text-slate-400 uppercase tracking-[0.25em] mb-3" style={{ fontFamily: "var(--font-mono)" }}>Free</p>
                   <p className="text-[36px] text-slate-900 tracking-tight mb-1" style={{ fontFamily: "var(--font-heading)" }}>₹0</p>
-                  <p className="text-[13px] text-slate-300 mb-8" style={{ fontFamily: "var(--font-sans)" }}>No card required</p>
+                  <p className="text-[14px] text-slate-400 mb-8" style={{ fontFamily: "var(--font-sans)" }}>No card required</p>
                   <div className="space-y-3 mb-8">
                     {["10 estimates / month", "Should-cost breakdown", "Similarity search", "PDF & image uploads", "All part types"].map((f) => (
                       <div key={f} className="flex items-center gap-2.5">
                         <svg className="w-3.5 h-3.5 text-cyan-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                         </svg>
-                        <span className="text-[13px] text-slate-500" style={{ fontFamily: "var(--font-sans)" }}>{f}</span>
+                        <span className="text-[14px] text-slate-500" style={{ fontFamily: "var(--font-sans)" }}>{f}</span>
                       </div>
                     ))}
                   </div>
@@ -494,24 +494,23 @@ export default function LandingPage() {
               </StaggerItem>
 
               <StaggerItem>
-                <div className="bg-[#F8F8F6] border border-slate-200/80 rounded-2xl p-8 relative hover-lift">
-                  <div className="absolute top-4 right-4 bg-amber-50 text-amber-600 text-[12px] px-2.5 py-1 rounded-full uppercase tracking-[0.2em] border border-amber-200 font-medium" style={{ fontFamily: "var(--font-mono)" }}>Coming soon</div>
+                <div className="bg-[#F8F8F6] border border-cyan-200/60 rounded-2xl p-8 relative hover-lift">
                   <p className="text-[12px] text-slate-400 uppercase tracking-[0.25em] mb-3" style={{ fontFamily: "var(--font-mono)" }}>Pro</p>
                   <p className="text-[36px] text-slate-900 tracking-tight mb-1" style={{ fontFamily: "var(--font-heading)" }}>₹4,999</p>
-                  <p className="text-[13px] text-slate-300 mb-8" style={{ fontFamily: "var(--font-sans)" }}>per user / month</p>
+                  <p className="text-[14px] text-slate-400 mb-8" style={{ fontFamily: "var(--font-sans)" }}>per user / month</p>
                   <div className="space-y-3 mb-8">
                     {["Unlimited estimates", "Persistent part library", "Team cost memory", "Excel / PDF export", "Priority support"].map((f) => (
                       <div key={f} className="flex items-center gap-2.5">
                         <svg className="w-3.5 h-3.5 text-cyan-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                         </svg>
-                        <span className="text-[13px] text-slate-500" style={{ fontFamily: "var(--font-sans)" }}>{f}</span>
+                        <span className="text-[14px] text-slate-500" style={{ fontFamily: "var(--font-sans)" }}>{f}</span>
                       </div>
                     ))}
                   </div>
-                  <button disabled className="block w-full text-center bg-slate-200 text-slate-400 px-6 py-3.5 rounded-full font-medium cursor-not-allowed text-[14px]" style={{ fontFamily: "var(--font-sans)" }}>
+                  <Link href="/login?waitlist=pro" className="block w-full text-center bg-slate-900 text-white px-6 py-3.5 rounded-full font-medium hover:bg-slate-800 transition-colors text-[14px]" style={{ fontFamily: "var(--font-sans)" }}>
                     Join waitlist
-                  </button>
+                  </Link>
                 </div>
               </StaggerItem>
             </StaggerReveal>
@@ -527,13 +526,13 @@ export default function LandingPage() {
               Your AI cost analyst.<br />
               <span className="text-cyan-600 italic">Works while you negotiate.</span>
             </h2>
-            <p className="max-w-md mx-auto text-[17px] text-slate-400 leading-[1.7] mb-12" style={{ fontFamily: "var(--font-sans)" }}>
+            <p className="max-w-md mx-auto text-[18px] text-slate-500 leading-[1.7] mb-12" style={{ fontFamily: "var(--font-sans)" }}>
               Newton-Metre reads drawings like a senior analyst — breaks down every cost, searches your company&apos;s history, and gives you the answer in 60 seconds.
             </p>
             <Link href="/login" className="inline-flex px-9 py-4 bg-slate-900 text-white text-[15px] font-medium rounded-full hover:bg-slate-800 transition-all duration-200 hover:shadow-lg" style={{ fontFamily: "var(--font-sans)" }}>
               Upload your first drawing →
             </Link>
-            <p className="mt-6 text-[12px] text-slate-300" style={{ fontFamily: "var(--font-mono)" }}>No credit card · No setup · Results in 60 seconds</p>
+            <p className="mt-6 text-[13px] text-slate-400" style={{ fontFamily: "var(--font-mono)" }}>No credit card · No setup · Results in 60 seconds</p>
           </ScrollReveal>
         </section>
 
@@ -548,29 +547,29 @@ export default function LandingPage() {
                 <Image src="/newton-metre-logo.png" alt="Newton-Metre" width={32} height={32} className="rounded-xl" />
                 <span style={{ fontFamily: "var(--font-heading)" }} className="text-[20px] text-cyan-600">Newton-Metre</span>
               </div>
-              <p className="text-[13px] text-slate-400 max-w-xs leading-[1.7]" style={{ fontFamily: "var(--font-sans)" }}>
+              <p className="text-[14px] text-slate-500 max-w-xs leading-[1.7]" style={{ fontFamily: "var(--font-sans)" }}>
                 AI cost analyst + company memory for manufactured parts.
               </p>
             </div>
             <div className="flex gap-16">
               <div>
-                <p className="text-[12px] text-slate-300 uppercase tracking-[0.25em] mb-3" style={{ fontFamily: "var(--font-mono)" }}>Product</p>
+                <p className="text-[13px] text-slate-400 uppercase tracking-[0.25em] mb-3" style={{ fontFamily: "var(--font-mono)" }}>Product</p>
                 <div className="space-y-2">
                   {[["Process", "#process"], ["Pricing", "#pricing"]].map(([l, h]) => (
-                    <a key={l} href={h} className="block link-reveal text-[13px] text-slate-400 hover:text-slate-700 transition-colors" style={{ fontFamily: "var(--font-sans)" }}>{l}</a>
+                    <a key={l} href={h} className="block link-reveal text-[14px] text-slate-500 hover:text-slate-700 transition-colors" style={{ fontFamily: "var(--font-sans)" }}>{l}</a>
                   ))}
                 </div>
               </div>
               <div>
-                <p className="text-[12px] text-slate-300 uppercase tracking-[0.25em] mb-3" style={{ fontFamily: "var(--font-mono)" }}>Account</p>
+                <p className="text-[13px] text-slate-400 uppercase tracking-[0.25em] mb-3" style={{ fontFamily: "var(--font-mono)" }}>Account</p>
                 <div className="space-y-2">
-                  <Link href="/login" className="block link-reveal text-[13px] text-slate-400 hover:text-slate-700 transition-colors" style={{ fontFamily: "var(--font-sans)" }}>Sign in</Link>
-                  <Link href="/login" className="block link-reveal text-[13px] text-slate-400 hover:text-slate-700 transition-colors" style={{ fontFamily: "var(--font-sans)" }}>Get started</Link>
+                  <Link href="/login" className="block link-reveal text-[14px] text-slate-500 hover:text-slate-700 transition-colors" style={{ fontFamily: "var(--font-sans)" }}>Sign in</Link>
+                  <Link href="/login" className="block link-reveal text-[14px] text-slate-500 hover:text-slate-700 transition-colors" style={{ fontFamily: "var(--font-sans)" }}>Get started</Link>
                 </div>
               </div>
             </div>
           </div>
-          <div className="border-t border-slate-100 pt-6 text-[12px] text-slate-300 uppercase tracking-[0.2em]" style={{ fontFamily: "var(--font-mono)" }}>
+          <div className="border-t border-slate-100 pt-6 text-[13px] text-slate-400 uppercase tracking-[0.2em]" style={{ fontFamily: "var(--font-mono)" }}>
             © 2026 Newton-Metre
           </div>
         </div>
