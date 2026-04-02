@@ -83,7 +83,7 @@ export default function DashboardPage() {
         {/* Logo */}
         <div className="px-4 pt-5 pb-4 border-b border-slate-100">
           <Link href="/dashboard" className="flex items-center gap-2.5">
-            <Image src="/newton-metre-logo.png" alt="Costrich" width={32} height={32} className="rounded-lg" />
+            <Image src="/costrich-logo.png" alt="Costrich" width={32} height={32} className="rounded-lg" />
             <span style={{ fontFamily: "var(--font-heading)" }} className="text-[18px] text-cyan-600 tracking-tight">Costrich</span>
           </Link>
         </div>

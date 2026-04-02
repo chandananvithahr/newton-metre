@@ -11,28 +11,28 @@ import { ScrollReveal, StaggerReveal, StaggerItem } from "@/components/ScrollRev
 
 const PROCESS_STEPS = [
   {
-    img: "/assets/image_1.png",
+    img: "/assets/image_1.webp",
     title: "CNC Turning",
     sub: "Material + Machining",
     cost: "₹340",
     desc: "Steel billet clamped in a 3-jaw chuck. Chips curl, coolant catches light. Time and material — calculated.",
   },
   {
-    img: "/assets/image_2.png",
+    img: "/assets/image_2.webp",
     title: "CNC Milling",
     sub: "Milling",
     cost: "₹190",
     desc: "End mill plunging into a polished shaft. Keyway slot cut with micron precision on a 3-axis VMC.",
   },
   {
-    img: "/assets/image_3.png",
+    img: "/assets/image_3.webp",
     title: "Sequential Drilling",
     sub: "Drilling",
     cost: "₹32",
     desc: "Four M6 holes in sequence. Twist drill penetrating steel flange, chips spiraling upward.",
   },
   {
-    img: "/assets/image_4.png",
+    img: "/assets/image_4.webp",
     title: "Surface Treatment",
     sub: "Chrome Plating",
     cost: "₹120",
@@ -48,7 +48,7 @@ export default function LandingPage() {
       <nav className="fixed top-0 z-50 w-full bg-[#F8F8F6]/90 backdrop-blur-md border-b border-slate-200/80">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 lg:px-10 h-16 lg:h-20">
           <Link href="/" className="flex items-center gap-3">
-            <Image src="/newton-metre-logo.png" alt="Costrich" width={40} height={40} className="rounded-xl" />
+            <Image src="/costrich-logo.png" alt="Costrich" width={40} height={40} className="rounded-xl" />
             <span style={{ fontFamily: "var(--font-heading)" }} className="text-[22px] text-cyan-600 tracking-tight">Costrich</span>
           </Link>
           <div className="flex items-center gap-8">
@@ -74,7 +74,7 @@ export default function LandingPage() {
             ════════════════════════════════════════════════════════ */}
         <section className="relative overflow-hidden bg-slate-900">
           <div className="absolute inset-0">
-            <Image src="/assets/image_0.png" alt="" fill className="object-cover object-center opacity-70" priority />
+            <Image src="/assets/image_0.webp" alt="" fill className="object-cover object-center opacity-70" priority />
             <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/60 to-transparent" />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-slate-900/30" />
           </div>
@@ -230,7 +230,7 @@ export default function LandingPage() {
 
             <ScrollReveal>
               <div className="relative max-w-2xl mx-auto">
-                <Image src="/assets/image_5.png" alt="Finished precision-machined shaft" width={1200} height={600} className="w-full h-auto rounded-2xl" />
+                <Image src="/assets/image_5.webp" alt="Finished precision-machined shaft" width={1200} height={600} className="w-full h-auto rounded-2xl" />
               </div>
             </ScrollReveal>
 
@@ -261,7 +261,7 @@ export default function LandingPage() {
 
               <ScrollReveal direction="left">
                 <div className="rounded-2xl overflow-hidden border border-slate-200/80 shadow-lg">
-                  <Image src="/assets/image_6.png" alt="Engineer finding similar parts with Costrich" width={800} height={600} className="w-full h-auto" />
+                  <Image src="/assets/image_6.webp" alt="Engineer finding similar parts with Costrich" width={800} height={600} className="w-full h-auto" />
                 </div>
               </ScrollReveal>
 
@@ -545,7 +545,7 @@ export default function LandingPage() {
           <div className="flex flex-col md:flex-row justify-between items-start gap-10 mb-10">
             <div>
               <div className="flex items-center gap-2.5 mb-3">
-                <Image src="/newton-metre-logo.png" alt="Costrich" width={32} height={32} className="rounded-xl" />
+                <Image src="/costrich-logo.png" alt="Costrich" width={32} height={32} className="rounded-xl" />
                 <span style={{ fontFamily: "var(--font-heading)" }} className="text-[20px] text-cyan-600">Costrich</span>
               </div>
               <p className="text-[13px] text-slate-400 max-w-xs leading-[1.7]" style={{ fontFamily: "var(--font-sans)" }}>
