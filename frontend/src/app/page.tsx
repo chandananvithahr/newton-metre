@@ -30,9 +30,9 @@ export default function LandingPage() {
       <nav className="fixed top-0 z-50 w-full bg-[#faf8ff]/90 backdrop-blur-md">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between px-8 py-4">
           <div className="flex items-center gap-12">
-            <Link href="/" className="flex items-center gap-2.5">
-              <Image src="/newton-metre-logo.png" alt="Newton-Metre" width={32} height={32} className="rounded-lg" />
-              <span className="text-2xl italic text-[#00288e]" style={{ fontFamily: "var(--font-headline)" }}>Newton-Metre</span>
+            <Link href="/" className="flex items-center gap-3">
+              <Image src="/newton-metre-logo.png" alt="Newton-Metre" width={40} height={40} className="rounded-xl" />
+              <span className="text-[26px] italic text-[#00288e] font-semibold" style={{ fontFamily: "var(--font-headline)" }}>Newton-Metre</span>
             </Link>
             <div className="hidden md:flex gap-8">
               {[
@@ -398,10 +398,13 @@ export default function LandingPage() {
       </main>
 
       {/* ── Footer ────────────────────────────────────────────── */}
-      <footer className="bg-slate-50 py-12">
+      <footer className="bg-[#f4f3fa] py-12">
         <div className="flex flex-col md:flex-row justify-between items-center px-8 max-w-[1400px] mx-auto w-full">
           <div className="mb-8 md:mb-0">
-            <span className="text-lg text-[#1a1b20] block mb-2 italic" style={{ fontFamily: "var(--font-headline)" }}>Newton-Metre</span>
+            <div className="flex items-center gap-2.5 mb-2">
+              <Image src="/newton-metre-logo.png" alt="Newton-Metre" width={28} height={28} className="rounded-lg" />
+              <span className="text-lg text-[#1a1b20] italic font-semibold" style={{ fontFamily: "var(--font-headline)" }}>Newton-Metre</span>
+            </div>
             <p className="text-[12px] text-[#757684]" style={{ fontFamily: "var(--font-body)" }}>© 2026 Newton-Metre. Precision Sourcing Intelligence.</p>
           </div>
           <div className="flex gap-8">

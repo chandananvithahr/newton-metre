@@ -83,8 +83,8 @@ export default function DashboardPage() {
         {/* Logo */}
         <div className="px-4 pt-5 pb-4 border-b border-[#c4c5d5]/15">
           <Link href="/" className="flex items-center gap-2.5">
-            <Image src="/newton-metre-logo.png" alt="Newton-Metre" width={32} height={32} className="rounded-lg" />
-            <span className="text-[18px] text-[#00288e] italic tracking-tight" style={{ fontFamily: "var(--font-headline)" }}>Newton-Metre</span>
+            <Image src="/newton-metre-logo.png" alt="Newton-Metre" width={36} height={36} className="rounded-xl" />
+            <span className="text-[20px] text-[#00288e] italic font-semibold tracking-tight" style={{ fontFamily: "var(--font-headline)" }}>Newton-Metre</span>
           </Link>
         </div>
 
