@@ -461,7 +461,7 @@ function Footer() {
       <div className="max-w-[1200px] mx-auto relative z-10">
         <div className="grid md:grid-cols-4 gap-12 mb-16">
           <div>
-            <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center justify-center gap-3 mb-4">
               <div className="relative w-9 h-9 flex items-center justify-center">
                 <div className="absolute inset-0 bg-[#1a1a1a] rounded-xl" />
                 <span className="relative text-white font-mono font-bold text-sm tracking-tighter">N·m</span>
