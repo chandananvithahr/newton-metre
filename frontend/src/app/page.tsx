@@ -54,12 +54,12 @@ export default function LandingPage() {
                 className="text-[14px] font-medium text-[#515f74] hover:text-[#00288e] transition-colors"
                 style={{ fontFamily: "var(--font-label)" }}
               >
-                Sign in
+                Log in
               </Link>
             </div>
           </div>
           <Link
-            href="/login"
+            href="/estimate/new"
             className="gradient-cta text-white px-6 py-2.5 rounded-lg text-xs font-bold tracking-widest uppercase transition-transform active:scale-95"
             style={{ fontFamily: "var(--font-label)" }}
           >
@@ -173,17 +173,17 @@ export default function LandingPage() {
               </ScrollReveal>
             </div>
 
-            <StaggerReveal className="grid grid-cols-1 md:grid-cols-3 gap-px bg-[#c4c5d5]/10" delayStep={100}>
+            <StaggerReveal className="grid grid-cols-1 md:grid-cols-3 gap-6" delayStep={100}>
               {[
                 { icon: "⚠", title: "You Don't Know the Real Cost", desc: "Suppliers set the price. Procurement teams accept it. On average, you're overpaying 14% on every precision part — and you can't prove it." },
                 { icon: "📊", title: "40 Hours of Guesswork", desc: "Your engineers spend days cross-referencing old POs, calling vendors, and building spreadsheets. The answer is still a guess." },
                 { icon: "🔺", title: "One Bad Quote Kills the Project", desc: "In defense and aerospace, a wrong cost estimate doesn't just blow the budget — it kills the bid. The stakes are too high for gut feeling." },
               ].map((item) => (
                 <StaggerItem key={item.title}>
-                  <div className="bg-[#faf8ff] p-12 hover:bg-white transition-colors group">
-                    <span className="text-[#00288e] text-4xl mb-8 group-hover:scale-110 transition-transform block">{item.icon}</span>
-                    <h3 className="text-2xl font-bold mb-4" style={{ fontFamily: "var(--font-headline)" }}>{item.title}</h3>
-                    <p className="text-[#515f74] text-sm leading-relaxed" style={{ fontFamily: "var(--font-body)" }}>{item.desc}</p>
+                  <div className="bg-white rounded-xl border border-[#c4c5d5]/30 p-10 hover:ambient-shadow transition-all duration-200 group h-full flex flex-col">
+                    <span className="text-[#00288e] text-4xl mb-6 group-hover:scale-110 transition-transform block">{item.icon}</span>
+                    <h3 className="text-xl font-bold mb-4" style={{ fontFamily: "var(--font-headline)" }}>{item.title}</h3>
+                    <p className="text-[#515f74] text-sm leading-relaxed flex-1" style={{ fontFamily: "var(--font-body)" }}>{item.desc}</p>
                   </div>
                 </StaggerItem>
               ))}
@@ -239,65 +239,47 @@ export default function LandingPage() {
               </h2>
             </ScrollReveal>
 
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-              {/* Large card — Geometric Complexity Index */}
-              <ScrollReveal className="md:col-span-8">
-                <div className="bg-[#f4f3fa] rounded-xl p-10 flex flex-col justify-between min-h-[280px] relative overflow-hidden group">
-                  <div className="max-w-md relative z-10">
-                    <h3 className="text-3xl font-bold mb-4" style={{ fontFamily: "var(--font-headline)" }}>
-                      Line-by-Line Should-Cost Breakdown
-                    </h3>
-                    <p className="text-[#515f74] text-sm" style={{ fontFamily: "var(--font-body)" }}>
-                      Material, machining time, setup, tooling, labour, power, overhead, margin — every cost line calculated from physics, not guesswork. Hand this to your supplier.
-                    </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                {
+                  icon: "📋",
+                  title: "Line-by-Line Breakdown",
+                  desc: "Material, machining, setup, tooling, labour, power, overhead, margin — every cost line from physics. Hand this to your supplier.",
+                  tags: ["Turned Parts", "Milled Parts", "Sheet Metal"],
+                },
+                {
+                  icon: "🔍",
+                  title: "Find Similar Parts",
+                  desc: "Upload any drawing and instantly find matching parts from your company\u2019s history. Know what you paid before \u2014 negotiate better now.",
+                },
+                {
+                  icon: "🤖",
+                  title: "AI Reads Your Drawing",
+                  desc: "Upload a PDF, DXF, STEP, or photo. AI extracts dimensions, material, tolerances, and processes \u2014 no templates, no manual entry.",
+                },
+                {
+                  icon: "₹",
+                  title: "Indian Market Rates",
+                  desc: "Built on real Indian manufacturing economics \u2014 labour rates, machine hour rates, material prices from 15 cities across India.",
+                },
+              ].map((item) => (
+                <ScrollReveal key={item.title}>
+                  <div className="bg-white rounded-xl border border-[#c4c5d5]/30 p-8 hover:ambient-shadow transition-all duration-200 h-full flex flex-col">
+                    <span className="text-3xl mb-5 block">{item.icon}</span>
+                    <h3 className="text-lg font-bold mb-3" style={{ fontFamily: "var(--font-headline)" }}>{item.title}</h3>
+                    <p className="text-[#515f74] text-sm leading-relaxed flex-1" style={{ fontFamily: "var(--font-body)" }}>{item.desc}</p>
+                    {item.tags && (
+                      <div className="mt-5 flex gap-2 flex-wrap">
+                        {item.tags.map((t) => (
+                          <span key={t} className="bg-[#00288e]/5 text-[#00288e] text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded">
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                  <div className="mt-12 relative z-10 flex gap-4 flex-wrap">
-                    {CAPABILITIES.map((c) => (
-                      <span key={c.tag} className="bg-[#00288e]/5 text-[#00288e] text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded">
-                        {c.tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </ScrollReveal>
-
-              {/* Small card — Integrations */}
-              <ScrollReveal className="md:col-span-4">
-                <div className="bg-[#1e40af] text-white rounded-xl p-10 flex flex-col justify-center text-center min-h-[280px]">
-                  <div className="mb-6 text-6xl opacity-50">🔍</div>
-                  <h3 className="text-2xl font-bold mb-4" style={{ fontFamily: "var(--font-headline)" }}>Find Similar Parts</h3>
-                  <p className="text-white/70 text-sm leading-relaxed" style={{ fontFamily: "var(--font-body)" }}>
-                    Upload any drawing and instantly find matching parts from your company&apos;s history. Know what you paid before — negotiate better now.
-                  </p>
-                </div>
-              </ScrollReveal>
-
-              {/* Small card — Material Grade */}
-              <ScrollReveal className="md:col-span-4">
-                <div className="bg-[#e3e1e8] rounded-xl p-10 flex flex-col justify-center min-h-[250px]">
-                  <h3 className="text-2xl font-bold mb-4" style={{ fontFamily: "var(--font-headline)" }}>AI Reads Your Drawing</h3>
-                  <p className="text-[#515f74] text-sm" style={{ fontFamily: "var(--font-body)" }}>
-                    Upload a PDF, DXF, STEP, or photo. AI extracts dimensions, material, tolerances, and processes — no templates, no manual entry.
-                  </p>
-                </div>
-              </ScrollReveal>
-
-              {/* Medium card — Rupee Benchmarking */}
-              <ScrollReveal className="md:col-span-8">
-                <div className="bg-[#f4f3fa] rounded-xl p-10 flex items-center gap-12 overflow-hidden min-h-[250px]">
-                  <div className="flex-1">
-                    <h3 className="text-3xl font-bold mb-4" style={{ fontFamily: "var(--font-headline)" }}>
-                      Real-Time Rupee (₹) Benchmarking
-                    </h3>
-                    <p className="text-[#515f74] text-sm" style={{ fontFamily: "var(--font-body)" }}>
-                      We track thousands of live transactions across India&apos;s manufacturing hubs to ensure your should-cost is hyper-accurate to local market conditions.
-                    </p>
-                  </div>
-                  <div className="hidden lg:flex w-48 h-48 bg-white/50 rounded-full items-center justify-center border border-[#c4c5d5]/30">
-                    <span className="text-5xl font-bold text-[#00288e]" style={{ fontFamily: "var(--font-body)" }}>₹</span>
-                  </div>
-                </div>
-              </ScrollReveal>
+                </ScrollReveal>
+              ))}
             </div>
           </div>
         </section>
