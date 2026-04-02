@@ -30,8 +30,9 @@ export default function LandingPage() {
       <nav className="fixed top-0 z-50 w-full bg-[#faf8ff]/90 backdrop-blur-md">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between px-8 py-4">
           <div className="flex items-center gap-12">
-            <Link href="/" className="text-2xl italic text-[#00288e]" style={{ fontFamily: "var(--font-headline)" }}>
-              Newton-Metre
+            <Link href="/" className="flex items-center gap-2.5">
+              <Image src="/newton-metre-logo.png" alt="Newton-Metre" width={32} height={32} className="rounded-lg" />
+              <span className="text-2xl italic text-[#00288e]" style={{ fontFamily: "var(--font-headline)" }}>Newton-Metre</span>
             </Link>
             <div className="hidden md:flex gap-8">
               {[
