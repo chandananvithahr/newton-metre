@@ -28,12 +28,12 @@ export function LandingNav() {
       <div className="max-w-[1400px] mx-auto flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative w-9 h-9 flex items-center justify-center">
+          <div className="relative w-11 h-11 flex items-center justify-center">
             <div className="absolute inset-0 bg-[#1a1a1a] rounded-xl rotate-3 opacity-10 group-hover:rotate-6 transition-transform" />
             <div className="absolute inset-0 bg-[#1a1a1a] rounded-xl" />
-            <span className="relative text-white font-mono font-bold text-sm tracking-tighter">N·m</span>
+            <span className="relative text-white font-mono font-bold text-base tracking-tighter">N·m</span>
           </div>
-          <span className="text-[#1a1a1a] text-xl font-semibold tracking-tight" style={{ fontFamily: "var(--font-headline)", fontStyle: "italic" }}>Newton-Metre</span>
+          <span className="text-[#1a1a1a] text-2xl font-bold tracking-tight" style={{ fontFamily: "var(--font-headline)", fontStyle: "italic" }}>Newton-Metre</span>
         </Link>
 
         {/* Nav links */}
