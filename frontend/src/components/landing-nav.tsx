@@ -46,7 +46,7 @@ export function LandingNav() {
             <a
               key={label}
               href={href}
-              className="text-sm text-[#6b7280] hover:text-[#1a1a1a] transition-colors"
+              className="text-sm text-[#374151] hover:text-[#1a1a1a] transition-colors font-medium"
             >
               {label}
             </a>
@@ -54,14 +54,14 @@ export function LandingNav() {
           {loggedIn ? (
             <button
               onClick={handleLogout}
-              className="text-sm text-[#6b7280] hover:text-[#1a1a1a] transition-colors"
+              className="text-sm text-[#374151] hover:text-[#1a1a1a] transition-colors font-medium"
             >
               Log out
             </button>
           ) : (
             <Link
               href="/login"
-              className="text-sm text-[#6b7280] hover:text-[#1a1a1a] transition-colors"
+              className="text-sm text-[#374151] hover:text-[#1a1a1a] transition-colors font-medium"
             >
               Log in
             </Link>

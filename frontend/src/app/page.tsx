@@ -57,7 +57,7 @@ function Hero() {
             </div>
           </div>
 
-          <div className="text-[10px] text-[#9ca3af] uppercase tracking-widest font-bold mb-4">Not sure where to start? Try one of these:</div>
+          <div className="text-[11px] text-[#374151] uppercase tracking-widest font-bold mb-4">Not sure where to start? Try one of these:</div>
           <div className="flex flex-wrap justify-center gap-3">
             {["Should-Cost Estimate", "Similarity Search"].map((label) => (
               <Link
@@ -85,7 +85,7 @@ function Problem() {
             Engineering became precise.<br />
             <em className="text-[#9ca3af]">Commercial negotiations never did.</em>
           </h2>
-          <p className="text-[#6b7280] text-base leading-relaxed">
+          <p className="text-[#374151] text-lg leading-relaxed">
             Your engineers design to micron-level tolerances. But when procurement negotiates the price, they rely on PDFs from suppliers, old purchase orders, and gut feeling.
           </p>
         </div>
@@ -99,7 +99,7 @@ function Problem() {
             <div key={i} className="p-8 rounded-2xl bg-white/80 border border-black/10 h-full flex flex-col">
               <div className="text-4xl font-medium text-[#1a1a1a] mb-3" style={{ fontFamily: "var(--font-mono)" }}>{item.stat}</div>
               <div className="text-xs font-bold text-[#1a1a1a] uppercase tracking-widest mb-3">{item.label}</div>
-              <p className="text-sm text-[#6b7280] leading-relaxed flex-1">{item.desc}</p>
+              <p className="text-sm text-[#374151] leading-relaxed flex-1">{item.desc}</p>
             </div>
           ))}
         </div>
@@ -120,7 +120,7 @@ function ShouldCost() {
               Upload a drawing.<br />
               <em>Get the real number.</em>
             </h2>
-            <p className="text-[#6b7280] text-base leading-relaxed mb-10">
+            <p className="text-[#374151] text-lg leading-relaxed mb-10">
               Newton-Metre gives you a complete should-cost breakdown — material, machining, finishing, setup, overhead, and margin — line by line. No spreadsheets. No guessing. One number your entire team can act on.
             </p>
             <Link href="/estimate/new" className="dark-pill inline-flex items-center gap-2 px-8 py-4 text-xs font-bold uppercase tracking-widest">
@@ -190,7 +190,7 @@ function ShouldCost() {
             <div key={i} className="p-6 rounded-xl border border-black/10 bg-white/80 hover:bg-white hover:border-black/20 transition-all group h-full flex flex-col">
               <CheckCircle2 className="w-5 h-5 text-emerald-500 mb-4" />
               <div className="text-xs font-bold text-[#1a1a1a] uppercase tracking-widest mb-2 group-hover:text-orange-600 transition-colors">{item.title}</div>
-              <p className="text-xs text-[#6b7280] leading-relaxed flex-1">{item.desc}</p>
+              <p className="text-sm text-[#374151] leading-relaxed flex-1">{item.desc}</p>
             </div>
           ))}
         </div>
@@ -213,7 +213,7 @@ function SimilaritySearch() {
             One Search. <br />
             <em className="text-white/60">The Entire Company Database.</em>
           </h2>
-          <p className="text-lg text-white/50 leading-relaxed">
+          <p className="text-lg text-white/70 leading-relaxed">
             Every department creates knowledge. Most of it gets buried in folders, lost when people leave, or duplicated across teams. Newton-Metre indexes everything and makes it searchable in seconds.
           </p>
         </div>
@@ -228,9 +228,9 @@ function SimilaritySearch() {
               { dept: "Manufacturing & Shop Floor", title: "Right process, right machine, first time", desc: "Search past production records to find proven setups, cycle times, and tooling configs for similar geometries." },
             ].map((item, i) => (
               <div key={i} className="relative pl-8 border-l border-white/10 group hover:border-l-orange-400/50 transition-colors">
-                <div className="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-2">{item.dept}</div>
+                <div className="text-[11px] font-bold text-white/50 uppercase tracking-widest mb-2">{item.dept}</div>
                 <div className="text-lg font-bold mb-2">{item.title}</div>
-                <p className="text-white/40 text-sm leading-relaxed">{item.desc}</p>
+                <p className="text-white/60 text-sm leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -306,7 +306,7 @@ function SiloBreaker() {
                 <item.Icon className="w-6 h-6" />
               </div>
               <div className="text-xs font-bold text-[#1a1a1a] uppercase tracking-widest mb-3">{item.dept}</div>
-              <p className="text-sm text-[#6b7280] leading-relaxed flex-1">{item.work}</p>
+              <p className="text-sm text-[#374151] leading-relaxed flex-1">{item.work}</p>
             </div>
           ))}
         </div>
@@ -337,7 +337,7 @@ function HowItWorks() {
             <div key={i} className="relative group text-center">
               <div className="text-5xl font-bold text-black/5 mb-4 group-hover:text-orange-500/10 transition-colors" style={{ fontFamily: "var(--font-mono)" }}>{item.step}</div>
               <div className="text-xs font-bold text-[#1a1a1a] uppercase tracking-widest mb-3">{item.title}</div>
-              <p className="text-xs text-[#6b7280] leading-relaxed">{item.desc}</p>
+              <p className="text-sm text-[#374151] leading-relaxed">{item.desc}</p>
             </div>
           ))}
         </div>
@@ -357,7 +357,7 @@ function BuiltForIndia() {
               Built for the <br />
               <em>Indian Manufacturing Renaissance.</em>
             </h2>
-            <p className="text-[#6b7280] text-base leading-relaxed mb-10">
+            <p className="text-[#374151] text-lg leading-relaxed mb-10">
               Western tools use Western approximations. Newton-Metre is built on the ground truth of Indian economics — MSME labour rates, regional machine hour rates, BIS standards, and INR material pricing.
             </p>
             <div className="grid grid-cols-2 gap-8">
@@ -369,7 +369,7 @@ function BuiltForIndia() {
               ].map((item, i) => (
                 <div key={i}>
                   <div className="text-xs font-bold text-[#1a1a1a] uppercase tracking-widest mb-1">{item.label}</div>
-                  <p className="text-xs text-[#6b7280]">{item.desc}</p>
+                  <p className="text-sm text-[#374151]">{item.desc}</p>
                 </div>
               ))}
             </div>
@@ -414,7 +414,7 @@ function Pricing() {
             <h2 className="text-4xl font-medium text-[#1a1a1a] tracking-tight mb-4" style={{ fontFamily: "var(--font-headline)" }}>
               Pricing plans<br />for every need
             </h2>
-            <p className="text-sm text-[#6b7280] leading-relaxed">
+            <p className="text-base text-[#374151] leading-relaxed">
               Scale as you go with plans designed to match your growth.
             </p>
           </div>
@@ -422,7 +422,7 @@ function Pricing() {
           {/* Free */}
           <div className="p-8 rounded-2xl bg-white/80 border border-black/10 h-full flex flex-col">
             <div className="text-sm font-bold uppercase tracking-widest text-[#1a1a1a] mb-6">Start for free</div>
-            <p className="text-xs text-[#6b7280] mb-6">Get access to:</p>
+            <p className="text-sm text-[#374151] mb-6">Get access to:</p>
             <ul className="space-y-3 mb-8">
               {["10 estimates / month", "Should-cost breakdown", "Similarity search", "PDF & image uploads"].map((f) => (
                 <li key={f} className="flex items-center gap-2.5 text-sm text-[#374151]">
@@ -443,7 +443,7 @@ function Pricing() {
               <span className="text-4xl font-medium text-[#1a1a1a]" style={{ fontFamily: "var(--font-mono)" }}>₹4,999</span>
               <span className="text-xs text-[#6b7280]">/mo</span>
             </div>
-            <p className="text-xs text-[#6b7280] mb-6">Upgrade as you go for more credits, more features, and more support.</p>
+            <p className="text-sm text-[#374151] mb-6">Upgrade as you go for more credits, more features, and more support.</p>
             <Link href="/login?waitlist=pro" className="block w-full py-3.5 rounded-full border border-black/10 text-xs font-bold uppercase tracking-widest text-center text-[#1a1a1a] hover:bg-white/60 transition-colors">
               See all plans
             </Link>
