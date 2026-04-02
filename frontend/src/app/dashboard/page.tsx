@@ -83,8 +83,8 @@ export default function DashboardPage() {
         {/* Logo */}
         <div className="px-4 pt-5 pb-4 border-b border-slate-100">
           <Link href="/dashboard" className="flex items-center gap-2.5">
-            <Image src="/costrich-logo.png" alt="Costrich" width={32} height={32} className="rounded-lg" />
-            <span style={{ fontFamily: "var(--font-heading)" }} className="text-[18px] text-cyan-600 tracking-tight">Costrich</span>
+            <Image src="/newton-metre-logo.png" alt="Newton-Metre" width={32} height={32} className="rounded-lg" />
+            <span style={{ fontFamily: "var(--font-heading)" }} className="text-[18px] text-cyan-600 tracking-tight">Newton-Metre</span>
           </Link>
         </div>
 
@@ -174,7 +174,7 @@ export default function DashboardPage() {
                 Get a should-cost
               </h2>
               <p className="text-[13px] text-slate-400 leading-relaxed mb-5" style={{ fontFamily: "var(--font-sans)" }}>
-                Upload a drawing. Costrich reads it, calculates every cost line — material, machining, finishing, margin.
+                Upload a drawing. Newton-Metre reads it, calculates every cost line — material, machining, finishing, margin.
               </p>
               <span className="text-[12px] text-slate-900 font-medium group-hover:underline" style={{ fontFamily: "var(--font-sans)" }}>
                 Upload a drawing →
@@ -195,7 +195,7 @@ export default function DashboardPage() {
                 Find similar parts
               </h2>
               <p className="text-[13px] text-slate-400 leading-relaxed mb-5" style={{ fontFamily: "var(--font-sans)" }}>
-                Upload drawings, POs, contracts, or QA docs. Costrich searches your company&apos;s history for matches.
+                Upload drawings, POs, contracts, or QA docs. Newton-Metre searches your company&apos;s history for matches.
               </p>
               <span className="text-[12px] text-slate-900 font-medium group-hover:underline" style={{ fontFamily: "var(--font-sans)" }}>
                 Search drawings →

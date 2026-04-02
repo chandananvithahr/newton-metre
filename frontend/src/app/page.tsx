@@ -48,8 +48,8 @@ export default function LandingPage() {
       <nav className="fixed top-0 z-50 w-full bg-[#F8F8F6]/90 backdrop-blur-md border-b border-slate-200/80">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 lg:px-10 h-16 lg:h-20">
           <Link href="/" className="flex items-center gap-3">
-            <Image src="/costrich-logo.png" alt="Costrich" width={40} height={40} className="rounded-xl" />
-            <span style={{ fontFamily: "var(--font-heading)" }} className="text-[22px] text-cyan-600 tracking-tight">Costrich</span>
+            <Image src="/newton-metre-logo.png" alt="Newton-Metre" width={40} height={40} className="rounded-xl" />
+            <span style={{ fontFamily: "var(--font-heading)" }} className="text-[22px] text-cyan-600 tracking-tight">Newton-Metre</span>
           </Link>
           <div className="flex items-center gap-8">
             <div className="hidden md:flex items-center gap-8">
@@ -92,7 +92,7 @@ export default function LandingPage() {
 
               <div className="max-w-lg space-y-3 mb-10 animate-fade-in-up animate-fade-in-up-delay-2">
                 <p className="text-[20px] text-white/70 leading-[1.6]" style={{ fontFamily: "var(--font-sans)" }}>
-                  Costrich reads your drawing, breaks down every cost line — material, machining, finishing, margin — like a senior cost analyst would.
+                  Newton-Metre reads your drawing, breaks down every cost line — material, machining, finishing, margin — like a senior cost analyst would.
                 </p>
                 <p className="text-[20px] text-white/70 leading-[1.6]" style={{ fontFamily: "var(--font-sans)" }}>
                   Then searches your company&apos;s entire history for similar parts. Instantly.
@@ -152,7 +152,7 @@ export default function LandingPage() {
                 Every rupee, explained.
               </h2>
               <p className="text-center max-w-lg mx-auto text-[16px] text-slate-400 leading-[1.7] mb-16" style={{ fontFamily: "var(--font-sans)" }}>
-                From raw billet to finished part. Costrich calculates every process, every cost line, every margin.
+                From raw billet to finished part. Newton-Metre calculates every process, every cost line, every margin.
               </p>
             </ScrollReveal>
 
@@ -261,7 +261,7 @@ export default function LandingPage() {
 
               <ScrollReveal direction="left">
                 <div className="rounded-2xl overflow-hidden border border-slate-200/80 shadow-lg">
-                  <Image src="/assets/image_6.webp" alt="Engineer finding similar parts with Costrich" width={800} height={600} className="w-full h-auto" />
+                  <Image src="/assets/image_6.webp" alt="Engineer finding similar parts with Newton-Metre" width={800} height={600} className="w-full h-auto" />
                 </div>
               </ScrollReveal>
 
@@ -277,7 +277,7 @@ export default function LandingPage() {
 
                   <p className="text-[16px] text-slate-400 leading-[1.8] mb-8" style={{ fontFamily: "var(--font-sans)" }}>
                     Thousands of drawings, POs, contracts, QA reports — buried across shared drives and inboxes.
-                    Costrich turns them into one searchable brain. Upload a drawing,
+                    Newton-Metre turns them into one searchable brain. Upload a drawing,
                     find every similar part your company has ever made.
                   </p>
 
@@ -328,7 +328,7 @@ export default function LandingPage() {
               </h2>
               <p className="text-center max-w-xl mx-auto text-[16px] text-slate-400 leading-[1.7] mb-16" style={{ fontFamily: "var(--font-sans)" }}>
                 Your company has already designed, costed, and manufactured thousands of parts.
-                Costrich makes that history searchable — for everyone.
+                Newton-Metre makes that history searchable — for everyone.
               </p>
             </ScrollReveal>
 
@@ -389,7 +389,7 @@ export default function LandingPage() {
             <StaggerReveal className="grid md:grid-cols-2 gap-6" delayStep={100}>
               <StaggerItem>
                 <div className="bg-[#F8F8F6] border border-slate-200/80 rounded-2xl p-8">
-                  <p className="text-[12px] text-red-400 uppercase tracking-[0.25em] font-medium mb-8" style={{ fontFamily: "var(--font-mono)" }}>Without Costrich</p>
+                  <p className="text-[12px] text-red-400 uppercase tracking-[0.25em] font-medium mb-8" style={{ fontFamily: "var(--font-mono)" }}>Without Newton-Metre</p>
                   <div className="space-y-5">
                     {["Call 3 suppliers. Wait 2 weeks.", "Negotiate on gut feel — no cost data.", "\"We made something like this once...\" — nobody can find it.", "Engineer retires. Knowledge walks out the door."].map((text) => (
                       <div key={text} className="flex items-start gap-3">
@@ -402,9 +402,9 @@ export default function LandingPage() {
               </StaggerItem>
               <StaggerItem>
                 <div className="bg-[#F7FBFA] border border-cyan-200/60 rounded-2xl p-8">
-                  <p className="text-[12px] text-cyan-600 uppercase tracking-[0.25em] font-medium mb-8" style={{ fontFamily: "var(--font-mono)" }}>With Costrich</p>
+                  <p className="text-[12px] text-cyan-600 uppercase tracking-[0.25em] font-medium mb-8" style={{ fontFamily: "var(--font-mono)" }}>With Newton-Metre</p>
                   <div className="space-y-5">
-                    {["Upload a drawing. Answer in 60 seconds.", "Every cost line: material, machining, finishing, margin.", "Costrich finds similar parts from your entire history.", "Knowledge stays in the system. Searchable forever."].map((text) => (
+                    {["Upload a drawing. Answer in 60 seconds.", "Every cost line: material, machining, finishing, margin.", "Newton-Metre finds similar parts from your entire history.", "Knowledge stays in the system. Searchable forever."].map((text) => (
                       <div key={text} className="flex items-start gap-3">
                         <span className="w-1 h-1 rounded-full bg-cyan-500 mt-[9px] shrink-0" />
                         <span className="text-[14px] text-slate-600 leading-[1.6]" style={{ fontFamily: "var(--font-sans)" }}>{text}</span>
@@ -528,7 +528,7 @@ export default function LandingPage() {
               <span className="text-cyan-600 italic">Works while you negotiate.</span>
             </h2>
             <p className="max-w-md mx-auto text-[17px] text-slate-400 leading-[1.7] mb-12" style={{ fontFamily: "var(--font-sans)" }}>
-              Costrich reads drawings like a senior analyst — breaks down every cost, searches your company&apos;s history, and gives you the answer in 60 seconds.
+              Newton-Metre reads drawings like a senior analyst — breaks down every cost, searches your company&apos;s history, and gives you the answer in 60 seconds.
             </p>
             <Link href="/login" className="inline-flex px-9 py-4 bg-slate-900 text-white text-[15px] font-medium rounded-full hover:bg-slate-800 transition-all duration-200 hover:shadow-lg" style={{ fontFamily: "var(--font-sans)" }}>
               Upload your first drawing →
@@ -545,8 +545,8 @@ export default function LandingPage() {
           <div className="flex flex-col md:flex-row justify-between items-start gap-10 mb-10">
             <div>
               <div className="flex items-center gap-2.5 mb-3">
-                <Image src="/costrich-logo.png" alt="Costrich" width={32} height={32} className="rounded-xl" />
-                <span style={{ fontFamily: "var(--font-heading)" }} className="text-[20px] text-cyan-600">Costrich</span>
+                <Image src="/newton-metre-logo.png" alt="Newton-Metre" width={32} height={32} className="rounded-xl" />
+                <span style={{ fontFamily: "var(--font-heading)" }} className="text-[20px] text-cyan-600">Newton-Metre</span>
               </div>
               <p className="text-[13px] text-slate-400 max-w-xs leading-[1.7]" style={{ fontFamily: "var(--font-sans)" }}>
                 AI cost analyst + company memory for manufactured parts.
@@ -571,7 +571,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="border-t border-slate-100 pt-6 text-[12px] text-slate-300 uppercase tracking-[0.2em]" style={{ fontFamily: "var(--font-mono)" }}>
-            © 2026 Costrich
+            © 2026 Newton-Metre
           </div>
         </div>
       </footer>

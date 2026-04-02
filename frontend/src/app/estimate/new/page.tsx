@@ -382,7 +382,7 @@ export default function NewEstimatePage() {
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-12">
           <StepProgress />
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-10">
-            <p className="text-sm font-medium text-slate-900 mb-1">Costrich is working...</p>
+            <p className="text-sm font-medium text-slate-900 mb-1">Newton-Metre is working...</p>
             <p className="text-xs text-slate-400 mb-6">{subtitle || "Sit back — this takes a few seconds."}</p>
             <div className="space-y-3">
               {lines.map((line, i) => {
@@ -418,7 +418,7 @@ export default function NewEstimatePage() {
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-12">
           <h1 className="font-heading text-4xl mb-2 tracking-tight text-slate-900">What are we costing?</h1>
           <p className="text-slate-500 mb-8 text-base leading-relaxed">
-            Upload a drawing. Costrich reads it, calculates every cost line, and hands you a negotiation-ready breakdown.
+            Upload a drawing. Newton-Metre reads it, calculates every cost line, and hands you a negotiation-ready breakdown.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <button
@@ -475,7 +475,7 @@ export default function NewEstimatePage() {
             BACK
           </button>
           <h1 className="font-heading text-4xl mb-2 tracking-tight text-slate-900">Upload your drawing</h1>
-          <p className="text-slate-500 mb-8 text-base leading-relaxed">Costrich will read the drawing, extract dimensions, material, and processes — no templates, no manual entry.</p>
+          <p className="text-slate-500 mb-8 text-base leading-relaxed">Newton-Metre will read the drawing, extract dimensions, material, and processes — no templates, no manual entry.</p>
 
           <div className="bg-white rounded-2xl border border-slate-200 p-8">
 
@@ -604,7 +604,7 @@ export default function NewEstimatePage() {
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-8">
           <StepProgress />
           <h1 className="font-heading text-4xl mb-2 tracking-tight text-slate-900">Here&apos;s what we found</h1>
-          <p className="text-slate-500 text-base mb-6 leading-relaxed">Costrich extracted these details from your drawing. Confirm and we&apos;ll calculate the should-cost.</p>
+          <p className="text-slate-500 text-base mb-6 leading-relaxed">Newton-Metre extracted these details from your drawing. Confirm and we&apos;ll calculate the should-cost.</p>
 
           <div className="bg-white rounded-xl border border-slate-200 p-6 mb-4">
             <h2 className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-4" style={{ fontFamily: "var(--font-mono)" }}>Dimensions</h2>
