@@ -36,7 +36,7 @@ function Hero() {
             </div>
             <div>
               <div className="inline-flex items-center gap-3 px-6 py-2.5 rounded-full bg-white/70 backdrop-blur-sm text-[#1a1a1a] text-sm font-bold uppercase tracking-widest mb-6 border border-black/10 shadow-sm">
-                <span className="w-2.5 h-2.5 rounded-full bg-orange-500 animate-pulse" />
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
                 Universal Intelligence
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-[64px] font-medium text-[#1a1a1a] leading-[1.1] tracking-tight mb-4" style={{ fontFamily: "var(--font-headline)" }}>
