@@ -48,22 +48,13 @@ export function LandingNav() {
               </a>
             ))}
             {loggedIn ? (
-              <>
-                <Link
-                  href="/dashboard"
-                  className="text-[14px] font-medium text-[#515f74] hover:text-[#00288e] transition-colors"
-                  style={{ fontFamily: "var(--font-label)" }}
-                >
-                  Dashboard
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="text-[14px] font-medium text-[#515f74] hover:text-[#00288e] transition-colors"
-                  style={{ fontFamily: "var(--font-label)" }}
-                >
-                  Log out
-                </button>
-              </>
+              <button
+                onClick={handleLogout}
+                className="text-[14px] font-medium text-[#515f74] hover:text-[#00288e] transition-colors"
+                style={{ fontFamily: "var(--font-label)" }}
+              >
+                Log out
+              </button>
             ) : (
               <Link
                 href="/login"

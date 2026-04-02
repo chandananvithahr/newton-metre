@@ -39,11 +39,15 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-7">
               <ScrollReveal>
+                <p className="text-[#00288e] font-bold tracking-widest text-xs uppercase mb-6" style={{ fontFamily: "var(--font-label)" }}>
+                  Precision Sourcing Intelligence
+                </p>
                 <h1
-                  className="hero-title text-[clamp(48px,7vw,72px)] font-extrabold text-[#00288e] mb-8 max-w-2xl"
+                  className="text-[clamp(40px,6vw,64px)] font-bold text-[#1a1b20] mb-8 max-w-2xl leading-[1.1] tracking-tight"
                   style={{ fontFamily: "var(--font-headline)" }}
                 >
-                  KNOW WHAT IT SHOULD COST
+                  Know what it <span className="italic text-[#00288e]">should</span> cost.
+                  <br />Before they quote.
                 </h1>
               </ScrollReveal>
               <ScrollReveal>
@@ -52,18 +56,21 @@ export default function LandingPage() {
                 </p>
               </ScrollReveal>
               <ScrollReveal>
-                <div className="flex items-center gap-6">
+                <div className="flex flex-wrap items-center gap-4">
                   <Link
-                    href="/login"
+                    href="/estimate/new"
                     className="gradient-cta text-white px-8 py-4 rounded-lg font-bold tracking-widest uppercase text-sm transition-transform active:scale-95"
                     style={{ fontFamily: "var(--font-label)" }}
                   >
-                    Start Your Analysis
+                    Get a Should-Cost
                   </Link>
-                  <a href="#workflow" className="flex items-center gap-2 text-[#00288e] font-bold tracking-tight text-xs uppercase" style={{ fontFamily: "var(--font-label)" }}>
-                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    Watch Process
-                  </a>
+                  <Link
+                    href="/similar"
+                    className="border-2 border-[#00288e] text-[#00288e] px-8 py-4 rounded-lg font-bold tracking-widest uppercase text-sm hover:bg-[#00288e] hover:text-white transition-all active:scale-95"
+                    style={{ fontFamily: "var(--font-label)" }}
+                  >
+                    Find Similar Parts
+                  </Link>
                 </div>
               </ScrollReveal>
             </div>
