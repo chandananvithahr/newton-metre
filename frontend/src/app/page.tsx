@@ -335,7 +335,7 @@ function HowItWorks() {
             { step: "05", title: "Negotiate", desc: "Hand the data-backed breakdown to stakeholders." },
           ].map((item, i) => (
             <div key={i} className="relative group text-center">
-              <div className="text-5xl font-bold text-black/5 mb-4 group-hover:text-orange-500/10 transition-colors" style={{ fontFamily: "var(--font-mono)" }}>{item.step}</div>
+              <div className="text-5xl font-bold text-[#1a1a1a]/20 mb-4 group-hover:text-orange-500/40 transition-colors" style={{ fontFamily: "var(--font-mono)" }}>{item.step}</div>
               <div className="text-xs font-bold text-[#1a1a1a] uppercase tracking-widest mb-3">{item.title}</div>
               <p className="text-sm text-[#374151] leading-relaxed">{item.desc}</p>
             </div>
