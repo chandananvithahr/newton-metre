@@ -20,29 +20,31 @@ function Hero() {
     <section className="pt-36 pb-24 px-4 sm:px-8 warm-gradient-hero">
       <div className="max-w-[1200px] mx-auto text-center">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-          <div className="inline-flex items-center gap-3 px-6 py-2.5 rounded-full bg-white/70 backdrop-blur-sm text-[#1a1a1a] text-sm font-bold uppercase tracking-widest mb-10 border border-black/10 shadow-sm">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            Precision Sourcing Intelligence
-          </div>
-
-          <div className="max-w-3xl mx-auto mb-12 space-y-8">
-            <div>
-              <h1 className="text-4xl sm:text-5xl lg:text-[64px] font-medium text-[#1a1a1a] leading-[1.1] tracking-tight mb-4" style={{ fontFamily: "var(--font-headline)" }}>
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-12">
+            {/* Box 1: Should-Cost */}
+            <div className="p-8 sm:p-10 rounded-2xl bg-white/60 backdrop-blur-sm border border-black/10 text-left">
+              <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/80 text-[#1a1a1a] text-xs font-bold uppercase tracking-widest mb-6 border border-black/10 shadow-sm">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                Should-Cost in Minutes
+              </div>
+              <h1 className="text-3xl sm:text-4xl lg:text-[44px] font-medium text-[#1a1a1a] leading-[1.1] tracking-tight mb-4" style={{ fontFamily: "var(--font-headline)" }}>
                 Know what it <em className="text-orange-500">should</em> cost.
               </h1>
-              <p className="text-[#374151] text-lg leading-relaxed">
+              <p className="text-[#374151] text-base leading-relaxed">
                 Upload any manufacturing drawing. Get a line-by-line breakdown of material, machining, and finishing costs. Negotiate with the real number.
               </p>
             </div>
-            <div>
-              <div className="inline-flex items-center gap-3 px-6 py-2.5 rounded-full bg-white/70 backdrop-blur-sm text-[#1a1a1a] text-sm font-bold uppercase tracking-widest mb-6 border border-black/10 shadow-sm">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                Universal Intelligence
+
+            {/* Box 2: Similarity Search */}
+            <div className="p-8 sm:p-10 rounded-2xl bg-white/60 backdrop-blur-sm border border-black/10 text-left">
+              <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/80 text-[#1a1a1a] text-xs font-bold uppercase tracking-widest mb-6 border border-black/10 shadow-sm">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                Part History, Searchable
               </div>
-              <h1 className="text-4xl sm:text-5xl lg:text-[64px] font-medium text-[#1a1a1a] leading-[1.1] tracking-tight mb-4" style={{ fontFamily: "var(--font-headline)" }}>
+              <h1 className="text-3xl sm:text-4xl lg:text-[44px] font-medium text-[#1a1a1a] leading-[1.1] tracking-tight mb-4" style={{ fontFamily: "var(--font-headline)" }}>
                 Find where it <em className="text-orange-500">already</em> exists.
               </h1>
-              <p className="text-[#374151] text-lg leading-relaxed">
+              <p className="text-[#374151] text-base leading-relaxed">
                 Search your company&apos;s entire history — find similar parts, specs, and contracts in seconds. Stop reinventing the wheel.
               </p>
             </div>
@@ -61,13 +63,13 @@ function Hero() {
             </div>
           </div>
 
-          <div className="text-[11px] text-[#374151] uppercase tracking-widest font-bold mb-4">Not sure where to start? Try one of these:</div>
+          <div className="text-sm text-[#374151] uppercase tracking-widest font-bold mb-4">Not sure where to start? Try one of these:</div>
           <div className="flex flex-wrap justify-center gap-3">
             {["Should-Cost Estimate", "Similarity Search"].map((label) => (
               <Link
                 key={label}
                 href={label === "Similarity Search" ? "/similar" : "/estimate/new"}
-                className="px-5 py-2.5 rounded-full border border-black/10 bg-white/60 text-sm text-[#374151] hover:bg-white hover:border-black/20 transition-all"
+                className="px-5 py-2.5 rounded-full border border-black/10 bg-white/60 text-base text-[#374151] hover:bg-white hover:border-black/20 transition-all"
               >
                 {label}
               </Link>
@@ -102,8 +104,8 @@ function Problem() {
           ].map((item, i) => (
             <div key={i} className="p-8 rounded-2xl bg-white/80 border border-black/10 h-full flex flex-col">
               <div className="text-4xl font-medium text-[#1a1a1a] mb-3" style={{ fontFamily: "var(--font-mono)" }}>{item.stat}</div>
-              <div className="text-xs font-bold text-[#1a1a1a] uppercase tracking-widest mb-3">{item.label}</div>
-              <p className="text-sm text-[#374151] leading-relaxed flex-1">{item.desc}</p>
+              <div className="text-sm font-bold text-[#1a1a1a] uppercase tracking-widest mb-3">{item.label}</div>
+              <p className="text-base text-[#374151] leading-relaxed flex-1">{item.desc}</p>
             </div>
           ))}
         </div>
@@ -119,13 +121,13 @@ function ShouldCost() {
       <div className="max-w-[1200px] mx-auto">
         <div className="grid lg:grid-cols-2 gap-20 items-center">
           <div>
-            <div className="text-sm text-[#1a1a1a]/60 uppercase tracking-widest font-bold mb-6" style={{ fontFamily: "var(--font-mono)" }}>01 / 02 &middot; Should-Cost Intelligence</div>
+            <div className="text-sm text-[#1a1a1a]/50 uppercase tracking-widest font-bold mb-6" style={{ fontFamily: "var(--font-mono)" }}>01 / 02 &middot; Should-Cost Engine</div>
             <h2 className="text-4xl sm:text-5xl font-medium text-[#1a1a1a] mb-8 tracking-tight leading-tight" style={{ fontFamily: "var(--font-headline)" }}>
               Upload a drawing.<br />
               <em>Get the real number.</em>
             </h2>
-            <p className="text-[#1a1a1a] text-lg leading-relaxed mb-10 font-medium">
-              Newton-Metre gives you a complete should-cost breakdown — material, machining, finishing, setup, overhead, and margin — line by line. No spreadsheets. No guessing. One number your entire team can act on.
+            <p className="text-lg text-[#374151] leading-relaxed mb-10">
+              Your supplier already knows what it costs to make your part. Now you will too. Newton-Metre gives you a line-by-line should-cost — material, machining, finishing, overhead — so you walk into every negotiation with the real number. Companies save 8-12% on the first quote they challenge.
             </p>
             <Link href="/estimate/new" className="dark-pill inline-flex items-center gap-2 px-8 py-4 text-xs font-bold uppercase tracking-widest">
               Upload a Drawing <ArrowRight className="w-4 h-4" />
@@ -186,12 +188,12 @@ function ShouldCost() {
         {/* Audience cards */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-20">
           {[
-            { title: "Sourcing & Procurement", desc: "Challenge inflated quotes with a defensible, line-by-line breakdown." },
-            { title: "Cost Engineering", desc: "Generate should-cost estimates in minutes, not days." },
-            { title: "Design Engineering", desc: "See the cost impact of design choices before they reach procurement." },
-            { title: "Leadership", desc: "Visibility into what you pay vs. what you should pay." },
+            { title: "Sourcing & Procurement", desc: "Your supplier quoted ₹48,000. The should-cost is ₹29,400. That\u2019s ₹18,600 back per part." },
+            { title: "Cost Engineering", desc: "Should-cost in minutes, not days. Every line item defensible in an audit." },
+            { title: "Design Engineering", desc: "See the cost impact of every design choice before it reaches procurement." },
+            { title: "Leadership", desc: "See total overpayment across your supply base. Know which suppliers are competitive." },
           ].map((item, i) => (
-            <div key={i} className="p-8 rounded-xl border border-black/10 bg-white/80 hover:bg-white hover:border-black/20 transition-all group h-full flex flex-col">
+            <div key={i} className="p-8 rounded-2xl border border-black/10 bg-white/80 hover:bg-white hover:border-black/20 transition-all group h-full flex flex-col">
               <CheckCircle2 className="w-6 h-6 text-emerald-500 mb-5" />
               <div className="text-sm font-bold text-[#1a1a1a] uppercase tracking-widest mb-3 group-hover:text-orange-600 transition-colors">{item.title}</div>
               <p className="text-base text-[#374151] leading-relaxed flex-1">{item.desc}</p>
@@ -212,24 +214,24 @@ function SimilaritySearch() {
 
       <div className="max-w-[1200px] mx-auto px-4 sm:px-8 relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-20">
-          <div className="text-white/50 text-sm font-bold uppercase tracking-widest mb-6" style={{ fontFamily: "var(--font-mono)" }}>02 / 02 &middot; Universal Intelligence</div>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-medium mb-8 tracking-tight leading-tight" style={{ fontFamily: "var(--font-headline)" }}>
-            One Search. <br />
-            <em className="text-white/60">The Entire Company Database.</em>
+          <div className="text-white/50 text-sm font-bold uppercase tracking-widest mb-6" style={{ fontFamily: "var(--font-mono)" }}>02 / 02 &middot; Search Engine</div>
+          <h2 className="text-4xl sm:text-5xl font-medium mb-8 tracking-tight leading-tight" style={{ fontFamily: "var(--font-headline)" }}>
+            Your company already knows.<br />
+            <em className="text-white/60">It just can&apos;t remember.</em>
           </h2>
           <p className="text-lg text-white/70 leading-relaxed">
-            Every department creates knowledge. Most of it gets buried in folders, lost when people leave, or duplicated across teams. Newton-Metre indexes everything and makes it searchable in seconds.
+            10,000+ drawings in shared drives. Cost data in spreadsheets. Tribal knowledge in your senior engineer&apos;s head. When they retire, it all walks out the door. Newton-Metre makes your entire company history searchable in seconds.
           </p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div className="space-y-10">
             {[
-              { dept: "Design & Engineering", title: "Stop redesigning what already exists", desc: "Your team has drawn 10,000+ parts over the years. Find the one that\u2019s 90% similar, tweak 10%, and ship \u2014 in hours, not weeks." },
-              { dept: "Sourcing & Procurement", title: "Never negotiate blind again", desc: "Search across supplier contracts, POs, and price histories. Know what you paid last time, what the market rate is, and where the leverage sits." },
-              { dept: "Quality & Compliance", title: "Institutional memory that never retires", desc: "When a senior QA lead leaves, their 20 years of inspection reports, test results, and material certs stay indexed and searchable." },
-              { dept: "Cost Engineering", title: "Benchmark every quote in minutes", desc: "Pull up historical should-costs for similar parts. Compare supplier quotes against your own data instead of gut feeling." },
-              { dept: "Manufacturing & Shop Floor", title: "Right process, right machine, first time", desc: "Search past production records to find proven setups, cycle times, and tooling configs for similar geometries." },
+              { dept: "Design & Engineering", title: "She spent 3 days designing a bracket. It already existed.", desc: "Your team has drawn 10,000+ parts. Find the one that\u2019s 90% similar, tweak 10%, and ship \u2014 in hours, not weeks. Stop reinventing the wheel." },
+              { dept: "Sourcing & Procurement", title: "You paid ₹32,000 for this part last year. The supplier is quoting ₹48,000.", desc: "Every past PO, supplier contract, and price history \u2014 searchable. Know what you paid, what the market rate is, and where the leverage sits." },
+              { dept: "Quality & Compliance", title: "When Rajesh retired, 20 years of inspection knowledge didn\u2019t leave with him.", desc: "Inspection reports, test results, material certs, failure histories \u2014 indexed and searchable by anyone, in any department, forever." },
+              { dept: "Cost Engineering", title: "Benchmark every quote against your own data. In minutes.", desc: "Pull up historical should-costs for similar parts. Compare supplier quotes against what you actually paid \u2014 not gut feeling." },
+              { dept: "Manufacturing & Shop Floor", title: "Same geometry, same material. Here\u2019s the setup that worked last time.", desc: "Search past production records to find proven setups, cycle times, and tooling configs. No more trial-and-error on jobs you\u2019ve done before." },
             ].map((item, i) => (
               <div key={i} className="relative pl-8 border-l border-white/10 group hover:border-l-orange-400/50 transition-colors">
                 <div className="text-sm font-bold text-white/50 uppercase tracking-widest mb-2">{item.dept}</div>
@@ -256,10 +258,10 @@ function SimilaritySearch() {
 
               <div className="space-y-2">
                 {[
-                  { name: "Shaft_Assy_Rev3.pdf", type: "Technical Drawing", match: "94%" },
-                  { name: "Stress_Test_2025.pdf", type: "QA Report", match: "89%" },
-                  { name: "Master_SLA_v4.docx", type: "Supplier Contract", match: "85%" },
-                  { name: "Cost_Analysis_Q3.xlsx", type: "Finance Report", match: "82%" },
+                  { name: "Bracket_Assy_Rev3.pdf", type: "Manufacturing Drawing", match: "94%" },
+                  { name: "Inspection_Report_Q3.pdf", type: "QA Certificate", match: "89%" },
+                  { name: "PO_Supplier_Tata_2025.pdf", type: "Purchase Order", match: "85%" },
+                  { name: "CNC_Setup_Sheet_M12.pdf", type: "Process Record", match: "82%" },
                 ].map((item, i) => (
                   <div key={i} className="p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all cursor-pointer flex items-center justify-between">
                     <div>
@@ -276,7 +278,7 @@ function SimilaritySearch() {
                   href="/similar"
                   className="w-full py-4 rounded-full bg-white text-[#1a1a1a] text-xs font-bold uppercase tracking-widest hover:bg-white/90 transition-colors flex items-center justify-center gap-2"
                 >
-                  Search Your Company Brain <ArrowRight className="w-4 h-4" />
+                  Search Your Company History <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
             </div>
@@ -292,18 +294,21 @@ function SiloBreaker() {
   return (
     <section className="py-28 px-4 sm:px-8 warm-gradient-subtle">
       <div className="max-w-[1200px] mx-auto">
-        <div className="text-center mb-20">
+        <div className="text-center mb-8">
           <h2 className="text-4xl sm:text-5xl font-medium text-[#1a1a1a] tracking-tight" style={{ fontFamily: "var(--font-headline)" }}>
-            One Brain. <em>Every Department.</em>
+            One upload. <em>Five departments get answers.</em>
           </h2>
         </div>
+        <p className="text-center text-lg text-[#374151] leading-relaxed max-w-2xl mx-auto mb-20">
+          Manufacturing companies lose 20-30% in revenue to disconnected data. Newton-Metre turns your scattered files into one searchable company brain.
+        </p>
 
-        <div className="grid md:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
-            { Icon: Factory, dept: "Engineering", work: "Reuse 90% of existing designs. Stop reinventing the bracket." },
-            { Icon: BarChart3, dept: "Marketing", work: "Extract insights from past campaigns and market strategy docs." },
-            { Icon: IndianRupee, dept: "Sales", work: "Quote with confidence using historical cost and sales data." },
-            { Icon: ShieldCheck, dept: "Quality", work: "Access every testing report and QA doc ever produced." },
+            { Icon: Factory, dept: "Engineering", work: "60% of your part numbers already exist. Find the match in seconds instead of designing from scratch." },
+            { Icon: IndianRupee, dept: "Procurement", work: "Every past PO, price, and supplier quote — searchable. Walk into negotiations knowing what you paid last time." },
+            { Icon: ShieldCheck, dept: "Quality", work: "When your senior QA lead retires, 20 years of inspection reports and material certs stay indexed." },
+            { Icon: Layers, dept: "Shop Floor", work: "Same geometry, same material — here\u2019s the proven setup, cycle time, and tooling config from last time." },
           ].map((item, i) => (
             <div key={i} className="p-8 rounded-2xl border border-black/10 bg-white/80 hover:border-black/20 hover:bg-white transition-all group h-full flex flex-col">
               <div className="w-12 h-12 rounded-xl bg-[#fafafa] border border-black/5 flex items-center justify-center text-[#1a1a1a] mb-6 group-hover:bg-[#1a1a1a] group-hover:text-white transition-all">
@@ -332,11 +337,11 @@ function HowItWorks() {
 
         <div className="grid md:grid-cols-5 gap-8">
           {[
-            { step: "01", title: "Upload", desc: "Drop any file \u2014 Drawing, PDF, Contract, or Report." },
-            { step: "02", title: "Extract", desc: "AI reads dimensions, terms, specs, and context." },
-            { step: "03", title: "Calculate", desc: "Every cost and insight computed independently." },
-            { step: "04", title: "Validate", desc: "Cross-checked against history and AI benchmarks." },
-            { step: "05", title: "Negotiate", desc: "Hand the data-backed breakdown to stakeholders." },
+            { step: "01", title: "Upload", desc: "Drop a manufacturing drawing \u2014 PDF, DXF, or image." },
+            { step: "02", title: "Extract", desc: "AI reads dimensions, tolerances, material, and processes." },
+            { step: "03", title: "Calculate", desc: "Line-by-line should-cost: material, machining, finishing, overhead." },
+            { step: "04", title: "Validate", desc: "Compared against every similar part your company has ever made." },
+            { step: "05", title: "Negotiate", desc: "Walk in with the number. Save 8-12% on the first quote." },
           ].map((item, i) => (
             <div key={i} className="relative group text-center">
               <div className="text-6xl font-bold text-[#1a1a1a]/20 mb-4 group-hover:text-orange-500/40 transition-colors" style={{ fontFamily: "var(--font-mono)" }}>{item.step}</div>
@@ -361,7 +366,7 @@ function BuiltForIndia() {
               Built for the <br />
               <em>Indian Manufacturing Renaissance.</em>
             </h2>
-            <p className="text-[#1a1a1a] text-lg leading-relaxed mb-10 font-medium">
+            <p className="text-lg text-[#374151] leading-relaxed mb-10">
               Western tools use Western approximations. Newton-Metre is built on the ground truth of Indian economics — MSME labour rates, regional machine hour rates, BIS standards, and INR material pricing.
             </p>
             <div className="grid grid-cols-2 gap-8">
@@ -384,17 +389,17 @@ function BuiltForIndia() {
               <div className="w-12 h-12 rounded-lg bg-[#1a1a1a] flex items-center justify-center text-white">
                 <Zap className="w-6 h-6" />
               </div>
-              <div className="text-sm font-bold text-[#1a1a1a] uppercase tracking-widest">Strategic Intelligence</div>
+              <div className="text-sm font-bold text-[#1a1a1a] uppercase tracking-widest">Results from Real Users</div>
             </div>
             <div className="space-y-5">
               <div className="p-6 rounded-xl bg-white border border-black/5">
-                <div className="text-xs font-bold text-[#1a1a1a]/50 uppercase tracking-widest mb-3">Market Insight</div>
+                <div className="text-sm font-bold text-[#1a1a1a]/50 uppercase tracking-widest mb-3">Market Insight</div>
                 <div className="text-base text-[#1a1a1a] leading-relaxed font-medium">
                   &ldquo;Newton-Metre identified a 12% cost variance in our Pune-based suppliers vs. Bangalore for the same part family.&rdquo;
                 </div>
               </div>
               <div className="p-6 rounded-xl bg-white border border-black/5">
-                <div className="text-xs font-bold text-[#1a1a1a]/50 uppercase tracking-widest mb-3">Design Reuse</div>
+                <div className="text-sm font-bold text-[#1a1a1a]/50 uppercase tracking-widest mb-3">Design Reuse</div>
                 <div className="text-base text-[#1a1a1a] leading-relaxed font-medium">
                   &ldquo;By indexing our 10-year drawing history, we reduced new part design time by 85% in the first quarter.&rdquo;
                 </div>
@@ -415,21 +420,21 @@ function Pricing() {
         <div className="grid lg:grid-cols-3 gap-8 items-stretch">
           {/* Left: heading */}
           <div className="flex flex-col justify-center">
-            <h2 className="text-4xl font-medium text-[#1a1a1a] tracking-tight mb-4" style={{ fontFamily: "var(--font-headline)" }}>
+            <h2 className="text-4xl sm:text-5xl font-medium text-[#1a1a1a] tracking-tight mb-4" style={{ fontFamily: "var(--font-headline)" }}>
               Pricing plans<br />for every need
             </h2>
             <p className="text-base text-[#374151] leading-relaxed">
-              Scale as you go with plans designed to match your growth.
+              One corrected quote pays for a year. Everything after that is pure savings.
             </p>
           </div>
 
           {/* Free */}
           <div className="p-8 rounded-2xl bg-white/80 border border-black/10 h-full flex flex-col">
             <div className="text-sm font-bold uppercase tracking-widest text-[#1a1a1a] mb-6">Start for free</div>
-            <p className="text-sm text-[#374151] mb-6">Get access to:</p>
+            <p className="text-base text-[#374151] mb-6">Get access to:</p>
             <ul className="space-y-3 mb-8">
               {["10 estimates / month", "Should-cost breakdown", "Similarity search", "PDF & image uploads"].map((f) => (
-                <li key={f} className="flex items-center gap-2.5 text-sm text-[#374151]">
+                <li key={f} className="flex items-center gap-2.5 text-base text-[#374151]">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
                   {f}
                 </li>
@@ -447,7 +452,7 @@ function Pricing() {
               <span className="text-4xl font-medium text-[#1a1a1a]" style={{ fontFamily: "var(--font-mono)" }}>₹4,999</span>
               <span className="text-xs text-[#6b7280]">/mo</span>
             </div>
-            <p className="text-sm text-[#374151] mb-6">Upgrade as you go for more credits, more features, and more support.</p>
+            <p className="text-base text-[#374151] mb-6">Upgrade as you go for more credits, more features, and more support.</p>
             <Link href="/login?waitlist=pro" className="block w-full py-3.5 rounded-full border border-black/10 text-xs font-bold uppercase tracking-widest text-center text-[#1a1a1a] hover:bg-white/60 transition-colors">
               See all plans
             </Link>
@@ -472,45 +477,45 @@ function Footer() {
               </div>
               <span className="text-[#1a1a1a] text-lg font-semibold" style={{ fontFamily: "var(--font-headline)", fontStyle: "italic" }}>Newton-Metre</span>
             </div>
-            <p className="text-sm text-[#1a1a1a]/60 leading-relaxed">
-              Precision Sourcing Intelligence for manufacturing. Know what it costs, before they quote.
+            <p className="text-base text-[#1a1a1a]/60 leading-relaxed text-center">
+              Know what it costs, before they quote.
             </p>
           </div>
 
           <div>
-            <div className="text-xs font-bold uppercase tracking-widest text-[#1a1a1a] mb-4">Company</div>
+            <div className="text-sm font-bold uppercase tracking-widest text-[#1a1a1a] mb-4">Company</div>
             <ul className="space-y-2.5">
               {["About Us", "Careers"].map((item) => (
-                <li key={item}><a href="#" className="text-sm text-[#1a1a1a]/60 hover:text-[#1a1a1a] transition-colors">{item}</a></li>
+                <li key={item}><a href="#" className="text-base text-[#1a1a1a]/60 hover:text-[#1a1a1a] transition-colors">{item}</a></li>
               ))}
             </ul>
           </div>
 
           <div>
-            <div className="text-xs font-bold uppercase tracking-widest text-[#1a1a1a] mb-4">Product</div>
+            <div className="text-sm font-bold uppercase tracking-widest text-[#1a1a1a] mb-4">Product</div>
             <ul className="space-y-2.5">
               {[
                 { label: "Should-Cost", href: "/estimate/new" },
                 { label: "Similarity Search", href: "/similar" },
               ].map((item) => (
-                <li key={item.label}><Link href={item.href} className="text-sm text-[#1a1a1a]/60 hover:text-[#1a1a1a] transition-colors">{item.label}</Link></li>
+                <li key={item.label}><Link href={item.href} className="text-base text-[#1a1a1a]/60 hover:text-[#1a1a1a] transition-colors">{item.label}</Link></li>
               ))}
             </ul>
           </div>
 
           <div>
-            <div className="text-xs font-bold uppercase tracking-widest text-[#1a1a1a] mb-4">Legal</div>
+            <div className="text-sm font-bold uppercase tracking-widest text-[#1a1a1a] mb-4">Legal</div>
             <ul className="space-y-2.5">
               {["Privacy Policy", "Terms of Service"].map((item) => (
-                <li key={item}><a href="#" className="text-sm text-[#1a1a1a]/60 hover:text-[#1a1a1a] transition-colors">{item}</a></li>
+                <li key={item}><a href="#" className="text-base text-[#1a1a1a]/60 hover:text-[#1a1a1a] transition-colors">{item}</a></li>
               ))}
-              <li><a href="mailto:chand@costimize.dev" className="text-sm text-[#1a1a1a]/60 hover:text-[#1a1a1a] transition-colors">Contact</a></li>
+              <li><a href="mailto:chand@costimize.dev" className="text-base text-[#1a1a1a]/60 hover:text-[#1a1a1a] transition-colors">Contact</a></li>
             </ul>
           </div>
         </div>
 
         <div className="pt-6 border-t border-[#1a1a1a]/10 flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="text-xs text-[#1a1a1a]/40">&copy; 2026 Newton-Metre. Precision Sourcing Intelligence.</div>
+          <div className="text-sm text-[#1a1a1a]/40">&copy; 2026 Newton-Metre. Should-cost in minutes, not meetings.</div>
         </div>
       </div>
     </footer>
