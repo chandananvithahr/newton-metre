@@ -17,9 +17,9 @@ const WORKFLOW_STEPS = [
 ];
 
 const CAPABILITIES = [
-  { tag: "Feature Detection" },
-  { tag: "Tool-Path Mapping" },
-  { tag: "Tolerance Impact" },
+  { tag: "Turned Parts" },
+  { tag: "Milled Parts" },
+  { tag: "Sheet Metal" },
 ];
 
 export default function LandingPage() {
@@ -86,7 +86,7 @@ export default function LandingPage() {
               </ScrollReveal>
               <ScrollReveal>
                 <p className="text-[#515f74] text-lg max-w-xl mb-10 leading-relaxed" style={{ fontFamily: "var(--font-body)" }}>
-                  Precision engineering meets sourcing intelligence. Leverage our physics-based engines and Proprietary Geometric Complexity Index to substantiate material grades and manufacturing costs instantly.
+                  Upload a drawing. Get the exact should-cost — material, machining, finishing, margin — line by line. Walk into every supplier negotiation knowing the real number.
                 </p>
               </ScrollReveal>
               <ScrollReveal>
@@ -168,16 +168,16 @@ export default function LandingPage() {
               </ScrollReveal>
               <ScrollReveal className="max-w-xs">
                 <p className="text-[#515f74] text-sm" style={{ fontFamily: "var(--font-body)" }}>
-                  Traditional sourcing relies on &ldquo;gut feeling&rdquo; and historical averages. We replace ambiguity with automated material grade substantiation.
+                  Suppliers quote. You accept. Nobody knows if the price is fair. Newton-Metre gives you the number before they do.
                 </p>
               </ScrollReveal>
             </div>
 
             <StaggerReveal className="grid grid-cols-1 md:grid-cols-3 gap-px bg-[#c4c5d5]/10" delayStep={100}>
               {[
-                { icon: "⚠", title: "Opaque Quotations", desc: "Lack of transparency in supplier pricing models leads to an average 14% overspend on precision parts." },
-                { icon: "📊", title: "Manual Analysis", desc: "Engineering teams waste 40+ hours per project verifying material grades and geometric difficulties manually." },
-                { icon: "🔺", title: "Risk Exposure", desc: "Inaccurate cost estimates lead to budget overruns and missed delivery windows in high-stakes manufacturing." },
+                { icon: "⚠", title: "You Don't Know the Real Cost", desc: "Suppliers set the price. Procurement teams accept it. On average, you're overpaying 14% on every precision part — and you can't prove it." },
+                { icon: "📊", title: "40 Hours of Guesswork", desc: "Your engineers spend days cross-referencing old POs, calling vendors, and building spreadsheets. The answer is still a guess." },
+                { icon: "🔺", title: "One Bad Quote Kills the Project", desc: "In defense and aerospace, a wrong cost estimate doesn't just blow the budget — it kills the bid. The stakes are too high for gut feeling." },
               ].map((item) => (
                 <StaggerItem key={item.title}>
                   <div className="bg-[#faf8ff] p-12 hover:bg-white transition-colors group">
@@ -235,7 +235,7 @@ export default function LandingPage() {
           <div className="max-w-[1400px] mx-auto px-8">
             <ScrollReveal>
               <h2 className="text-[clamp(32px,5vw,48px)] font-bold mb-16 text-center" style={{ fontFamily: "var(--font-headline)" }}>
-                Engineering Capabilities
+                What You Get
               </h2>
             </ScrollReveal>
 
@@ -245,10 +245,10 @@ export default function LandingPage() {
                 <div className="bg-[#f4f3fa] rounded-xl p-10 flex flex-col justify-between min-h-[280px] relative overflow-hidden group">
                   <div className="max-w-md relative z-10">
                     <h3 className="text-3xl font-bold mb-4" style={{ fontFamily: "var(--font-headline)" }}>
-                      Proprietary Geometric Complexity Index
+                      Line-by-Line Should-Cost Breakdown
                     </h3>
                     <p className="text-[#515f74] text-sm" style={{ fontFamily: "var(--font-body)" }}>
-                      Quantify manufacturing difficulty with an algorithm that maps geometric variables to machining time and machine hourly rates.
+                      Material, machining time, setup, tooling, labour, power, overhead, margin — every cost line calculated from physics, not guesswork. Hand this to your supplier.
                     </p>
                   </div>
                   <div className="mt-12 relative z-10 flex gap-4 flex-wrap">
@@ -264,10 +264,10 @@ export default function LandingPage() {
               {/* Small card — Integrations */}
               <ScrollReveal className="md:col-span-4">
                 <div className="bg-[#1e40af] text-white rounded-xl p-10 flex flex-col justify-center text-center min-h-[280px]">
-                  <div className="mb-6 text-6xl opacity-50">⚙</div>
-                  <h3 className="text-2xl font-bold mb-4" style={{ fontFamily: "var(--font-headline)" }}>Unified Integrations</h3>
+                  <div className="mb-6 text-6xl opacity-50">🔍</div>
+                  <h3 className="text-2xl font-bold mb-4" style={{ fontFamily: "var(--font-headline)" }}>Find Similar Parts</h3>
                   <p className="text-white/70 text-sm leading-relaxed" style={{ fontFamily: "var(--font-body)" }}>
-                    Direct synchronization with SolidWorks, SAP, and Oracle for seamless procurement lifecycles.
+                    Upload any drawing and instantly find matching parts from your company&apos;s history. Know what you paid before — negotiate better now.
                   </p>
                 </div>
               </ScrollReveal>
@@ -275,9 +275,9 @@ export default function LandingPage() {
               {/* Small card — Material Grade */}
               <ScrollReveal className="md:col-span-4">
                 <div className="bg-[#e3e1e8] rounded-xl p-10 flex flex-col justify-center min-h-[250px]">
-                  <h3 className="text-2xl font-bold mb-4" style={{ fontFamily: "var(--font-headline)" }}>Automated Material Grade</h3>
+                  <h3 className="text-2xl font-bold mb-4" style={{ fontFamily: "var(--font-headline)" }}>AI Reads Your Drawing</h3>
                   <p className="text-[#515f74] text-sm" style={{ fontFamily: "var(--font-body)" }}>
-                    Verify compliance and market pricing for over 12,000 specific metal alloys and industrial polymers.
+                    Upload a PDF, DXF, STEP, or photo. AI extracts dimensions, material, tolerances, and processes — no templates, no manual entry.
                   </p>
                 </div>
               </ScrollReveal>
@@ -372,7 +372,7 @@ export default function LandingPage() {
               className="text-[clamp(36px,6vw,64px)] font-bold mb-10 max-w-4xl mx-auto leading-tight"
               style={{ fontFamily: "var(--font-headline)" }}
             >
-              Stop guessing. Start calculating with engineering precision.
+              Upload a drawing. Know the cost. Negotiate from strength.
             </h2>
             <div className="flex flex-col md:flex-row gap-6 justify-center items-center">
               <Link
