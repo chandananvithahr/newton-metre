@@ -115,12 +115,12 @@ function ShouldCost() {
       <div className="max-w-[1200px] mx-auto">
         <div className="grid lg:grid-cols-2 gap-20 items-center">
           <div>
-            <div className="text-[11px] text-[#9ca3af] uppercase tracking-widest font-bold mb-6" style={{ fontFamily: "var(--font-mono)" }}>01 / 02 &middot; Should-Cost Intelligence</div>
+            <div className="text-sm text-[#1a1a1a]/60 uppercase tracking-widest font-bold mb-6" style={{ fontFamily: "var(--font-mono)" }}>01 / 02 &middot; Should-Cost Intelligence</div>
             <h2 className="text-4xl sm:text-5xl font-medium text-[#1a1a1a] mb-8 tracking-tight leading-tight" style={{ fontFamily: "var(--font-headline)" }}>
               Upload a drawing.<br />
               <em>Get the real number.</em>
             </h2>
-            <p className="text-[#374151] text-lg leading-relaxed mb-10">
+            <p className="text-[#1a1a1a] text-lg leading-relaxed mb-10 font-medium">
               Newton-Metre gives you a complete should-cost breakdown — material, machining, finishing, setup, overhead, and margin — line by line. No spreadsheets. No guessing. One number your entire team can act on.
             </p>
             <Link href="/estimate/new" className="dark-pill inline-flex items-center gap-2 px-8 py-4 text-xs font-bold uppercase tracking-widest">
@@ -187,10 +187,10 @@ function ShouldCost() {
             { title: "Design Engineering", desc: "See the cost impact of design choices before they reach procurement." },
             { title: "Leadership", desc: "Visibility into what you pay vs. what you should pay." },
           ].map((item, i) => (
-            <div key={i} className="p-6 rounded-xl border border-black/10 bg-white/80 hover:bg-white hover:border-black/20 transition-all group h-full flex flex-col">
-              <CheckCircle2 className="w-5 h-5 text-emerald-500 mb-4" />
-              <div className="text-xs font-bold text-[#1a1a1a] uppercase tracking-widest mb-2 group-hover:text-orange-600 transition-colors">{item.title}</div>
-              <p className="text-sm text-[#374151] leading-relaxed flex-1">{item.desc}</p>
+            <div key={i} className="p-8 rounded-xl border border-black/10 bg-white/80 hover:bg-white hover:border-black/20 transition-all group h-full flex flex-col">
+              <CheckCircle2 className="w-6 h-6 text-emerald-500 mb-5" />
+              <div className="text-sm font-bold text-[#1a1a1a] uppercase tracking-widest mb-3 group-hover:text-orange-600 transition-colors">{item.title}</div>
+              <p className="text-base text-[#374151] leading-relaxed flex-1">{item.desc}</p>
             </div>
           ))}
         </div>
@@ -208,7 +208,7 @@ function SimilaritySearch() {
 
       <div className="max-w-[1200px] mx-auto px-4 sm:px-8 relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-20">
-          <div className="text-white/30 text-[11px] font-bold uppercase tracking-widest mb-6" style={{ fontFamily: "var(--font-mono)" }}>02 / 02 &middot; Universal Intelligence</div>
+          <div className="text-white/50 text-sm font-bold uppercase tracking-widest mb-6" style={{ fontFamily: "var(--font-mono)" }}>02 / 02 &middot; Universal Intelligence</div>
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-medium mb-8 tracking-tight leading-tight" style={{ fontFamily: "var(--font-headline)" }}>
             One Search. <br />
             <em className="text-white/60">The Entire Company Database.</em>
@@ -228,9 +228,9 @@ function SimilaritySearch() {
               { dept: "Manufacturing & Shop Floor", title: "Right process, right machine, first time", desc: "Search past production records to find proven setups, cycle times, and tooling configs for similar geometries." },
             ].map((item, i) => (
               <div key={i} className="relative pl-8 border-l border-white/10 group hover:border-l-orange-400/50 transition-colors">
-                <div className="text-[11px] font-bold text-white/50 uppercase tracking-widest mb-2">{item.dept}</div>
-                <div className="text-lg font-bold mb-2">{item.title}</div>
-                <p className="text-white/60 text-sm leading-relaxed">{item.desc}</p>
+                <div className="text-sm font-bold text-white/50 uppercase tracking-widest mb-2">{item.dept}</div>
+                <div className="text-xl font-bold mb-3">{item.title}</div>
+                <p className="text-white/70 text-base leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -305,8 +305,8 @@ function SiloBreaker() {
               <div className="w-12 h-12 rounded-xl bg-[#fafafa] border border-black/5 flex items-center justify-center text-[#1a1a1a] mb-6 group-hover:bg-[#1a1a1a] group-hover:text-white transition-all">
                 <item.Icon className="w-6 h-6" />
               </div>
-              <div className="text-xs font-bold text-[#1a1a1a] uppercase tracking-widest mb-3">{item.dept}</div>
-              <p className="text-sm text-[#374151] leading-relaxed flex-1">{item.work}</p>
+              <div className="text-sm font-bold text-[#1a1a1a] uppercase tracking-widest mb-3">{item.dept}</div>
+              <p className="text-base text-[#374151] leading-relaxed flex-1">{item.work}</p>
             </div>
           ))}
         </div>
@@ -335,9 +335,9 @@ function HowItWorks() {
             { step: "05", title: "Negotiate", desc: "Hand the data-backed breakdown to stakeholders." },
           ].map((item, i) => (
             <div key={i} className="relative group text-center">
-              <div className="text-5xl font-bold text-[#1a1a1a]/20 mb-4 group-hover:text-orange-500/40 transition-colors" style={{ fontFamily: "var(--font-mono)" }}>{item.step}</div>
-              <div className="text-xs font-bold text-[#1a1a1a] uppercase tracking-widest mb-3">{item.title}</div>
-              <p className="text-sm text-[#374151] leading-relaxed">{item.desc}</p>
+              <div className="text-6xl font-bold text-[#1a1a1a]/20 mb-4 group-hover:text-orange-500/40 transition-colors" style={{ fontFamily: "var(--font-mono)" }}>{item.step}</div>
+              <div className="text-sm font-bold text-[#1a1a1a] uppercase tracking-widest mb-3">{item.title}</div>
+              <p className="text-base text-[#374151] leading-relaxed">{item.desc}</p>
             </div>
           ))}
         </div>
@@ -357,7 +357,7 @@ function BuiltForIndia() {
               Built for the <br />
               <em>Indian Manufacturing Renaissance.</em>
             </h2>
-            <p className="text-[#374151] text-lg leading-relaxed mb-10">
+            <p className="text-[#1a1a1a] text-lg leading-relaxed mb-10 font-medium">
               Western tools use Western approximations. Newton-Metre is built on the ground truth of Indian economics — MSME labour rates, regional machine hour rates, BIS standards, and INR material pricing.
             </p>
             <div className="grid grid-cols-2 gap-8">
@@ -368,30 +368,30 @@ function BuiltForIndia() {
                 { label: "MSME Ready", desc: "Built for Indian workshop economics." },
               ].map((item, i) => (
                 <div key={i}>
-                  <div className="text-xs font-bold text-[#1a1a1a] uppercase tracking-widest mb-1">{item.label}</div>
-                  <p className="text-sm text-[#374151]">{item.desc}</p>
+                  <div className="text-sm font-bold text-[#1a1a1a] uppercase tracking-widest mb-1.5">{item.label}</div>
+                  <p className="text-base text-[#374151]">{item.desc}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="bg-white/80 rounded-2xl p-8 border border-black/10">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-10 h-10 rounded-lg bg-[#1a1a1a] flex items-center justify-center text-white">
-                <Zap className="w-5 h-5" />
+          <div className="bg-white/80 rounded-2xl p-10 border border-black/10">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-12 h-12 rounded-lg bg-[#1a1a1a] flex items-center justify-center text-white">
+                <Zap className="w-6 h-6" />
               </div>
-              <div className="text-xs font-bold text-[#1a1a1a] uppercase tracking-widest">Strategic Intelligence</div>
+              <div className="text-sm font-bold text-[#1a1a1a] uppercase tracking-widest">Strategic Intelligence</div>
             </div>
-            <div className="space-y-4">
-              <div className="p-4 rounded-xl bg-white border border-black/5">
-                <div className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-widest mb-2">Market Insight</div>
-                <div className="text-sm text-[#1a1a1a] leading-relaxed">
+            <div className="space-y-5">
+              <div className="p-6 rounded-xl bg-white border border-black/5">
+                <div className="text-xs font-bold text-[#1a1a1a]/50 uppercase tracking-widest mb-3">Market Insight</div>
+                <div className="text-base text-[#1a1a1a] leading-relaxed font-medium">
                   &ldquo;Newton-Metre identified a 12% cost variance in our Pune-based suppliers vs. Bangalore for the same part family.&rdquo;
                 </div>
               </div>
-              <div className="p-4 rounded-xl bg-white border border-black/5">
-                <div className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-widest mb-2">Design Reuse</div>
-                <div className="text-sm text-[#1a1a1a] leading-relaxed">
+              <div className="p-6 rounded-xl bg-white border border-black/5">
+                <div className="text-xs font-bold text-[#1a1a1a]/50 uppercase tracking-widest mb-3">Design Reuse</div>
+                <div className="text-base text-[#1a1a1a] leading-relaxed font-medium">
                   &ldquo;By indexing our 10-year drawing history, we reduced new part design time by 85% in the first quarter.&rdquo;
                 </div>
               </div>
