@@ -240,6 +240,68 @@ export async function extractRFQ(file: File): Promise<RFQExtractResponse> {
   return res.json();
 }
 
+// ── Chat API ────────────────────────────────────────────────────────────────
+
+export interface ChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  created_at: string;
+}
+
+export interface ChatSession {
+  id: string;
+  title: string;
+  estimate_id: string | null;
+  updated_at: string;
+  message_count: number;
+}
+
+export async function sendChatMessage(
+  message: string,
+  sessionId?: string,
+  estimateId?: string,
+): Promise<{ reply: string; session_id: string; title: string }> {
+  const headers = await getAuthHeaders();
+  const res = await safeFetch(`${API_URL}/api/chat`, {
+    method: "POST",
+    headers: { ...headers, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      message,
+      session_id: sessionId || null,
+      estimate_id: estimateId || null,
+    }),
+  });
+  if (!res.ok) throw new Error(await parseErrorResponse(res, "Chat failed. Please try again."));
+  return res.json();
+}
+
+export async function getChatSessions(): Promise<ChatSession[]> {
+  const headers = await getAuthHeaders();
+  const res = await safeFetch(`${API_URL}/api/chat/sessions`, { headers });
+  if (!res.ok) throw new Error("Failed to load chat history.");
+  return res.json();
+}
+
+export async function getChatMessages(sessionId: string): Promise<{
+  session: { id: string; title: string; estimate_id: string | null; summary: string | null };
+  messages: ChatMessage[];
+}> {
+  const headers = await getAuthHeaders();
+  const res = await safeFetch(`${API_URL}/api/chat/sessions/${sessionId}/messages`, { headers });
+  if (!res.ok) throw new Error("Failed to load chat messages.");
+  return res.json();
+}
+
+export async function deleteChatSession(sessionId: string): Promise<void> {
+  const headers = await getAuthHeaders();
+  const res = await safeFetch(`${API_URL}/api/chat/sessions/${sessionId}`, {
+    method: "DELETE",
+    headers,
+  });
+  if (!res.ok) throw new Error("Failed to delete chat session.");
+}
+
 export async function estimateRFQ(lineItems: RFQLineItemResult[]): Promise<RFQEstimateResponse> {
   const headers = await getAuthHeaders();
 
