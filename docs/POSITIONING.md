@@ -34,7 +34,7 @@ None of these are data-backed. None of them scale. And every overpaid part compo
 
 ---
 
-## Two Superpowers, One Platform
+## Three Superpowers, One Platform
 
 ### 1. Similarity Search — Your Company's Brain
 
@@ -103,6 +103,28 @@ Newton-Metre is the cost analyst your procurement team doesn't have. It does the
 - Negotiation time cut from weeks to minutes
 - Savings compound across hundreds of parts per year
 
+### 3. AI Agent — Your Manufacturing Analyst That Never Sleeps
+
+**The problem:**
+
+Your procurement team uses three different tools: one for cost estimation, one to search past orders, one to look up supplier history. They switch between spreadsheets, emails, and shared drives. When the MD asks "what's our average cost for turned aluminum parts?" — nobody can answer without a week of digging.
+
+The data exists. It's scattered across estimates, purchase orders, supplier quotes, and drawing archives. No one has time to connect it all.
+
+**What Newton-Metre does (the work):**
+
+1. **Ask anything** — "What did we pay for similar parts last quarter?" "Why is this estimate higher than last time?" "Which supplier gives best rates for SS304 turning?"
+2. **Newton-Metre connects the dots** — searches estimates, PO history, similar parts, and supplier data in one conversation
+3. **Proactive intelligence** — "This part is 92% similar to Part #4521 which cost Rs 1,180. Your current quote is Rs 2,400. Here's the line-by-line breakdown showing where the gap is."
+4. **Every department gets their own analyst** — procurement sees cost and supplier data, engineering sees process and tolerance data, sales gets historical pricing for faster quotes
+
+**The result:**
+- Questions that took a week to answer — answered in seconds
+- No more switching between tools, spreadsheets, and emails
+- The agent gets smarter with every interaction — learns your parts, your suppliers, your costs
+- Runs on your own servers — no proprietary drawings sent to cloud APIs
+- Works offline for defense/aerospace clients (air-gapped deployment)
+
 ---
 
 ## Who It's For
@@ -127,6 +149,8 @@ Newton-Metre is the cost analyst your procurement team doesn't have. It does the
 | "We made something similar once..." | Instant similarity search across all past orders |
 | Designer starts from scratch | Designer finds similar existing parts first |
 | Knowledge walks out the door when people leave | Cost history and part library stay in the system |
+| "What's our avg cost for turned aluminum?" — nobody knows | Ask the agent, get the answer in seconds |
+| Three tools, five spreadsheets, constant context-switching | One conversation — the agent connects everything |
 
 ---
 
@@ -147,5 +171,8 @@ Newton-Metre is the cost analyst your procurement team doesn't have. It does the
 **For CXOs:**
 > Your company's knowledge is trapped in shared drives and retired engineers' heads. Newton-Metre turns it into a searchable brain — costs, designs, suppliers, all in one place.
 
+**For defense/aerospace:**
+> Your drawings never leave your network. Newton-Metre runs on your own servers — should-cost, similarity search, and AI agent — fully air-gapped. No cloud APIs. No data leaks.
+
 **General:**
-> Newton-Metre is your company's brain for manufactured parts. Search thousands of drawings. Get should-cost breakdowns. Every department — design, procurement, sales, quality — uses the same searchable history.
+> Newton-Metre is your company's brain for manufactured parts. Search thousands of drawings. Get should-cost breakdowns. Ask your AI agent anything about your costs, parts, and suppliers. Every department — design, procurement, sales, quality — uses the same searchable history.

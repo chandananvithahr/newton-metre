@@ -1,0 +1,86 @@
+[
+  {
+    "id": "search_by_material",
+    "input": "Show me all SS304 parts we've estimated",
+    "expected_tools": ["search_estimates"],
+    "expected_args": {"query": "SS304", "material": "SS304"},
+    "should_not_call": ["find_similar_parts", "calculate_quick_cost"]
+  },
+  {
+    "id": "find_similar",
+    "input": "Find similar parts to estimate est_abc123",
+    "expected_tools": ["find_similar_parts"],
+    "expected_args": {"part_id": "est_abc123"},
+    "should_not_call": ["search_estimates"]
+  },
+  {
+    "id": "cost_breakdown",
+    "input": "Why is estimate est_xyz789 so expensive?",
+    "expected_tools": ["explain_cost_breakdown"],
+    "expected_args": {"estimate_id": "est_xyz789"},
+    "should_not_call": ["calculate_quick_cost"]
+  },
+  {
+    "id": "supplier_history",
+    "input": "Which supplier gave us the best price for EN8 turning parts?",
+    "expected_tools": ["get_supplier_history"],
+    "expected_args": {"query": "EN8 turning"},
+    "should_not_call": ["calculate_quick_cost"]
+  },
+  {
+    "id": "quick_cost",
+    "input": "How much would a 50mm diameter, 100mm long SS304 shaft cost?",
+    "expected_tools": ["calculate_quick_cost"],
+    "expected_args": {"description": "50mm diameter, 100mm long SS304 shaft"},
+    "should_not_call": ["search_estimates"]
+  },
+  {
+    "id": "compare_with_history",
+    "input": "How does this estimate compare to what we paid before for similar parts?",
+    "expected_tools": ["find_similar_parts"],
+    "expected_args": {},
+    "should_not_call": []
+  },
+  {
+    "id": "no_tool_greeting",
+    "input": "Hello, what can you help me with?",
+    "expected_tools": [],
+    "expected_args": {},
+    "should_not_call": ["search_estimates", "find_similar_parts", "calculate_quick_cost", "get_supplier_history", "explain_cost_breakdown"]
+  },
+  {
+    "id": "no_tool_general_question",
+    "input": "What is CNC turning?",
+    "expected_tools": [],
+    "expected_args": {},
+    "should_not_call": ["search_estimates", "find_similar_parts", "calculate_quick_cost"]
+  },
+  {
+    "id": "multi_tool_comparison",
+    "input": "Find parts similar to est_001 and show me the cost breakdown",
+    "expected_tools": ["find_similar_parts", "explain_cost_breakdown"],
+    "expected_args": {"part_id": "est_001", "estimate_id": "est_001"},
+    "should_not_call": ["calculate_quick_cost"]
+  },
+  {
+    "id": "supplier_specific",
+    "input": "What has Supplier Rajesh quoted for milling jobs?",
+    "expected_tools": ["get_supplier_history"],
+    "expected_args": {"supplier_name": "Rajesh", "query": "milling"},
+    "should_not_call": ["find_similar_parts"]
+  },
+  {
+    "id": "cost_range_search",
+    "input": "Show me all estimates over Rs 5000",
+    "expected_tools": ["search_estimates"],
+    "expected_args": {"query": "all", "min_cost": 5000},
+    "should_not_call": []
+  },
+  {
+    "id": "quick_cost_sheet_metal",
+    "input": "Rough cost for a 2mm thick stainless steel enclosure, 300x200x100mm?",
+    "expected_tools": ["calculate_quick_cost"],
+    "expected_args": {"description": "2mm thick stainless steel enclosure, 300x200x100mm"},
+    "should_not_call": ["search_estimates"]
+  }
+]

@@ -1,0 +1,65 @@
+{
+  "_comment": "Ground truth for similarity search evaluation. Each query lists known similar drawings with relevance grades: 3=exact match, 2=very similar, 1=somewhat similar.",
+  "queries": [
+    {
+      "id": "query_shaft_01",
+      "description": "50mm SS304 stepped shaft with threading",
+      "material": "SS304",
+      "processes": ["turning", "threading"],
+      "dimensions": {"outer_diameter_mm": 50, "length_mm": 120},
+      "relevant_drawings": [
+        {"drawing_id": "lib_shaft_02", "relevance": 3, "reason": "Same material, same process, similar dimensions"},
+        {"drawing_id": "lib_shaft_05", "relevance": 2, "reason": "Same process, different material (EN8), similar dimensions"},
+        {"drawing_id": "lib_shaft_09", "relevance": 1, "reason": "Turned shaft but much larger (150mm OD)"}
+      ]
+    },
+    {
+      "id": "query_bracket_01",
+      "description": "L-bracket, Al 6061, 80x60x40mm with 4 holes",
+      "material": "Aluminum 6061",
+      "processes": ["milling_face", "drilling"],
+      "dimensions": {"length_mm": 80, "width_mm": 60, "height_mm": 40},
+      "relevant_drawings": [
+        {"drawing_id": "lib_bracket_03", "relevance": 3, "reason": "Same type, same material, similar size"},
+        {"drawing_id": "lib_bracket_07", "relevance": 2, "reason": "Same type, steel instead of aluminum"},
+        {"drawing_id": "lib_plate_02", "relevance": 1, "reason": "Flat plate, not L-bracket, but similar holes"}
+      ]
+    },
+    {
+      "id": "query_flange_01",
+      "description": "Flange plate, EN8, 150mm OD with 6 bolt holes",
+      "material": "EN8 Steel",
+      "processes": ["turning", "drilling"],
+      "dimensions": {"outer_diameter_mm": 150, "inner_diameter_mm": 50, "length_mm": 25},
+      "relevant_drawings": [
+        {"drawing_id": "lib_flange_02", "relevance": 3, "reason": "Nearly identical flange"},
+        {"drawing_id": "lib_flange_04", "relevance": 2, "reason": "Similar flange, 200mm OD"},
+        {"drawing_id": "lib_disc_01", "relevance": 1, "reason": "Disc shape but no bolt holes"}
+      ]
+    },
+    {
+      "id": "query_bushing_01",
+      "description": "Brass bushing, 30mm OD, 20mm ID, 40mm long",
+      "material": "Brass IS319",
+      "processes": ["turning", "boring"],
+      "dimensions": {"outer_diameter_mm": 30, "inner_diameter_mm": 20, "length_mm": 40},
+      "relevant_drawings": [
+        {"drawing_id": "lib_bushing_02", "relevance": 3, "reason": "Same type, similar size"},
+        {"drawing_id": "lib_bushing_05", "relevance": 2, "reason": "Larger bushing, same material"},
+        {"drawing_id": "lib_spacer_01", "relevance": 1, "reason": "Similar shape but no bore"}
+      ]
+    },
+    {
+      "id": "query_housing_01",
+      "description": "Bearing housing, cast iron, complex milling",
+      "material": "Cast Iron",
+      "processes": ["milling_face", "milling_pocket", "boring", "drilling"],
+      "dimensions": {"length_mm": 120, "width_mm": 80, "height_mm": 60},
+      "relevant_drawings": [
+        {"drawing_id": "lib_housing_03", "relevance": 3, "reason": "Same bearing housing type"},
+        {"drawing_id": "lib_housing_06", "relevance": 2, "reason": "Different bearing size"},
+        {"drawing_id": "lib_block_01", "relevance": 1, "reason": "Rectangular block, no bore"}
+      ]
+    }
+  ]
+}

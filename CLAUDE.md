@@ -11,13 +11,17 @@ Always pull the screen screenshot alongside the HTML and match it pixel-for-pixe
 
 ## Project Overview
 
-Newton-Metre — "Know what it costs. Before they quote." A manufacturing cost intelligence platform. Two superpowers: (1) should-cost breakdowns (±5-10% accuracy) for mechanical parts, sheet metal, PCB, and cable assemblies, and (2) similarity search that turns your company's drawing history into a searchable asset. Built for Indian manufacturing economics (₹ currency, INR pricing).
+Newton-Metre — "Know what it costs. Before they quote." A manufacturing cost intelligence platform evolving into a **Company Brain** for manufacturers. Three superpowers: (1) should-cost breakdowns (±5-10% accuracy) for mechanical parts, sheet metal, PCB, and cable assemblies, (2) similarity search that turns your company's drawing history into a searchable asset, and (3) institutional memory that proactively surfaces similar parts, historical costs, and supplier data. Built for Indian manufacturing economics (₹ currency, INR pricing).
 
 **Target industries:** Defense, Aerospace, Automobile
 **Target part types:** Turned, Milled, Sheet metal
 **Users:** Sourcing & procurement, cost engineering, design engineering, and leadership teams at manufacturing companies.
 
 **Core value:** "Upload a drawing. Get a line-by-line should-cost. Find similar parts from your history. Negotiate with data."
+
+**Product vision:** Should-cost + similarity + company memory + AI agent = unique combination. CADDi ($1.4B) does similarity only. aPriori does should-cost only (3D required). Nobody does all three from 2D drawings — and nobody has a conversational AI agent that ties cost estimation, part search, and supplier intelligence into one interface.
+
+**AI independence roadmap:** Currently API-dependent (Gemini/GPT-4o). Progressively migrating to own fine-tuned models: Qwen2.5-VL-7B (extraction), Qwen2.5-32B (agent), DINOv2 (embeddings). Target: zero cloud API dependency by month 6, on-prem deployable for defense by month 9. See `costimize-v2/docs/research/AI-AGENT-ROADMAP.md` for full strategy.
 
 See `docs/POSITIONING.md` for full multi-audience messaging and one-liners.
 
@@ -55,9 +59,11 @@ Original monolithic CNC turning-only estimator. Kept for reference.
 | **Backend API** | FastAPI (Python) | Serves engines via REST API |
 | **Database** | Supabase (Postgres + pgvector) | Auth, estimates, embeddings |
 | **Auth** | Supabase Auth (JWT) | Backend validates on every route |
-| **AI Vision** | OpenAI GPT-4o (primary), Google Gemini (fallback) | Extracts dimensions + processes |
-| **AI Validation** | Gemini 1.5 Flash | Cross-checks physics engine estimates |
-| **Similarity Search** | Gemini API + pgvector | Drawing visual similarity via 256-dim embeddings |
+| **AI Vision** | OpenAI GPT-4o (primary), Google Gemini (fallback) → Qwen2.5-VL-7B (self-hosted target) | Extracts dimensions + processes |
+| **AI Validation** | Gemini 1.5 Flash → Qwen2.5-7B (self-hosted target) | Cross-checks physics engine estimates |
+| **AI Agent** | Gemini Flash (now) → Qwen2.5-32B-Instruct (self-hosted target) | In-app conversational agent with tool-calling |
+| **Similarity Search** | Gemini API + pgvector → DINOv2 + nomic-embed (self-hosted target) | Drawing visual similarity via 768-dim embeddings |
+| **Inference Server** | Cloud APIs (now) → vLLM on RunPod/on-prem (target) | OpenAI-compatible API, model-agnostic |
 | **Analytics** | Vercel Analytics + usage_log table | Page views + API usage tracking |
 | **Testing** | pytest | 164 tests across 12 test files |
 | **Language** | Python 3.11+ (backend), TypeScript (frontend) | |
@@ -221,7 +227,8 @@ costimize-v2/
 │   ├── PRACTICAL-MACHINING-DATA.md        # Theory vs shop floor derating, cycle time breakdowns
 │   ├── MACHINERYS-HANDBOOK-EXTRACTION.md  # Cutting speeds, power constants, econometrics, tolerances
 │   ├── KENNAMETAL-DATA-EXTRACTION.md      # Unit power constants, carbide grades, grooving speeds, cross-validation
-│   └── INDIAN-MANUFACTURING-DATA-EXTRACTION.md  # BIS steel grades, govt machine hour rates, Totem cutting data
+│   ├── INDIAN-MANUFACTURING-DATA-EXTRACTION.md  # BIS steel grades, govt machine hour rates, Totem cutting data
+│   └── SIMILARITY-SEARCH-DEEP-DIVE.md    # Full tech landscape: Google ScaNN, embeddings, ColPali, RAG, GraphRAG, infra costs, ROI, company brain strategy
 │
 ├── demos/
 │   └── dinov2_demo.py            # Interactive DINOv2 demo (requires torch, for learning)
@@ -248,7 +255,7 @@ costimize-v2/
 2. **Sheet Metal:** Upload drawing → AI extracts dimensions/cutting perimeter/bends → cost engine (laser + bend + weld + finish) → breakdown
 3. **PCB:** Upload BOM (CSV/Excel/PDF) → parse components → scrape prices → calculate fab + assembly + test → breakdown
 4. **Cable:** Upload BOM → parse components → count wires/connectors → calculate labour → breakdown
-5. **Similarity:** Upload 2+ drawings → embed (Gemini API/image hash) → compare vectors → rank by visual+material+dimension+process → show matches
+5. **Similarity:** Upload 2+ drawings → embed (Gemini Embedding 2 / DINOv2 / image hash) → hybrid search (vector + BM25) → re-rank (FlashRank) → multi-signal rank (visual+material+dimension+process+tolerance+finish) → show matches
 6. **All tabs:** Historical PO records loaded from sidebar → matched against current estimate → comparison displayed
 7. **Training data:** Every validated mechanical estimate auto-saved to data/validation/ for future ML
 
@@ -290,23 +297,36 @@ costimize-v2/
 - **Interactive loop** — max 2 rounds of clarifying questions for >15% gaps
 - **Training data** — every validated estimate auto-saved for future ML
 
-#### Similarity Search (engines/similarity/)
-- **3-strategy embedder** — Gemini API (0 RAM, default) → image hash (0 deps, fallback) → DINOv2 (future, GPU)
-- **EMBEDDING_DIM=256** — sufficient for Gemini text hash + perceptual hash
-- **Dual backend** — FAISS if installed, numpy brute-force fallback for <10K drawings
-- **4-signal ranking** — 0.5 visual + 0.2 material + 0.2 dimension + 0.1 process overlap
+#### Similarity Search → Company Brain (engines/similarity/)
+
+**Current (MVP):** Gemini text-hash → 256-dim → pgvector. Works but quality-limited.
+
+**Target architecture (researched 2026-04-02, see `docs/research/SIMILARITY-SEARCH-DEEP-DIVE.md`):**
+- **Embeddings:** Gemini Embedding 2 (768-dim, embeds PDFs directly) + DINOv2-ViT-B/14 (visual) + ColFlor (174M, on-prem)
+- **EMBEDDING_DIM=768** — Matryoshka (truncatable), 99.5% quality retention from 3072
+- **Hybrid search** — pgvector HNSW (vectors) + PostgreSQL tsvector (BM25) combined via Reciprocal Rank Fusion
+- **Re-ranking** — FlashRank or BGE-reranker-v2-m3 (open-source cross-encoder) on top 100 → top 10
+- **6-signal ranking** — visual + material + dimension + process + tolerance + surface finish
+- **Knowledge graph** — PostgreSQL relational: part → material → process → feature → cost → supplier
+- **Portfolio intelligence** — LightRAG (open-source, 70% cheaper than GraphRAG) for "what's our avg cost for turned aluminum?"
+- **Feedback loop** — users confirm/reject matches → builds similarity graph over time
 - **Role presets** — designer (visual-heavy), procurement (material-heavy), QA (process-heavy)
-- **Product rules** — separate feature from cost estimation, min 2 drawings, session-scoped for regular users
+- **Product rules** — separate from cost estimation, session-scoped for regular users, enterprise gets persistent index
+- **On-prem path** — ColFlor (174M params, fits 8GB RAM) for defense clients who won't use cloud APIs
+
+**Upgrade phases:** (1) Real embeddings + BM25 → (2) DINOv2 + re-ranker → (3) Fine-tune + on-prem → (4) KG + LightRAG → (5) STEP via GC-CAD GNN
 
 ### Key Design Decisions
 
 - **Frozen dataclasses** for all cost breakdown results (immutable)
 - **Supabase Postgres** — production database with RLS, pgvector for similarity. JSON files still used for Streamlit MVP mode
-- **AI fallback chain** — OpenAI → Gemini for all vision/extraction
+- **Two-stage extraction** — GLM-OCR (0.9B, local/API, $0.03/M tokens) extracts raw text → Gemini Flash interprets engineering context (GD&T, processes). Cuts AI cost 50-80%. GPT-4o as final fallback only.
 - **Rule-based fallbacks** — process detection works without AI
 - **24hr cache** on all scraped prices
 - **Physics first, ML later** — physics-based models for day-one accuracy, ML correction factors after collecting estimate-vs-actual pairs
-- **Self-hosted VLM roadmap** — Gemini API now → Qwen2.5-VL-7B self-hosted → fine-tuned on-premise (defense clients won't use cloud APIs)
+- **Self-hosted AI roadmap** — All AI (extraction, agent, embeddings) migrating from cloud APIs to self-hosted fine-tuned models. See `AI-AGENT-ROADMAP.md`. Timeline: extraction Month 2, embeddings Month 4, agent Month 5, full self-hosted Month 6, defense on-prem Month 9
+- **LLM-agnostic agent** — Agent layer is tool definitions + routing, talks to any OpenAI-compatible API. Swapping Gemini → vLLM is a config change, not a rewrite
+- **Training data collection** — Every cloud API call logged as training data (extraction pairs, agent conversations, similarity feedback). Tables: training_extractions, training_conversations, training_similarity
 - **No silent tracking** — cost estimation and similarity search are separate features with no data sharing
 - **Dual pipeline strategy** — keep VLM-only (working) alongside any future YOLO+VLM pipeline, benchmark to decide
 - **Native parsing over rasterization** — DXF/DWG: parse entities with `ezdxf` (exact coordinates). STEP: parse geometry with OCP. PDF: extract text with pdfplumber first. NEVER convert to image for extraction — PNG only as last resort for scanned PDFs at 300+ DPI minimum. No external CAD software needed.
@@ -316,7 +336,7 @@ costimize-v2/
 
 ## Research & Strategy (docs/research/)
 
-Comprehensive research conducted March 2026 covering:
+Comprehensive research conducted March-April 2026 covering:
 - **Competitive landscape:** aPriori (physics, 3D only), CADDi ($1.4B, 28 patents, similarity search), IndustrialMind.ai (direct competitor, ex-Tesla, wrapping APIs)
 - **VLM benchmarks:** Qwen2.5-VL-7B beats GPT-4o on document understanding. Fine-tuning path: LoRA on 1,000 drawings for $6-16
 - **CAPP papers:** ARKNESS (KG + 3B Llama = GPT-4o on machining), CAPP-GPT (process planning from CAD B-Rep)
@@ -336,6 +356,43 @@ Comprehensive research conducted March 2026 covering:
 - **Indian manufacturing data:** BIS steel grades (IS 2062, IS 1570) mapped to ISO groups, government machine hour rates from MSME Kolkata & CTR Ludhiana, Totem catalog cutting speeds, EN-to-IS grade cross-references
 
 See `MASTER-RESEARCH-REPORT.md` for the consolidated single source of truth.
+
+### Similarity Search & Company Brain (April 2026)
+
+Deep research across 8 parallel agents covering Google ScaNN/Vertex AI, embedding models (DINOv2/CLIP/SigLIP2/ColPali), RAG/GraphRAG/LightRAG, 40+ GitHub repos, 30+ papers, infrastructure costs at 4 scales, ROI analysis, and competitive positioning. Key findings:
+
+- **Embedding quality is the bottleneck**, not the vector DB or ANN algorithm
+- **DINOv2 is 2.3x better than CLIP** for visual similarity (64% vs 28%)
+- **ColFlor (174M params)** fits 8GB RAM for on-prem defense — 17x smaller than ColPali, 1.8% quality drop
+- **Gemini Embedding 2** embeds PDFs directly (up to 6 pages), 768-dim with Matryoshka
+- **pgvector is sufficient** until 50M+ vectors (471 QPS at 99% recall with pgvectorscale)
+- **Company brain market: $7.66B → $51.36B by 2030** (47% CAGR)
+- **ROI: 43x** for a $50M-procurement manufacturer ($4.3M savings on $100K/year subscription)
+- **No competitor does should-cost + similarity + company memory** from 2D drawings
+
+See `SIMILARITY-SEARCH-DEEP-DIVE.md` for the full 14-section deep dive.
+
+### AI Agent & Self-Hosted AI Strategy (April 2026)
+
+In-app conversational AI agent + progressive migration from cloud APIs to own fine-tuned models. Key decisions:
+
+- **Agent architecture** — LLM-agnostic tool orchestration. 5 tools: search_estimates, find_similar_parts, get_supplier_history, explain_cost_breakdown, calculate_quick_cost. OpenAI-compatible API interface = swap models via config
+- **Fine-tuning priority** — (1) Extraction: Qwen2.5-VL-7B, 200+ drawings, $7-13/run. (2) Embeddings: DINOv2, 500+ pairs, $3-5/run. (3) Agent: Qwen2.5-32B, 500+ conversations, $13-26/run. (4) Validation: Qwen2.5-7B, 300+ pairs, $5-10/run
+- **Self-hosted stack** — vLLM + TEI on single A6000 (48GB) or RTX 4090 (24GB). All models fit: extraction (5GB) + agent (20GB) + embeddings (0.7GB) = 25.7GB
+- **Defense on-prem** — Ship GPU box ($1,800-4,500) with Ubuntu + vLLM + fine-tuned models. Air-gapped. No internet required
+- **Data collection** — Every cloud API call logged as training triple. Automatic annotation pipeline: user corrections = gold labels
+- **Total fine-tuning cost: ~$50-80** over 6 months. **Breakeven vs cloud: ~50-100 active users**
+- **Open-source function calling** — Qwen2.5-32B-Instruct is top-3 on Berkeley Function-Calling Leaderboard. Minimum reliable size for tool use: 32B params
+
+**AI Evals (Karpathy autoresearch pattern):**
+- **promptfoo** (primary) — YAML config, side-by-side model comparison, JSON schema assertions, CI/CD integration
+- **deepeval** (Python) — pytest-style, 14+ metrics, tool correctness, LLM-as-judge
+- **Autoresearch loop** — modify prompt/model → run eval suite → keep if improved → discard if regressed → repeat
+- Golden datasets in `costimize-v2/evals/`: 50 extraction test cases, 50 agent tool-calling cases, 20 similarity queries
+- Decision rule: fine-tuned model replaces cloud API only when eval metrics match or beat baseline
+- Inspired by [github.com/karpathy/autoresearch](https://github.com/karpathy/autoresearch) — AI agent experiments autonomously, ~100 experiments overnight
+
+See `AI-AGENT-ROADMAP.md` for the full 11-section strategy document.
 
 ---
 

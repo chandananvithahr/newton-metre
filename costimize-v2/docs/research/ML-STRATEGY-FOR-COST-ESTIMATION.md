@@ -465,29 +465,103 @@ model.fit(X_train, y_train)
 - AAGNet provides open-source starting point
 - Pre-trained models available, so cold-start is solved
 
+### Phase 5: Fine-Tuned Extraction VLM (After 200+ Corrected Drawings) — NEW April 2026
+
+**What:** Replace cloud API extraction calls (Gemini/GPT-4o) with self-hosted fine-tuned Qwen2.5-VL-7B
+
+**Why Phase 3 was Florence-2, Phase 5 is Qwen2.5-VL-7B:**
+- Florence-2 (0.23B) is great for targeted dimension extraction but lacks general reasoning
+- Qwen2.5-VL-7B (7B) handles the full extraction task: dimensions + GD&T + material + processes + surface finish in one pass
+- Beats GPT-4o on document understanding benchmarks
+- Self-hosted = zero API cost + defense/on-prem ready
+
+**Data source:** Every cloud API extraction is automatically logged with user corrections as gold labels. No manual annotation needed — users create training data by using the product.
+
+**Method:** QLoRA (rank 16-32, 4-bit quantization) on RunPod A100 80GB. Cost: $7-13 per training run.
+
+**Deploy via:** vLLM with OpenAI-compatible API. Same interface as cloud APIs — swap is config-only.
+
+### Phase 6: Fine-Tuned Visual Embeddings (After 500+ Similarity Feedback Pairs) — NEW April 2026
+
+**What:** Fine-tune DINOv2-ViT-B/14 on manufacturing drawing pairs with user similarity feedback
+
+**Data source:** Every similarity search where user confirms ("yes, this is similar") or rejects ("no, this is different") creates a contrastive training pair.
+
+**Method:** Contrastive loss fine-tune. Full fine-tune is OK for ViT-B (86M params — small). Cost: $3-5 on RunPod.
+
+**Why:** DINOv2 baseline is already 2.3x better than CLIP for visual similarity. Fine-tuning on actual manufacturing drawings (Indian standards, BIS grades, specific part types) adds another estimated 20-30%.
+
+**Also replace text embeddings:** Swap Gemini Embedding 2 with nomic-embed-text-v1.5 (768-dim, self-hosted, 137M params). Same quality, zero API cost.
+
+### Phase 7: Fine-Tuned Agent LLM (After 500+ Agent Conversations) — NEW April 2026
+
+**What:** Fine-tune Qwen2.5-32B-Instruct for manufacturing domain tool-calling
+
+**Why last:** Base Qwen2.5-32B already handles tool-calling reliably (top-3 on Berkeley Function-Calling Leaderboard). Fine-tuning adds domain-specific routing: "when user says 'check this part' call search_estimates, not calculate_cost."
+
+**Data source:** Every cloud agent conversation (user message + tool calls + results + final response) = training trace. Log everything from day one.
+
+**Method:** QLoRA (rank 32-64, 4-bit). RunPod A100 80GB × 8-16 hours = $13-26.
+
+**Minimum reliable model size for tool use: 32B parameters.** 7B models can route 3-5 simple tools but fail on multi-step reasoning, nested tool calls, or deciding NOT to call a tool.
+
+### Phase 8: Full Self-Hosted Stack — NEW April 2026
+
+**What:** All AI runs on own infrastructure. Zero cloud API dependency.
+
+**Target hardware:** Single NVIDIA A6000 (48GB VRAM, ~$4,500 used) or RTX 4090 (24GB, ~$1,800)
+
+```
+vLLM Server:
+├── Qwen2.5-VL-7B-AWQ (extraction) — 5GB
+├── Qwen2.5-32B-AWQ (agent) — 20GB
+└── Qwen2.5-7B-AWQ (validation) — 5GB
+
+TEI Server (embeddings):
+├── DINOv2-ViT-B/14 — 0.4GB
+└── nomic-embed-text-v1.5 — 0.3GB
+
+ColFlor Server (late interaction) — 0.7GB
+
+Total: ~26GB active VRAM (fits A6000)
+```
+
+**For defense on-prem:** Ship GPU box + Ubuntu + vLLM + all fine-tuned models + PostgreSQL + Next.js static build. Air-gapped. Hardware cost: $1,800-4,500 = one month enterprise subscription.
+
+**Cost comparison at 100 active users:** Cloud APIs $200-500/mo → RunPod serverless $80-150/mo → Own hardware $30-150/mo.
+
 ### What NOT to Build
 
 | Temptation | Why Not |
 |-----------|---------|
 | **End-to-end deep learning cost estimator** | Needs 10K+ labeled parts. Physics works better with zero data. Black box kills user trust. |
-| **Custom LLM for manufacturing** | Training cost $100K+. GPT-4o/Gemini APIs are 95% as good. Wrap, don't train. |
+| **Custom foundation LLM for manufacturing** | Fine-tune open-source instead. Qwen2.5 + LoRA = $7-26 per run. Training from scratch = $100K+. |
 | **Reinforcement learning for process planning** | Academic fantasy. No reward signal in real procurement. |
 | **GAN for synthetic part generation** | Generates geometry, not costs. Solves the wrong problem. |
 | **Real-time tool wear prediction** | Costimize estimates cost, it doesn't control machines. Wrong product. |
 
 ---
 
-## Summary: ML Roadmap
+## Summary: ML + AI Roadmap
 
 | Phase | When | What | Model | Data Needed | Impact |
 |-------|------|------|-------|-------------|--------|
 | **0** | Now | Data collection instrumentation | None | 0 (collecting) | Foundation for everything |
 | **1** | 50-100 pairs | Physics + XGBoost correction | XGBoost | 50-100 estimate-actual pairs | ±5-10% accuracy improvement |
 | **2** | 500+ parts | Similar part search | Embeddings + kNN | 500+ parts with costs | Trust building, procurement workflow |
-| **3** | 400+ drawings | Fine-tuned drawing extraction | Florence-2 (LoRA) | 400+ annotated drawings | Eliminate API costs, better accuracy |
+| **3** | 400+ drawings | Fine-tuned drawing extraction (lightweight) | Florence-2 (LoRA) | 400+ annotated drawings | Faster extraction, reduced API costs |
 | **4** | STEP parser built | GNN feature recognition | BRepFormer / AAGNet | Pre-trained on MFCAD++ | Automated process detection from 3D |
+| **5** | 200+ corrected drawings | Self-hosted extraction VLM | Qwen2.5-VL-7B (QLoRA) | 200+ extraction pairs with corrections | **Eliminate extraction API costs entirely** |
+| **6** | 500+ similarity feedback | Self-hosted visual embeddings | DINOv2 + nomic-embed (fine-tune) | 500+ confirmed/rejected pairs | **Eliminate embedding API costs entirely** |
+| **7** | 500+ agent conversations | Self-hosted agent LLM | Qwen2.5-32B (QLoRA) | 500+ conversation traces | **Eliminate agent API costs entirely** |
+| **8** | Phases 5-7 complete | Full self-hosted + on-prem | All above on vLLM | All above | **Zero cloud dependency. Defense-ready.** |
 
-**The core insight:** Physics-based models are Costimize's competitive advantage for early-stage (zero data, full explainability, works on day one). ML is the long-term moat built on accumulated user data that no competitor can replicate. The strategy is: ship physics now, collect data passively, add ML when data justifies it.
+**The core insight:** Physics-based models are Costimize's competitive advantage for early-stage (zero data, full explainability, works on day one). ML is the long-term moat built on accumulated user data that no competitor can replicate. The strategy is: ship physics now, collect data passively, add ML when data justifies it. **Cloud APIs get us started. Fine-tuned self-hosted models are the moat.** Every user interaction makes our models better — and that data doesn't exist anywhere else.
+
+**Total fine-tuning investment:** ~$50-80 in compute over 6 months.
+**Defense on-prem hardware:** $1,800-4,500 per deployment.
+
+See `AI-AGENT-ROADMAP.md` for the full agent architecture and self-hosting strategy.
 
 ---
 

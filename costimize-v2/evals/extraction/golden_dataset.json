@@ -1,0 +1,142 @@
+[
+  {
+    "id": "shaft_ss304",
+    "description": "Stepped shaft, SS304, turned with threading",
+    "image_file": "golden/shaft_ss304.png",
+    "expected": {
+      "part_type": "turning",
+      "dimensions": {
+        "outer_diameter_mm": 50.0,
+        "inner_diameter_mm": null,
+        "length_mm": 120.0,
+        "width_mm": null,
+        "height_mm": null,
+        "hole_diameter_mm": null,
+        "hole_count": null,
+        "thread_count": 1,
+        "thread_length_mm": 20.0,
+        "groove_count": 2,
+        "surface_area_cm2": null
+      },
+      "material": "SS304",
+      "tolerances": {
+        "has_tight_tolerances": true,
+        "tightest_tolerance_mm": 0.02
+      },
+      "surface_finish": "Ra 1.6",
+      "suggested_processes": ["turning", "facing", "threading", "grinding_cylindrical"]
+    }
+  },
+  {
+    "id": "bracket_al6061",
+    "description": "L-bracket, Aluminum 6061, milled with holes",
+    "image_file": "golden/bracket_al6061.png",
+    "expected": {
+      "part_type": "milling",
+      "dimensions": {
+        "outer_diameter_mm": null,
+        "inner_diameter_mm": null,
+        "length_mm": 80.0,
+        "width_mm": 60.0,
+        "height_mm": 40.0,
+        "hole_diameter_mm": 8.0,
+        "hole_count": 4,
+        "thread_count": null,
+        "thread_length_mm": null,
+        "groove_count": null,
+        "surface_area_cm2": null
+      },
+      "material": "Aluminum 6061",
+      "tolerances": {
+        "has_tight_tolerances": false,
+        "tightest_tolerance_mm": 0.1
+      },
+      "surface_finish": null,
+      "suggested_processes": ["milling_face", "milling_pocket", "drilling"]
+    }
+  },
+  {
+    "id": "flange_en8",
+    "description": "Flange plate, EN8 steel, turned with bolt holes",
+    "image_file": "golden/flange_en8.png",
+    "expected": {
+      "part_type": "turning",
+      "dimensions": {
+        "outer_diameter_mm": 150.0,
+        "inner_diameter_mm": 50.0,
+        "length_mm": 25.0,
+        "width_mm": null,
+        "height_mm": null,
+        "hole_diameter_mm": 12.0,
+        "hole_count": 6,
+        "thread_count": null,
+        "thread_length_mm": null,
+        "groove_count": null,
+        "surface_area_cm2": null
+      },
+      "material": "EN8 Steel",
+      "tolerances": {
+        "has_tight_tolerances": true,
+        "tightest_tolerance_mm": 0.05
+      },
+      "surface_finish": "Ra 3.2",
+      "suggested_processes": ["turning", "facing", "boring", "drilling"]
+    }
+  },
+  {
+    "id": "bushing_brass",
+    "description": "Plain bushing, Brass IS319, turned and bored",
+    "image_file": "golden/bushing_brass.png",
+    "expected": {
+      "part_type": "turning",
+      "dimensions": {
+        "outer_diameter_mm": 30.0,
+        "inner_diameter_mm": 20.0,
+        "length_mm": 40.0,
+        "width_mm": null,
+        "height_mm": null,
+        "hole_diameter_mm": null,
+        "hole_count": null,
+        "thread_count": null,
+        "thread_length_mm": null,
+        "groove_count": null,
+        "surface_area_cm2": null
+      },
+      "material": "Brass IS319",
+      "tolerances": {
+        "has_tight_tolerances": true,
+        "tightest_tolerance_mm": 0.02
+      },
+      "surface_finish": "Ra 0.8",
+      "suggested_processes": ["turning", "facing", "boring", "grinding_cylindrical"]
+    }
+  },
+  {
+    "id": "cover_plate_ms",
+    "description": "Cover plate, Mild Steel, milled with tapped holes",
+    "image_file": "golden/cover_plate_ms.png",
+    "expected": {
+      "part_type": "milling",
+      "dimensions": {
+        "outer_diameter_mm": null,
+        "inner_diameter_mm": null,
+        "length_mm": 200.0,
+        "width_mm": 150.0,
+        "height_mm": 10.0,
+        "hole_diameter_mm": 6.0,
+        "hole_count": 8,
+        "thread_count": 4,
+        "thread_length_mm": 10.0,
+        "groove_count": null,
+        "surface_area_cm2": null
+      },
+      "material": "Mild Steel IS2062",
+      "tolerances": {
+        "has_tight_tolerances": false,
+        "tightest_tolerance_mm": 0.1
+      },
+      "surface_finish": null,
+      "suggested_processes": ["milling_face", "drilling", "tapping"]
+    }
+  }
+]
