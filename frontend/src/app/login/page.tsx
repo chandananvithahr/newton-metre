@@ -46,10 +46,16 @@ function LoginContent() {
   const [resendSuccess, setResendSuccess] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
 
+  const redirectTo = searchParams.get("redirect");
+
   useEffect(() => {
     const callbackError = searchParams.get("error");
     if (callbackError) {
       setError(callbackError);
+      setIsSignUp(false);
+    }
+    // If redirected from a protected page, show login form (not signup)
+    if (searchParams.get("redirect")) {
       setIsSignUp(false);
     }
   }, [searchParams]);
@@ -133,7 +139,7 @@ function LoginContent() {
         return;
       }
 
-      router.push("/");
+      router.push(redirectTo || "/dashboard");
     } catch {
       setError("Something went wrong. Please check your connection and try again.");
       setLoading(false);
@@ -238,7 +244,7 @@ function LoginContent() {
                         />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-bold text-[#515f74] uppercase tracking-wider mb-1.5" style={{ fontFamily: "var(--font-label)" }}>Sourcing Country</label>
+                        <label className="block text-[11px] font-bold text-[#515f74] uppercase tracking-wider mb-1.5" style={{ fontFamily: "var(--font-label)" }}>Country</label>
                         <select
                           value={country}
                           onChange={(e) => setCountry(e.target.value)}
