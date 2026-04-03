@@ -562,6 +562,7 @@ export default function NewEstimatePage() {
                   const raw = e.target.value.replace(/[^0-9]/g, "");
                   setQuantity(raw === "" ? 0 : parseInt(raw));
                 }}
+                onFocus={(e) => e.target.select()}
                 onBlur={() => { if (quantity === 0) setQuantity(1); }}
                 placeholder="e.g. 500"
                 className="w-28 px-3 py-2.5 border border-black/20 rounded-lg bg-[#fafafa] outline-none text-sm text-[#1a1b20] placeholder-[#c4c5d5] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -907,6 +908,7 @@ export default function NewEstimatePage() {
                 const raw = e.target.value.replace(/[^0-9]/g, "");
                 setQuantity(raw === "" ? 0 : parseInt(raw));
               }}
+              onFocus={(e) => e.target.select()}
               onBlur={() => { if (quantity === 0) setQuantity(1); }}
               className="w-24 px-3 py-2.5 border border-black/20 rounded-lg bg-[#fafafa] outline-none text-sm text-[#1a1b20] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               style={{ fontFamily: "var(--font-mono)" }}

@@ -62,5 +62,10 @@ app.include_router(rfq.router, prefix="/api")
 
 
 @app.get("/api/health")
-async def health() -> dict[str, str]:
-    return {"status": "ok"}
+async def health() -> dict:
+    import shutil
+    dwg2dxf = shutil.which("dwg2dxf") or shutil.which("dwg2dxf.exe")
+    return {
+        "status": "ok",
+        "dwg2dxf": dwg2dxf or "not found",
+    }
