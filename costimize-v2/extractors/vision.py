@@ -59,7 +59,15 @@ def _parse_and_validate(text: str) -> dict:
     """Strip markdown fences, parse JSON, validate schema. Returns plain dict."""
     if text.startswith("```"):
         text = text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
-    raw = json.loads(text)
+    # Fix common AI JSON issues: trailing commas, single quotes
+    import re
+    text = re.sub(r',\s*([}\]])', r'\1', text)  # remove trailing commas
+    try:
+        raw = json.loads(text)
+    except json.JSONDecodeError:
+        # Try fixing single quotes
+        text = text.replace("'", '"')
+        raw = json.loads(text)
     validated = _ExtractionResult.model_validate(raw)
     return validated.model_dump()
 
