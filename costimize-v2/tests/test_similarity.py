@@ -14,6 +14,8 @@ from engines.similarity.ranker import (
     compute_material_score,
     compute_dimension_score,
     compute_process_score,
+    compute_tolerance_score,
+    compute_finish_score,
     rank_candidates,
     RankingWeights,
     RankedResult,
@@ -152,13 +154,22 @@ class TestDimensionScore:
         assert score < 0.5
 
     def test_both_zero(self):
+        """Both zero on a key = skip (don't count), so only explicitly-set keys matter."""
         q = {"outer_diameter_mm": 0, "length_mm": 0}
         c = {"outer_diameter_mm": 0, "length_mm": 0}
-        assert compute_dimension_score(q, c) == 1.0
+        # All keys are zero → all skipped → no scores → neutral 0.5
+        assert compute_dimension_score(q, c) == 0.5
 
     def test_missing_dims(self):
         score = compute_dimension_score({}, {})
-        assert score == 1.0  # both empty = both zero = match
+        assert score == 0.5  # both empty = neutral
+
+    def test_sheet_metal_dims(self):
+        """Should handle width/height/thickness for sheet metal parts."""
+        q = {"width_mm": 500, "height_mm": 300, "thickness_mm": 2.0}
+        c = {"width_mm": 480, "height_mm": 310, "thickness_mm": 2.0}
+        score = compute_dimension_score(q, c)
+        assert 0.9 < score < 1.0
 
 
 class TestProcessScore:
@@ -182,6 +193,42 @@ class TestProcessScore:
 
     def test_one_empty(self):
         assert compute_process_score({"turning"}, set()) == 0.0
+
+
+class TestToleranceScore:
+    def test_identical_tolerances(self):
+        tol = {"general_tolerance_mm": 0.1, "tightest_tolerance_mm": 0.01}
+        assert compute_tolerance_score(tol, tol) == 1.0
+
+    def test_similar_tolerances(self):
+        q = {"general_tolerance_mm": 0.1, "tightest_tolerance_mm": 0.01}
+        c = {"general_tolerance_mm": 0.12, "tightest_tolerance_mm": 0.02}
+        score = compute_tolerance_score(q, c)
+        assert 0.5 < score < 1.0
+
+    def test_both_empty(self):
+        assert compute_tolerance_score({}, {}) == 0.5  # neutral
+
+    def test_one_specified_one_not(self):
+        q = {"general_tolerance_mm": 0.1}
+        c = {}
+        score = compute_tolerance_score(q, c)
+        assert score == 0.0
+
+
+class TestFinishScore:
+    def test_identical_ra(self):
+        assert compute_finish_score(1.6, 1.6) == 1.0
+
+    def test_similar_ra(self):
+        score = compute_finish_score(1.6, 3.2)
+        assert score == pytest.approx(0.5)
+
+    def test_both_unknown(self):
+        assert compute_finish_score(0, 0) == 0.5  # neutral
+
+    def test_one_specified(self):
+        assert compute_finish_score(1.6, 0) == 0.0
 
 
 class TestRankCandidates:
@@ -243,13 +290,21 @@ class TestRankCandidates:
         assert 0 <= r.material_score <= 1
         assert 0 <= r.dimension_score <= 1
         assert 0 <= r.process_score <= 1
+        assert 0 <= r.tolerance_score <= 1
+        assert 0 <= r.finish_score <= 1
         assert r.combined_score > 0
 
 
 class TestPresetWeights:
     def test_default_weights_sum_to_1(self):
         w = PRESET_WEIGHTS["default"]
-        assert w.visual + w.material + w.dimension + w.process == pytest.approx(1.0)
+        total = w.visual + w.material + w.dimension + w.process + w.tolerance + w.finish
+        assert total == pytest.approx(1.0)
+
+    def test_all_presets_sum_to_1(self):
+        for name, w in PRESET_WEIGHTS.items():
+            total = w.visual + w.material + w.dimension + w.process + w.tolerance + w.finish
+            assert total == pytest.approx(1.0), f"Preset '{name}' sums to {total}"
 
     def test_all_presets_exist(self):
         assert "default" in PRESET_WEIGHTS

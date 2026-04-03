@@ -10,6 +10,10 @@ load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY", "")
 
+# --- Embedding ---
+GEMINI_EMBEDDING_MODEL = "gemini-embedding-exp-03-07"
+GEMINI_EMBEDDING_DIM = 768  # Gemini Embedding API native dimension
+
 # --- Mechanical: Machine Rates (₹/hr) ---
 MACHINE_RATES = {
     "turning": 800,

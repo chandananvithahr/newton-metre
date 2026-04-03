@@ -36,6 +36,8 @@ class SearchResult:
     material_score: float
     dimension_score: float
     process_score: float
+    tolerance_score: float
+    finish_score: float
 
     # Cost intelligence (the Costimize differentiator)
     material: str
@@ -175,7 +177,7 @@ class DrawingSearcher:
         # FAISS search → top candidates
         candidates = self._index.search(query_vec, top_k=faiss_candidates)
 
-        # Multi-signal re-ranking
+        # Multi-signal re-ranking (6 signals)
         ranked = rank_candidates(
             candidates=candidates,
             query_material=material,
@@ -183,7 +185,7 @@ class DrawingSearcher:
             query_processes=processes or [],
             top_k=top_k,
             weights=weights,
-        )
+        )  # tolerance + finish use defaults from metadata
 
         # Convert to SearchResult
         results = []
@@ -199,6 +201,8 @@ class DrawingSearcher:
                 material_score=r.material_score,
                 dimension_score=r.dimension_score,
                 process_score=r.process_score,
+                tolerance_score=r.tolerance_score,
+                finish_score=r.finish_score,
                 material=m.get("material", ""),
                 dimensions=m.get("dimensions", {}),
                 processes=tuple(m.get("processes", [])),

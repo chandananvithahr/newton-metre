@@ -2,17 +2,17 @@
 
 3 strategies (auto-selected based on what's available):
 
-  Strategy 1: GEMINI API (default — zero RAM, works on any machine)
-    → Send image to Gemini → get text description → hash to embedding
+  Strategy 1: GEMINI EMBEDDING API (default — zero RAM, works on any machine)
+    → Send image to Gemini Flash → get text description → embed via Gemini Embedding API
     → Free tier: 1500 requests/day
-    → ~1 sec per drawing, ~0 MB RAM
-    → Good for MVP with 1K-10K drawings
+    → ~1-2 sec per drawing, ~0 MB RAM
+    → 768-dim real semantic embeddings (high quality)
 
   Strategy 2: IMAGE HASH (fallback — zero dependencies)
     → Perceptual hash (pHash) + color histogram + edge histogram
     → Pure Python + PIL (already installed)
     → ~0.1 sec per drawing, ~0 MB RAM
-    → ~70% accuracy (good enough for MVP demo)
+    → ~70% accuracy (padded to 768-dim for index compatibility)
 
   Strategy 3: DINOV2 (upgrade — needs GPU/16GB+ RAM)
     → Meta's DINOv2-base vision transformer
@@ -27,13 +27,17 @@ Why this works vs CADDi:
   Us: looks at the drawing as an IMAGE → AI/perceptual fingerprint (DIFFERENT METHOD)
   Same result (find similar parts), completely different technique (no patent conflict).
 """
-import hashlib
 import io
+import logging
 import numpy as np
 from PIL import Image
 
+from config import GEMINI_EMBEDDING_DIM
+
+logger = logging.getLogger(__name__)
+
 # All strategies produce vectors of this dimension
-EMBEDDING_DIM = 256
+EMBEDDING_DIM = GEMINI_EMBEDDING_DIM  # 768
 
 
 def embed_image(image: Image.Image) -> np.ndarray:
@@ -42,11 +46,11 @@ def embed_image(image: Image.Image) -> np.ndarray:
     Returns:
         numpy array of shape (EMBEDDING_DIM,) — L2-normalized embedding vector
     """
-    # Strategy 1: Try Gemini API
+    # Strategy 1: Try Gemini API (describe → embed)
     try:
         return _embed_with_gemini(image)
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning("Gemini embedding failed, falling back to image hash: %s", e)
 
     # Strategy 2: Perceptual hash (always works, no dependencies)
     return _embed_with_image_features(image)
@@ -63,10 +67,10 @@ def compute_similarity(vec_a: np.ndarray, vec_b: np.ndarray) -> float:
 
 
 # ═══════════════════════════════════════════════════════════════
-# Strategy 1: Gemini API embedding
+# Strategy 1: Gemini API — describe image → embed text
 # ═══════════════════════════════════════════════════════════════
 
-_GEMINI_EMBED_PROMPT = """Describe this engineering drawing in exactly 50 words focusing ONLY on:
+_GEMINI_DESCRIBE_PROMPT = """Describe this engineering drawing in exactly 50 words focusing ONLY on:
 - Overall shape (cylindrical, rectangular, complex profile)
 - Key geometric features (holes, slots, threads, chamfers, fillets)
 - Approximate proportions (length-to-diameter ratio, symmetry)
@@ -75,62 +79,42 @@ Be precise and technical. No filler words."""
 
 
 def _embed_with_gemini(image: Image.Image) -> np.ndarray:
-    """Use Gemini to describe the drawing, then hash the description to a vector.
+    """Use Gemini Flash to describe the drawing, then Gemini Embedding API
+    to produce a real 768-dim semantic embedding.
 
-    This is a clever trick: Gemini's text description of the drawing captures
-    the same visual features that DINOv2 would learn. We hash the description
-    to a fixed-length vector for FAISS search.
+    Two API calls:
+      1. Gemini Flash: image → 50-word text description
+      2. Gemini Embedding: text → 768-dim vector
 
-    Cost: ~0.001₹ per drawing (Gemini 1.5 Flash pricing)
-    RAM: ~0 MB (API call)
+    Cost: ~0.002₹ per drawing (Flash + Embedding API pricing)
+    RAM: ~0 MB (API calls only)
     """
-    from config import GEMINI_API_KEY
+    from config import GEMINI_API_KEY, GEMINI_EMBEDDING_MODEL
     if not GEMINI_API_KEY:
         raise RuntimeError("No Gemini API key")
 
     import google.generativeai as genai
     genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel("gemini-1.5-flash")
 
-    # Convert PIL image to bytes
+    # Step 1: Describe the drawing with Gemini Flash
+    vision_model = genai.GenerativeModel("gemini-1.5-flash")
     buf = io.BytesIO()
     image.save(buf, format="PNG")
     img_bytes = buf.getvalue()
 
-    response = model.generate_content(
-        [_GEMINI_EMBED_PROMPT, {"mime_type": "image/png", "data": img_bytes}],
+    response = vision_model.generate_content(
+        [_GEMINI_DESCRIBE_PROMPT, {"mime_type": "image/png", "data": img_bytes}],
         generation_config={"max_output_tokens": 200},
     )
+    description = response.text.strip()
 
-    description = response.text.strip().lower()
-    return _text_to_vector(description)
-
-
-def _text_to_vector(text: str) -> np.ndarray:
-    """Convert text description to a fixed-length vector using character n-gram hashing.
-
-    Uses a bag-of-character-trigrams approach:
-    1. Extract all character trigrams from text
-    2. Hash each trigram to a position in the vector
-    3. Increment that position
-    4. L2 normalize
-
-    This preserves semantic similarity: similar descriptions → similar vectors.
-    """
-    vector = np.zeros(EMBEDDING_DIM, dtype=np.float32)
-    text = text.lower().strip()
-
-    # Character trigrams
-    for i in range(len(text) - 2):
-        trigram = text[i:i + 3]
-        # Hash trigram to a position
-        h = int(hashlib.md5(trigram.encode()).hexdigest(), 16) % EMBEDDING_DIM
-        vector[h] += 1.0
-
-    # Word unigrams (captures key terms like "cylindrical", "holes", "threads")
-    for word in text.split():
-        h = int(hashlib.md5(word.encode()).hexdigest(), 16) % EMBEDDING_DIM
-        vector[h] += 2.0  # words weighted higher than trigrams
+    # Step 2: Embed the description with Gemini Embedding API (768-dim)
+    embed_result = genai.embed_content(
+        model=GEMINI_EMBEDDING_MODEL,
+        content=description,
+        output_dimensionality=EMBEDDING_DIM,
+    )
+    vector = np.array(embed_result["embedding"], dtype=np.float32)
 
     # L2 normalize
     norm = np.linalg.norm(vector)
@@ -153,7 +137,8 @@ def _embed_with_image_features(image: Image.Image) -> np.ndarray:
     - Intensity distribution via grayscale histogram (64 dims)
     - Spatial layout via grid-based mean intensity (64 dims = 8×8 grid)
 
-    Total: 256 dims. No ML model needed. ~70% accuracy.
+    Total: 256 raw dims → padded to 768 for index compatibility.
+    No ML model needed. ~70% accuracy.
     RAM: ~0 MB. Speed: ~0.1 sec/image.
     """
     img = image.convert("L")  # grayscale
@@ -170,7 +155,6 @@ def _embed_with_image_features(image: Image.Image) -> np.ndarray:
     features.append(phash_vector)  # 64 dims
 
     # 2. Edge histogram (64 dims) — captures lines and contours
-    # Simple Sobel-like gradient
     gx = np.abs(np.diff(pixels, axis=1))  # horizontal edges
     gy = np.abs(np.diff(pixels, axis=0))  # vertical edges
     edge_hist_x = np.histogram(gx.flatten(), bins=32, range=(0, 1))[0].astype(np.float32)
@@ -186,9 +170,9 @@ def _embed_with_image_features(image: Image.Image) -> np.ndarray:
     grid = pixels.reshape(8, 8, 8, 8).mean(axis=(1, 3)).flatten()
     features.append(grid)  # 64 dims
 
-    vector = np.concatenate(features)
+    vector = np.concatenate(features)  # 256 raw dims
 
-    # Pad or truncate to EMBEDDING_DIM
+    # Pad to EMBEDDING_DIM (768) for index compatibility
     if len(vector) < EMBEDDING_DIM:
         vector = np.pad(vector, (0, EMBEDDING_DIM - len(vector)))
     else:
@@ -208,13 +192,13 @@ def _embed_with_image_features(image: Image.Image) -> np.ndarray:
 
 _dinov2_model = None
 _dinov2_transform = None
-DINOV2_DIM = 768  # DINOv2 uses 768 dims
+DINOV2_DIM = 768  # DINOv2 uses 768 dims (matches our EMBEDDING_DIM)
 
 
 def embed_image_dinov2(image: Image.Image) -> np.ndarray:
     """DINOv2 embedding — use only with 16GB+ RAM or GPU.
 
-    Returns 768-dim vector (different dimension than other strategies).
+    Returns 768-dim vector (same dimension as Gemini Embedding).
     Call this explicitly when you have the hardware.
     """
     global _dinov2_model, _dinov2_transform

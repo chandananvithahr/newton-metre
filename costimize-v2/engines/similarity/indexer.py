@@ -103,7 +103,13 @@ class SimilarityIndex:
             if self._faiss_path.exists():
                 try:
                     import faiss
-                    self._index = faiss.read_index(str(self._faiss_path))
+                    loaded = faiss.read_index(str(self._faiss_path))
+                    # Discard old indexes with wrong dimension (e.g. 256 → 768 migration)
+                    if loaded.d == EMBEDDING_DIM:
+                        self._index = loaded
+                    else:
+                        self._index = None
+                        self._metadata = []  # vectors and metadata are paired
                 except Exception:
                     self._index = None
             if self._index is None:
@@ -112,7 +118,13 @@ class SimilarityIndex:
             # Load numpy vectors
             if self._vectors_path.exists():
                 try:
-                    self._vectors = np.load(str(self._vectors_path))
+                    loaded = np.load(str(self._vectors_path))
+                    # Discard old vectors with wrong dimension
+                    if loaded.ndim == 2 and loaded.shape[1] == EMBEDDING_DIM:
+                        self._vectors = loaded
+                    else:
+                        self._vectors = None
+                        self._metadata = []
                 except Exception:
                     self._vectors = None
 
