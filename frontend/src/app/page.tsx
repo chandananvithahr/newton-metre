@@ -485,9 +485,7 @@ function Footer() {
           <div>
             <div className="text-sm font-bold uppercase tracking-widest text-[#1a1a1a] mb-4">Company</div>
             <ul className="space-y-2.5">
-              {["About Us", "Careers"].map((item) => (
-                <li key={item}><a href="#" className="text-base text-[#1a1a1a]/60 hover:text-[#1a1a1a] transition-colors">{item}</a></li>
-              ))}
+              <li><a href="mailto:chand@costimize.dev" className="text-base text-[#1a1a1a]/60 hover:text-[#1a1a1a] transition-colors">Contact Us</a></li>
             </ul>
           </div>
 
@@ -506,9 +504,6 @@ function Footer() {
           <div>
             <div className="text-sm font-bold uppercase tracking-widest text-[#1a1a1a] mb-4">Legal</div>
             <ul className="space-y-2.5">
-              {["Privacy Policy", "Terms of Service"].map((item) => (
-                <li key={item}><a href="#" className="text-base text-[#1a1a1a]/60 hover:text-[#1a1a1a] transition-colors">{item}</a></li>
-              ))}
               <li><a href="mailto:chand@costimize.dev" className="text-base text-[#1a1a1a]/60 hover:text-[#1a1a1a] transition-colors">Contact</a></li>
             </ul>
           </div>
