@@ -8,7 +8,12 @@ from pathlib import Path
 
 
 VALIDATION_DIR = Path(__file__).parent.parent.parent / "data" / "validation"
-VALIDATION_DIR.mkdir(parents=True, exist_ok=True)
+try:
+    VALIDATION_DIR.mkdir(parents=True, exist_ok=True)
+except PermissionError:
+    # In containerized deployments, /app may be read-only — use /tmp instead
+    VALIDATION_DIR = Path("/tmp/validation")
+    VALIDATION_DIR.mkdir(parents=True, exist_ok=True)
 VALIDATION_FILE = VALIDATION_DIR / "validated_estimates.json"
 
 
