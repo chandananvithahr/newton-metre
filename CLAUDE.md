@@ -11,15 +11,27 @@ Always pull the screen screenshot alongside the HTML and match it pixel-for-pixe
 
 ## Project Overview
 
-Newton-Metre — "Know what it costs. Before they quote." A manufacturing cost intelligence platform evolving into a **Company Brain** for manufacturers. Three superpowers: (1) should-cost breakdowns (±5-10% accuracy) for mechanical parts, sheet metal, PCB, and cable assemblies, (2) similarity search that turns your company's drawing history into a searchable asset, and (3) institutional memory that proactively surfaces similar parts, historical costs, and supplier data. Built for Indian manufacturing economics (₹ currency, INR pricing).
+Newton-Metre — "Know what it costs. Before they quote." A manufacturing **Company Brain** with three products that form a flywheel:
+
+| Product | Role | What It Does |
+|---------|------|-------------|
+| **Should-cost estimation** | The sexy product (door-opener) | Upload a drawing → line-by-line cost breakdown in 30 seconds. ±5-10% accuracy for mechanical, sheet metal, PCB, cable. The demo moment that gets people in the door. |
+| **Similarity search** | The weapon (platform foundation) | Turns a company's drawing history into a searchable asset. Serves 7 departments (design, procurement, QA, sales, marketing, logistics, import/export). Creates data moat — once 50K drawings indexed with PO history, nobody switches. |
+| **AI Procurement Worker** | The cash cow (recurring revenue) | AI WORKER (not copilot) that handles RFQ, quote comparison, negotiation, proposals. Class C items (60-70% of POs) autonomously. 2-3% savings on ₹50Cr spend = ₹1-1.5 Cr/year. Every negotiation compounds the memory. |
+
+**The flywheel:** Should-cost gets them in → Similarity makes them stay & spreads across departments → AI Worker generates recurring revenue → More data → better search → better negotiations → more savings.
+
+Built for Indian manufacturing economics (₹ currency, INR pricing).
 
 **Target industries:** Defense, Aerospace, Automobile
 **Target part types:** Turned, Milled, Sheet metal
-**Users:** Sourcing & procurement, cost engineering, design engineering, and leadership teams at manufacturing companies.
+**Users:** Sourcing & procurement, cost engineering, design engineering, QA, sales, marketing, logistics, and leadership teams at manufacturing companies.
 
 **Core value:** "Upload a drawing. Get a line-by-line should-cost. Find similar parts from your history. Negotiate with data."
 
-**Product vision:** Should-cost + similarity + company memory + AI agent = unique combination. CADDi ($1.4B) does similarity only. aPriori does should-cost only (3D required). Nobody does all three from 2D drawings — and nobody has a conversational AI agent that ties cost estimation, part search, and supplier intelligence into one interface.
+**Product vision:** Nobody else has all three. CADDi ($1.4B) does similarity only. aPriori does should-cost only (3D required). Pactum does negotiation only. Nobody combines should-cost + similarity + institutional memory + AI procurement worker from 2D drawings.
+
+**Critical insight (70/30 split):** 70% of procurement spend is off-the-shelf MPN-based items (connectors, fasteners, bearings) — where similarity search + negotiation intelligence matters most. Only 30% is manufactured-to-drawing parts where should-cost shines. The AI must serve both.
 
 **AI independence roadmap:** Currently API-dependent (Gemini/GPT-4o). Progressively migrating to own fine-tuned models: Qwen2.5-VL-7B (extraction), Qwen2.5-32B (agent), DINOv2 (embeddings). Target: zero cloud API dependency by month 6, on-prem deployable for defense by month 9. See `costimize-v2/docs/research/AI-AGENT-ROADMAP.md` for full strategy.
 

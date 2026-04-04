@@ -155,13 +155,13 @@ export default function DashboardPage() {
         <div className="w-full max-w-2xl">
 
           <h1 className="text-[clamp(28px,4vw,42px)] text-[var(--color-text-primary)] tracking-tight text-center mb-2" style={{ fontFamily: "var(--font-headline)" }}>
-            What are we doing today?
+            What are we working on?
           </h1>
           <p className="text-center text-[15px] text-[var(--color-text-description)] mb-12" style={{ fontFamily: "var(--font-body)" }}>
-            Upload a drawing to get a should-cost breakdown, or search your company&apos;s part history.
+            Should-cost in 30 seconds. Your company&apos;s history, searchable. AI procurement on autopilot.
           </p>
 
-          <div className="grid sm:grid-cols-3 gap-5">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
 
             {/* Should-Cost */}
             <button
@@ -174,13 +174,13 @@ export default function DashboardPage() {
                 </svg>
               </div>
               <h2 className="text-[16px] font-bold text-[var(--color-text-primary)] mb-2 group-hover:text-[var(--color-brand-dark)]" style={{ fontFamily: "var(--font-body)" }}>
-                Get a should-cost
+                Should-cost
               </h2>
               <p className="text-[14px] text-[var(--color-text-description)] leading-relaxed mb-5" style={{ fontFamily: "var(--font-body)" }}>
-                Upload a drawing. Newton-Metre reads it, calculates every cost line — material, machining, finishing, margin.
+                Upload a drawing. Get a line-by-line cost breakdown in 30 seconds.
               </p>
               <span className="text-[12px] text-[var(--color-brand-dark)] font-bold uppercase tracking-widest group-hover:underline" style={{ fontFamily: "var(--font-label)" }}>
-                Upload a drawing →
+                Upload drawing →
               </span>
             </button>
 
@@ -198,10 +198,34 @@ export default function DashboardPage() {
                 Find similar parts
               </h2>
               <p className="text-[14px] text-[var(--color-text-description)] leading-relaxed mb-5" style={{ fontFamily: "var(--font-body)" }}>
-                Upload drawings, POs, contracts, or QA docs. Newton-Metre searches your company&apos;s history for matches.
+                Search your company&apos;s drawings, POs, and documents. Find what already exists.
               </p>
               <span className="text-[12px] text-[var(--color-brand-dark)] font-bold uppercase tracking-widest group-hover:underline" style={{ fontFamily: "var(--font-label)" }}>
-                Search drawings →
+                Search history →
+              </span>
+            </button>
+
+            {/* AI Procurement */}
+            <button
+              onClick={() => router.push("/chat")}
+              className="group bg-white ghost-border rounded-xl p-8 text-left hover:ambient-shadow transition-all duration-200 relative overflow-hidden"
+            >
+              <div className="absolute top-3 right-3">
+                <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-full bg-emerald-100 text-emerald-700" style={{ fontFamily: "var(--font-label)" }}>New</span>
+              </div>
+              <div className="w-10 h-10 logo-gradient rounded-lg flex items-center justify-center mb-5">
+                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
+                </svg>
+              </div>
+              <h2 className="text-[16px] font-bold text-[var(--color-text-primary)] mb-2 group-hover:text-[var(--color-brand-dark)]" style={{ fontFamily: "var(--font-body)" }}>
+                AI Procurement
+              </h2>
+              <p className="text-[14px] text-[var(--color-text-description)] leading-relaxed mb-5" style={{ fontFamily: "var(--font-body)" }}>
+                RFQs, quote comparison, negotiation. The AI does the work, you approve.
+              </p>
+              <span className="text-[12px] text-[var(--color-brand-dark)] font-bold uppercase tracking-widest group-hover:underline" style={{ fontFamily: "var(--font-label)" }}>
+                Start workflow →
               </span>
             </button>
 
@@ -219,10 +243,10 @@ export default function DashboardPage() {
                 Ask anything
               </h2>
               <p className="text-[14px] text-[var(--color-text-description)] leading-relaxed mb-5" style={{ fontFamily: "var(--font-body)" }}>
-                Ask about costs, materials, processes, or get help optimizing your manufacturing decisions.
+                Costs, materials, processes, suppliers. Your company&apos;s data, one conversation.
               </p>
               <span className="text-[12px] text-[var(--color-brand-dark)] font-bold uppercase tracking-widest group-hover:underline" style={{ fontFamily: "var(--font-label)" }}>
-                Start a conversation →
+                Ask now →
               </span>
             </button>
           </div>
