@@ -242,6 +242,7 @@ function SimilaritySearch() {
               { dept: "Quality", title: "25% of your quality issues are repeat failures. Preventable.", desc: "When a defect appears, instantly find every past NCR for similar parts. Inspection reports, FAI docs, failure histories — indexed forever." },
               { dept: "Sales", title: "Customer called. You quoted in 10 minutes. Competitor took 3 days.", desc: "Upload a sketch, find 5 similar parts from history, give a ballpark price — while the customer is still on the phone." },
               { dept: "Import / Export", title: "11,000 HS codes. You classified it wrong. Again.", desc: "Find the 5 most similar past imports, surface their HS codes and FTA routes. Indian manufacturers leave 70% of FTA benefits on the table." },
+              { dept: "Finance", title: "₹3.2 crore spent on turned parts last year. You had no idea.", desc: "Spend analysis by part family, material, supplier. Budget vs. actual on every category. Cost trends over time. Finally, visibility into where the money actually goes." },
             ].map((item, i) => (
               <div key={i} className="relative pl-8 border-l border-white/10 group hover:border-l-orange-400/50 transition-colors">
                 <div className="text-[11px] font-bold text-white/40 uppercase tracking-widest mb-2" style={{ fontFamily: "var(--font-label)" }}>{item.dept}</div>
