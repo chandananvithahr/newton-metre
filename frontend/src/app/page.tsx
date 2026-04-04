@@ -48,23 +48,66 @@ function Hero() {
             </a>
           </div>
 
-          <p className="text-[11px] text-[#525252] uppercase tracking-[0.15em] font-medium mb-4">
+          <p className="text-[11px] text-[#525252] uppercase tracking-[0.15em] font-medium mb-6">
             Three products. One platform.
           </p>
-          <div className="flex flex-wrap justify-center gap-3">
-            {[
-              { label: "Should-Cost Estimate", href: "/estimate/new" },
-              { label: "Similarity Search", href: "/similar" },
-              { label: "AI Procurement", href: "/login" },
-            ].map((item) => (
-              <Link
-                key={item.label}
-                href={item.href}
-                className="px-5 py-2.5 rounded-full border border-black/8 bg-white/80 text-sm text-[#525252] hover:bg-white hover:border-black/15 transition-all"
-              >
-                {item.label}
-              </Link>
-            ))}
+          <div className="grid sm:grid-cols-3 gap-4 max-w-[800px] mx-auto text-left">
+            <Link
+              href="/estimate/new"
+              className="group bg-white/80 backdrop-blur-sm border border-black/5 rounded-xl p-6 hover:bg-white hover:shadow-lg hover:shadow-black/5 hover:border-black/10 transition-all"
+            >
+              <div className="w-9 h-9 logo-gradient rounded-lg flex items-center justify-center mb-4">
+                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                </svg>
+              </div>
+              <div className="text-sm font-bold text-[#1a1a1a] mb-1.5">Should-Cost</div>
+              <p className="text-[13px] text-[#525252] leading-relaxed mb-3">
+                Upload a drawing. Line-by-line cost in 30 seconds.
+              </p>
+              <span className="text-[11px] text-[#1a1a1a] font-bold uppercase tracking-widest group-hover:underline">
+                Upload drawing →
+              </span>
+            </Link>
+
+            <Link
+              href="/similar"
+              className="group bg-white/80 backdrop-blur-sm border border-black/5 rounded-xl p-6 hover:bg-white hover:shadow-lg hover:shadow-black/5 hover:border-black/10 transition-all"
+            >
+              <div className="w-9 h-9 logo-gradient rounded-lg flex items-center justify-center mb-4">
+                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+                </svg>
+              </div>
+              <div className="text-sm font-bold text-[#1a1a1a] mb-1.5">Similarity Search</div>
+              <p className="text-[13px] text-[#525252] leading-relaxed mb-3">
+                Every drawing, PO, spec — searchable. 7 departments, one search bar.
+              </p>
+              <span className="text-[11px] text-[#1a1a1a] font-bold uppercase tracking-widest group-hover:underline">
+                Search history →
+              </span>
+            </Link>
+
+            <Link
+              href="/login"
+              className="group bg-white/80 backdrop-blur-sm border border-black/5 rounded-xl p-6 hover:bg-white hover:shadow-lg hover:shadow-black/5 hover:border-black/10 transition-all relative overflow-hidden"
+            >
+              <div className="absolute top-3 right-3">
+                <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-full bg-orange-100 text-orange-700">Enterprise</span>
+              </div>
+              <div className="w-9 h-9 logo-gradient rounded-lg flex items-center justify-center mb-4">
+                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                </svg>
+              </div>
+              <div className="text-sm font-bold text-[#1a1a1a] mb-1.5">AI Procurement</div>
+              <p className="text-[13px] text-[#525252] leading-relaxed mb-3">
+                Supplier intelligence, negotiation briefs, better decisions.
+              </p>
+              <span className="text-[11px] text-[#1a1a1a] font-bold uppercase tracking-widest group-hover:underline">
+                Join waitlist →
+              </span>
+            </Link>
           </div>
         </motion.div>
       </div>
