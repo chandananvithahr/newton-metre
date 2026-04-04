@@ -51,7 +51,7 @@ See `docs/POSITIONING.md` for full multi-audience messaging and one-liners.
 
 ### `frontend/` — Next.js Web App (Vercel)
 
-7 pages: landing, login/signup, dashboard (3-card: should-cost, similarity, chat), new estimate (single + assembly with ZIP upload), estimate detail, similarity search, full-page chat. **Split-screen layout:** all authenticated pages have a fixed 380px ChatPanel on the right (ChatGPT-style AI assistant, Gemini-powered). AppShell in root layout handles the split; landing and login get full width. Color scheme standardized to CSS design tokens. Tailwind CSS v4 with "Tactical Elegance" design system (Newsreader + Space Grotesk fonts, deep blue #00288e, tonal surface layering #faf8ff). Landing page has dedicated should-cost section (4 audience cards) and dedicated similarity search section (CADDi-style knowledge-as-asset). See `DESIGN.md` for full spec. Vercel Analytics enabled.
+13 pages: landing, login/signup, dashboard (3-card: should-cost, similarity, chat), new estimate (single + assembly with ZIP upload), estimate detail, similarity search, library (indexed drawings with stats), MPN part search, workflows (new/list/detail), full-page chat, and waitlist. **Split-screen layout:** all authenticated pages have a fixed 380px ChatPanel on the right (ChatGPT-style AI assistant, Gemini-powered). AppShell in root layout handles the split; landing, login, waitlist get full width. Color scheme standardized to CSS design tokens. Tailwind CSS v4 with "Tactical Elegance" design system (Newsreader + Space Grotesk fonts, deep blue #00288e, tonal surface layering #faf8ff). Landing page has: dedicated should-cost section (4 audience cards), similarity search section (CADDi-style knowledge-as-asset), ROI calculator (dark section with two sliders: procurement spend ₹1-100Cr + negotiation improvement 2-20% → live savings + ROI multiplier), recent estimates (last 5). Library page shows indexed drawings with file type badges, AI descriptions, stats (total, first indexed, last added). Login supports `?waitlist=procurement-brain` param for targeted signup copy. Favicon: N·m dark wordmark. See `DESIGN.md` for full spec. Vercel Analytics enabled.
 
 ### `costimize-v2/` — Python Engines + FastAPI Backend (Railway)
 
@@ -72,8 +72,8 @@ Original monolithic CNC turning-only estimator. Kept for reference.
 | **Database** | Supabase (Postgres + pgvector) | Auth, estimates, embeddings |
 | **Auth** | Supabase Auth (JWT) | Backend validates on every route |
 | **AI Vision** | OpenAI GPT-4o (primary), Google Gemini (fallback) → Qwen2.5-VL-7B (self-hosted target) | Extracts dimensions + processes |
-| **AI Validation** | Gemini 1.5 Flash → Qwen2.5-7B (self-hosted target) | Cross-checks physics engine estimates |
-| **AI Agent** | Gemini Flash (now) → Gemma 4 (self-hosted target) | In-app conversational agent with tool-calling |
+| **AI Validation** | Gemini 2.0 Flash Lite → Qwen2.5-7B (self-hosted target) | Cross-checks physics engine estimates |
+| **AI Agent** | Gemini 2.0 Flash Lite (now) → Gemma 4 (self-hosted target) | In-app conversational agent with tool-calling |
 | **Forecasting** | TimesFM 2.5 (200M, zero-shot, Apache 2.0) | Demand prediction, price trends, lead time forecasting |
 | **Similarity Search** | Gemini API + pgvector → DINOv2 + nomic-embed (self-hosted target) | Drawing visual similarity via 768-dim embeddings |
 | **Inference Server** | Cloud APIs (now) → vLLM on RunPod/on-prem (target) | OpenAI-compatible API, model-agnostic |
@@ -132,7 +132,7 @@ cd costimize-v2 && python -m pytest tests/test_agent_*.py # Run 183 agent tests 
 
 ### Project Structure
 
-**Frontend** (`frontend/`): Next.js pages in `src/app/` (landing, login, dashboard, estimate/new, estimate/[id], chat, similar, workflows). Components in `src/components/` (app-shell, chat-widget, app-nav, landing-nav, Toast). Lib: `src/lib/api.ts` + `supabase.ts`. Auth middleware in `src/middleware.ts`.
+**Frontend** (`frontend/`): Next.js pages in `src/app/` (page, login, dashboard, estimate/new, estimate/[id], chat, similar, library, mpn, workflows/new, workflows/[id], workflows, waitlist). Components in `src/components/` (app-shell, chat-widget, app-nav, landing-nav, Toast). Lib: `src/lib/api.ts` + `supabase.ts`. Auth middleware in `src/middleware.ts`.
 
 **Backend** (`costimize-v2/`): `agents/` (8 procurement agents + engine + memory + checkpoint), `engines/` (mechanical, sheet_metal, pcb, cable, validation, similarity), `extractors/` (vision, process_detector, bom, gemini_estimator, pdf_classifier, rfq), `scrapers/` (component, material), `history/` (po_parser/store/matcher), `ui/` (Streamlit tabs), `tests/` (347 tests, 20 files), `docs/research/` (24 docs — see `MASTER-RESEARCH-REPORT.md`), `supabase/migrations/` (005-010).
 
@@ -272,7 +272,7 @@ PIPELINES = {
 
 - **Frozen dataclasses** for all cost breakdown results (immutable)
 - **Supabase Postgres** — production database with RLS, pgvector for similarity. JSON files still used for Streamlit MVP mode
-- **Two-stage extraction** — GLM-OCR (0.9B, local/API, $0.03/M tokens) extracts raw text → Gemini Flash interprets engineering context (GD&T, processes). Cuts AI cost 50-80%. GPT-4o as final fallback only.
+- **Two-stage extraction** — GLM-OCR (0.9B, local/API, $0.03/M tokens) extracts raw text → Gemini 2.0 Flash Lite interprets engineering context (GD&T, processes). Cuts AI cost 50-80%. GPT-4o as final fallback only.
 - **Rule-based fallbacks** — process detection works without AI
 - **24hr cache** on all scraped prices
 - **Physics first, ML later** — physics-based models for day-one accuracy, ML correction factors after collecting estimate-vs-actual pairs

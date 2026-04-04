@@ -366,7 +366,7 @@ Every cloud API call is a training example waiting to happen:
     "model_output": {"dimensions": {...}, "material": "SS304", ...},
     "user_corrections": {"material": "SS316"},  # If user edited
     "timestamp": "2026-04-04T10:30:00Z",
-    "model_used": "gemini-1.5-flash",
+    "model_used": "gemini-2.0-flash-lite",
     "confidence": 0.87
 }
 
@@ -692,7 +692,7 @@ prompts:
   - "Extract dimensions, material, processes from this drawing: {{image}}"
 
 providers:
-  - id: gemini-1.5-flash   # Cloud API (baseline)
+  - id: gemini-2.0-flash-lite   # Cloud API (baseline)
   - id: openai:qwen-vl     # Self-hosted via vLLM (OpenAI-compatible)
 
 tests:
@@ -801,7 +801,7 @@ for model_name, search_fn in [("gemini_embed", gemini_search), ("dinov2", dinov2
 ```bash
 # promptfoo makes this trivial — same test cases, two providers
 promptfoo eval --config extraction-eval.yaml \
-  --provider "gemini-1.5-flash" \
+  --provider "gemini-2.0-flash-lite" \
   --provider "openai:http://localhost:8001/v1:qwen-vl-7b"
 
 # Output: side-by-side comparison table with pass/fail per assertion
