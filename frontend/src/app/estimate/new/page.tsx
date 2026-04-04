@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   extractDrawing,
   extractMultiViewDrawing,
   createEstimate,
   createAssemblyEstimate,
   getMaterialPrice,
+  getEstimates,
 } from "@/lib/api";
 import { AppNav } from "@/components/app-nav";
 
@@ -143,6 +145,12 @@ export default function NewEstimatePage() {
   const [drawingType, setDrawingType] = useState<DrawingType>("single");
   const [quantity, setQuantity] = useState(1);
   const [error, setError] = useState("");
+
+  // Recent estimates (shown on landing step)
+  const [recentEstimates, setRecentEstimates] = useState<Record<string, unknown>[]>([]);
+  useEffect(() => {
+    getEstimates().then((data) => setRecentEstimates(Array.isArray(data) ? data.slice(0, 5) : [])).catch(() => {});
+  }, []);
 
   // Single-part state
   const [file, setFile] = useState<File | null>(null);
@@ -477,6 +485,56 @@ export default function NewEstimatePage() {
               </p>
             </button>
           </div>
+
+          {/* Recent estimates */}
+          {recentEstimates.length > 0 && (
+            <div className="mt-10">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-[var(--color-text-muted)] mb-3" style={{ fontFamily: "var(--font-label)" }}>
+                Recent estimates
+              </p>
+              <div className="space-y-2">
+                {recentEstimates.map((est) => {
+                  const id = est.id as string;
+                  const cost = Number(est.total_cost ?? 0);
+                  const currency = (est.currency as string) || "INR";
+                  const partType = (est.part_type as string) || "mechanical";
+                  const createdAt = est.created_at as string;
+                  const confidence = est.confidence_tier as string | null;
+                  const confColor = confidence === "high" ? "text-emerald-600" : confidence === "medium" ? "text-amber-600" : "text-[var(--color-text-muted)]";
+                  return (
+                    <Link
+                      key={id}
+                      href={`/estimate/${id}`}
+                      className="flex items-center justify-between bg-white rounded-xl border border-black/8 px-5 py-3.5 hover:border-[var(--color-nm-primary)]/30 hover:shadow-sm transition-all group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-[11px] text-[var(--color-text-muted)] capitalize px-2 py-0.5 bg-[var(--color-surface-container-low)] rounded" style={{ fontFamily: "var(--font-mono)" }}>
+                          {partType}
+                        </span>
+                        <span className="text-[13px] text-[var(--color-text-description)]" style={{ fontFamily: "var(--font-mono)" }}>
+                          {new Date(createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                        </span>
+                        {confidence && (
+                          <span className={`text-[11px] font-medium capitalize ${confColor}`} style={{ fontFamily: "var(--font-mono)" }}>
+                            {confidence}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[15px] font-bold text-[var(--color-text-primary)]" style={{ fontFamily: "var(--font-mono)", fontVariantNumeric: "tabular-nums" }}>
+                          {currency} {cost.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+                        </span>
+                        <svg className="w-4 h-4 text-[var(--color-text-disabled)] group-hover:text-[var(--color-nm-primary)] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                        </svg>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
     );
@@ -851,8 +909,8 @@ export default function NewEstimatePage() {
           )}
 
           <div className="flex gap-3 mt-6">
-            <button onClick={() => router.push("/dashboard")} className="flex-1 border border-black/20 py-3.5 rounded-lg hover:bg-[var(--color-surface-hover)] text-sm font-medium text-[var(--color-text-description)] transition-colors">
-              Back to Dashboard
+            <button onClick={() => router.push("/similar")} className="flex-1 border border-black/20 py-3.5 rounded-lg hover:bg-[var(--color-surface-hover)] text-sm font-medium text-[var(--color-text-description)] transition-colors">
+              Find similar parts
             </button>
             <button onClick={() => { setStep("type"); setResult(null); setExtractedData(null); setFile(null); setSupplierQuoteStr(""); setSupplierQuoteSaved(false); }} className="flex-1 bg-[var(--color-brand-dark)] hover:bg-[var(--color-brand-dark-hover)] text-white py-3.5 rounded-lg font-bold tracking-widest uppercase text-sm transition-all duration-200">
               New Estimate
