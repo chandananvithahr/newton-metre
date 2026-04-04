@@ -70,8 +70,14 @@ async def extract_drawing(
         from extractors.cad_converter import dxf_to_text, step_to_text, is_dxf_dwg, is_step
 
         if is_dxf_dwg(file.content_type, filename):
-            cad_text = dxf_to_text(raw_bytes, filename)
-            result = analyze_step_text(cad_text)   # same text AI path
+            try:
+                cad_text = dxf_to_text(raw_bytes, filename)
+                result = analyze_step_text(cad_text)   # same text AI path
+            except (RuntimeError, Exception) as dwg_err:
+                import logging
+                logging.getLogger(__name__).warning("DXF/DWG native extraction failed (%s), falling back to AI vision", dwg_err)
+                # Fallback: send raw bytes to AI vision (GPT-4o handles many binary formats)
+                result = analyze_drawing(raw_bytes, filename)
         elif is_step(file.content_type, filename):
             cad_text = step_to_text(raw_bytes)
             result = analyze_step_text(cad_text)
@@ -83,12 +89,6 @@ async def extract_drawing(
     except RuntimeError as e:
         import logging
         logging.getLogger(__name__).exception("Extract RuntimeError: %s", e)
-        detail = str(e)
-        if "DWG" in detail or "converter" in detail.lower():
-            raise HTTPException(
-                status_code=400,
-                detail="DWG conversion failed. Please export as PDF or DXF from AutoCAD and re-upload.",
-            )
         raise HTTPException(status_code=500, detail="Failed to analyze drawing. Please try a clearer image.")
     except Exception as e:
         import logging
