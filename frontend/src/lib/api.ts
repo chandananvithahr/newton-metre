@@ -438,3 +438,18 @@ export async function estimateRFQ(lineItems: RFQLineItemResult[]): Promise<RFQEs
   if (!res.ok) throw new Error(await parseErrorResponse(res, "RFQ estimation failed. Please try again."));
   return res.json();
 }
+
+
+export interface LibraryDrawing {
+  id: string;
+  filename: string;
+  description: string;
+  created_at: string;
+}
+
+export async function listLibrary(): Promise<{ total: number; drawings: LibraryDrawing[] }> {
+  const headers = await getAuthHeaders();
+  const res = await safeFetch(`${API_URL}/api/similarity/library`, { headers });
+  if (!res.ok) throw new Error(await parseErrorResponse(res, "Failed to load library."));
+  return res.json();
+}

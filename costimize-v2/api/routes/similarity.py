@@ -175,3 +175,30 @@ async def search_similar(
     log_usage(user_id, "similarity_search", 0.005, {"matches_found": len(matches)})
 
     return SimilaritySearchResponse(matches=matches)
+
+
+@router.get("/similarity/library")
+async def list_library(
+    user_id: str = Depends(get_current_user_id),
+):
+    """List all drawings indexed in the user's company brain library."""
+    sb = get_supabase_admin()
+    result = sb.table("drawings").select(
+        "id, file_url, text_description, metadata, created_at"
+    ).eq("user_id", user_id).order("created_at", desc=False).limit(200).execute()
+
+    drawings = []
+    for row in (result.data or []):
+        filename = (
+            row.get("file_url")
+            or (row.get("metadata") or {}).get("filename")
+            or "drawing"
+        )
+        drawings.append({
+            "id": row["id"],
+            "filename": filename,
+            "description": (row.get("text_description") or "")[:200],
+            "created_at": row["created_at"],
+        })
+
+    return {"total": len(drawings), "drawings": drawings}
