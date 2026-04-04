@@ -84,7 +84,7 @@ export default function DashboardPage() {
         <div className="px-4 pt-5 pb-4 border-b border-black/5">
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="relative w-9 h-9 flex items-center justify-center shrink-0">
-              <div className="absolute inset-0 bg-[var(--color-brand-dark)] rounded-xl" />
+              <div className="absolute inset-0 logo-gradient rounded-xl" />
               <span className="relative text-white font-mono font-bold text-sm tracking-tighter">N·m</span>
             </div>
             <span className="text-[var(--color-brand-dark)] text-lg font-semibold tracking-tight" style={{ fontFamily: "var(--font-headline)", fontStyle: "italic" }}>Newton-Metre</span>
@@ -168,7 +168,7 @@ export default function DashboardPage() {
               onClick={() => router.push("/estimate/new")}
               className="group bg-white ghost-border rounded-xl p-8 text-left hover:ambient-shadow transition-all duration-200"
             >
-              <div className="w-10 h-10 bg-[var(--color-brand-dark)] rounded-lg flex items-center justify-center mb-5">
+              <div className="w-10 h-10 logo-gradient rounded-lg flex items-center justify-center mb-5">
                 <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                 </svg>
@@ -189,7 +189,7 @@ export default function DashboardPage() {
               onClick={() => router.push("/similar")}
               className="group bg-white ghost-border rounded-xl p-8 text-left hover:ambient-shadow transition-all duration-200"
             >
-              <div className="w-10 h-10 bg-[var(--color-brand-dark)] rounded-lg flex items-center justify-center mb-5">
+              <div className="w-10 h-10 logo-gradient rounded-lg flex items-center justify-center mb-5">
                 <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
                 </svg>
@@ -210,7 +210,7 @@ export default function DashboardPage() {
               onClick={() => router.push("/chat")}
               className="group bg-white ghost-border rounded-xl p-8 text-left hover:ambient-shadow transition-all duration-200"
             >
-              <div className="w-10 h-10 bg-[var(--color-brand-dark)] rounded-lg flex items-center justify-center mb-5">
+              <div className="w-10 h-10 logo-gradient rounded-lg flex items-center justify-center mb-5">
                 <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
                 </svg>

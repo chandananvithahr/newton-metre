@@ -163,7 +163,7 @@ export default function ChatPage() {
           </button>
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="relative w-8 h-8 flex items-center justify-center">
-              <div className="absolute inset-0 bg-[var(--color-brand-dark)] rounded-xl" />
+              <div className="absolute inset-0 logo-gradient rounded-xl" />
               <span className="relative text-white font-mono font-bold text-xs tracking-tighter">N·m</span>
             </div>
             <span className="text-[var(--color-brand-dark)] text-lg font-semibold tracking-tight" style={{ fontFamily: "var(--font-headline)", fontStyle: "italic" }}>
@@ -254,7 +254,7 @@ export default function ChatPage() {
             {messages.length === 0 ? (
               <div className="h-full flex items-center justify-center">
                 <div className="text-center max-w-md px-6">
-                  <div className="w-14 h-14 bg-[var(--color-brand-dark)] rounded-2xl flex items-center justify-center mx-auto mb-5">
+                  <div className="w-14 h-14 logo-gradient rounded-2xl flex items-center justify-center mx-auto mb-5">
                     <span className="text-white font-mono font-bold text-lg tracking-tighter">N·m</span>
                   </div>
                   <h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-2" style={{ fontFamily: "var(--font-headline)" }}>
@@ -289,7 +289,7 @@ export default function ChatPage() {
                     <div className={`max-w-[85%] ${msg.role === "user" ? "ml-auto" : ""}`}>
                       {msg.role === "assistant" && (
                         <div className="flex items-center gap-2 mb-1.5">
-                          <div className="w-5 h-5 bg-[var(--color-brand-dark)] rounded-md flex items-center justify-center">
+                          <div className="w-5 h-5 logo-gradient rounded-md flex items-center justify-center">
                             <span className="text-white text-[8px] font-mono font-bold">Nm</span>
                           </div>
                           <span className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-wider" style={{ fontFamily: "var(--font-label)" }}>
@@ -313,7 +313,7 @@ export default function ChatPage() {
                 {loading && (
                   <div className="mb-6">
                     <div className="flex items-center gap-2 mb-1.5">
-                      <div className="w-5 h-5 bg-[var(--color-brand-dark)] rounded-md flex items-center justify-center">
+                      <div className="w-5 h-5 logo-gradient rounded-md flex items-center justify-center">
                         <span className="text-white text-[8px] font-mono font-bold">Nm</span>
                       </div>
                       <span className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-wider" style={{ fontFamily: "var(--font-label)" }}>

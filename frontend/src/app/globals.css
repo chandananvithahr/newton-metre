@@ -134,10 +134,10 @@ select:focus {
 
 /* Base44-inspired warm gradients */
 .warm-gradient-hero {
-  background: linear-gradient(135deg, #B2EBF2 0%, #FFE0B2 50%, #FFCC80 100%);
+  background: linear-gradient(180deg, #e8fdf5 0%, #fef3e2 50%, #fde8c8 100%);
 }
 .warm-gradient-subtle {
-  background: linear-gradient(135deg, #D4F5ED 0%, #FFF0DB 50%, #FFE4BC 100%);
+  background: linear-gradient(180deg, #dff7ee 0%, #fef6e8 50%, #fdecd2 100%);
 }
 .warm-gradient-page {
   background: linear-gradient(180deg, #D4F5ED 0%, #FFF0DB 30%, #FFE4BC 100%);
@@ -148,6 +148,41 @@ select:focus {
 }
 .warm-gradient-accent {
   background: linear-gradient(135deg, #FFF7ED 0%, #FFE4E6 100%);
+}
+
+/* Section curve dividers */
+.curve-divider {
+  position: relative;
+}
+.curve-divider::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: inherit;
+  clip-path: ellipse(55% 100% at 50% 0%);
+  z-index: 1;
+}
+.curve-top {
+  position: relative;
+}
+.curve-top::before {
+  content: "";
+  position: absolute;
+  top: -40px;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: inherit;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  z-index: 1;
+}
+
+/* Logo gradient — green to orange */
+.logo-gradient {
+  background: linear-gradient(135deg, #059669 0%, #f97316 100%);
 }
 .dark-pill {
   background-color: #1a1a1a;

@@ -36,8 +36,8 @@ export function LandingNav() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 group">
           <div className="relative w-11 h-11 flex items-center justify-center">
-            <div className="absolute inset-0 bg-[var(--color-brand-dark)] rounded-xl rotate-3 opacity-10 group-hover:rotate-6 transition-transform" />
-            <div className="absolute inset-0 bg-[var(--color-brand-dark)] rounded-xl" />
+            <div className="absolute inset-0 logo-gradient rounded-xl rotate-3 opacity-10 group-hover:rotate-6 transition-transform" />
+            <div className="absolute inset-0 logo-gradient rounded-xl" />
             <span className="relative text-white font-mono font-bold text-base tracking-tighter">N·m</span>
           </div>
           <span className="text-[var(--color-brand-dark)] text-2xl font-bold tracking-tight" style={{ fontFamily: "var(--font-headline)", fontStyle: "italic" }}>Newton-Metre</span>
@@ -86,9 +86,10 @@ export function LandingNav() {
           {/* CTA */}
           <Link
             href="/estimate/new"
-            className="dark-pill px-5 py-2.5 text-xs font-bold uppercase tracking-widest"
+            className="px-5 py-2.5 text-xs font-bold uppercase tracking-widest rounded-full text-white transition-colors"
+            style={{ background: "linear-gradient(135deg, #059669, #10b981)" }}
           >
-            New Estimate
+            Start Building
           </Link>
         </div>
       </div>
