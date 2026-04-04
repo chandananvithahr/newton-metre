@@ -45,13 +45,13 @@
   --color-nm-outline:           #757684;
   --color-nm-outline-variant:   #c4c5d5;
 
-  /* Typography — Newsreader (headline) + Space Grotesk (body/UI) */
-  --font-headline: "Newsreader", serif;
+  /* Typography — Space Grotesk (headline + body/UI) */
+  --font-headline: "Space Grotesk", sans-serif;
   --font-body:     "Space Grotesk", sans-serif;
   --font-sans:     "Space Grotesk", sans-serif;
   --font-label:    "Space Grotesk", sans-serif;
   --font-mono:     "DM Mono", ui-monospace, SFMono-Regular, monospace;
-  --font-code:     "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-code:     "DM Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
 /* ── Easing curves (stronger than browser defaults) ── */
@@ -130,9 +130,7 @@ select:focus {
 .ghost-border { outline: 1px solid rgba(117, 118, 132, 0.15); }
 .ambient-shadow { box-shadow: 0px 20px 40px rgba(0, 40, 142, 0.06); }
 .gradient-cta { background: linear-gradient(135deg, #00288e 0%, #1e40af 100%); }
-.newsreader-italic { font-family: var(--font-headline); font-style: italic; }
-
-/* Base44-inspired warm gradients */
+/* Warm gradients — Base44-inspired */
 .warm-gradient-hero {
   background: linear-gradient(180deg, #e8fdf5 0%, #fef3e2 50%, #fde8c8 100%);
 }
@@ -145,39 +143,6 @@ select:focus {
 }
 .warm-gradient-footer {
   background: linear-gradient(135deg, #FFECD2 0%, #FFD8A8 40%, #F97316 100%);
-}
-.warm-gradient-accent {
-  background: linear-gradient(135deg, #FFF7ED 0%, #FFE4E6 100%);
-}
-
-/* Section curve dividers */
-.curve-divider {
-  position: relative;
-}
-.curve-divider::after {
-  content: "";
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 80px;
-  background: inherit;
-  clip-path: ellipse(55% 100% at 50% 0%);
-  z-index: 1;
-}
-.curve-top {
-  position: relative;
-}
-.curve-top::before {
-  content: "";
-  position: absolute;
-  top: -40px;
-  left: 0;
-  right: 0;
-  height: 80px;
-  background: inherit;
-  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
-  z-index: 1;
 }
 
 /* Logo — deep dark with subtle depth */
@@ -443,7 +408,7 @@ button:active:not(:disabled) {
 }
 
 @theme inline {
-  --font-heading:     "Newsreader", serif;
+  --font-heading:     "Space Grotesk", sans-serif;
   --font-sans:     "Space Grotesk", sans-serif;
   --color-sidebar-ring:     var(--sidebar-ring);
   --color-sidebar-border:     var(--sidebar-border);

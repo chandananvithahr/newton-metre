@@ -207,7 +207,7 @@ export default function DashboardPage() {
 
             {/* AI Procurement */}
             <button
-              onClick={() => router.push("/chat")}
+              onClick={() => router.push("/workflows")}
               className="group bg-white ghost-border rounded-xl p-8 text-left hover:ambient-shadow transition-all duration-200 relative overflow-hidden"
             >
               <div className="absolute top-3 right-3">

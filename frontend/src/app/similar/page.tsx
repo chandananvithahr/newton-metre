@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { embedDrawing, searchSimilar } from "@/lib/api";
 import { AppNav } from "@/components/app-nav";
 
@@ -11,6 +12,7 @@ interface Match {
 }
 
 export default function SimilarPartsPage() {
+  const router = useRouter();
   const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<"upload" | "results">("upload");
@@ -43,7 +45,7 @@ export default function SimilarPartsPage() {
   if (step === "upload") {
     return (
       <div className="min-h-screen warm-gradient-page">
-        <AppNav />
+        <AppNav active="/similar" />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-12">
           <h1 style={{ fontFamily: "var(--font-headline)" }} className="text-[32px] tracking-tight text-[var(--color-text-primary)] mb-2">Similar Parts</h1>
           <p className="text-[var(--color-text-muted)] mb-8 text-[14px]" style={{ fontFamily: "var(--font-body)" }}>Upload 2 or more drawings to find similar parts from your company&apos;s history.</p>
@@ -117,7 +119,7 @@ export default function SimilarPartsPage() {
   // Results view
   return (
     <div className="min-h-screen warm-gradient-page">
-      <AppNav>
+      <AppNav active="/similar">
         <button
           onClick={() => { setStep("upload"); setMatches([]); setFiles([]); }}
           className="text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] text-sm font-medium transition-colors py-2 px-3"
@@ -140,6 +142,7 @@ export default function SimilarPartsPage() {
             <p className="text-[var(--color-text-muted)] text-sm">Upload more drawings to build your comparison library.</p>
           </div>
         ) : (
+          <>
           <div className="bg-white rounded-xl border border-black/10 overflow-hidden">
             <table className="w-full">
               <thead>
@@ -173,6 +176,49 @@ export default function SimilarPartsPage() {
               </tbody>
             </table>
           </div>
+
+          {/* Flywheel actions */}
+          <div className="bg-white ghost-border rounded-xl p-5 mt-4">
+            <h2
+              className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-muted)] mb-3"
+              style={{ fontFamily: "var(--font-label)" }}
+            >
+              Next steps
+            </h2>
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={() => router.push("/estimate/new")}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-black/10 text-[13px] font-medium text-[var(--color-text-secondary)] hover:border-[var(--color-brand-dark)] hover:text-[var(--color-brand-dark)] transition-colors"
+                style={{ fontFamily: "var(--font-body)" }}
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                </svg>
+                Get should-cost
+              </button>
+              <button
+                onClick={() => router.push("/workflows/new?type=rfq")}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-black/10 text-[13px] font-medium text-[var(--color-text-secondary)] hover:border-[var(--color-brand-dark)] hover:text-[var(--color-brand-dark)] transition-colors"
+                style={{ fontFamily: "var(--font-body)" }}
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                </svg>
+                Generate RFQ
+              </button>
+              <button
+                onClick={() => router.push("/workflows/new?type=full_procurement")}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-full text-white text-[13px] font-medium transition-colors"
+                style={{ fontFamily: "var(--font-body)", background: "var(--color-brand-dark)" }}
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                </svg>
+                Full procurement
+              </button>
+            </div>
+          </div>
+          </>
         )}
       </div>
     </div>

@@ -25,7 +25,6 @@ export function LandingNav() {
   }
 
   const navLinks = [
-    ["How it works", "#how-it-works"],
     ["Capabilities", "#capabilities"],
     ["Pricing", "#pricing"],
   ] as const;
@@ -40,7 +39,7 @@ export function LandingNav() {
               <div className="absolute inset-0 bg-[var(--color-brand-dark)] rounded-xl shadow-sm" />
               <span className="relative text-white font-mono font-bold text-sm tracking-tighter">N·m</span>
             </div>
-            <span className="hidden sm:inline text-[var(--color-brand-dark)] text-xl font-bold tracking-tight" style={{ fontFamily: "var(--font-headline)", fontStyle: "italic" }}>Newton-Metre</span>
+            <span className="hidden sm:inline text-[var(--color-brand-dark)] text-xl font-bold tracking-tight">Newton-Metre</span>
           </Link>
 
           {/* Desktop nav links */}
@@ -50,7 +49,7 @@ export function LandingNav() {
                 key={label}
                 href={href}
                 className="text-sm text-[var(--color-neutral-gray)] hover:text-[var(--color-brand-dark)] transition-colors font-medium"
-                style={{ fontFamily: "var(--font-body)" }}
+
               >
                 {label}
               </a>
@@ -59,7 +58,7 @@ export function LandingNav() {
               <button
                 onClick={handleLogout}
                 className="text-sm text-[var(--color-neutral-gray)] hover:text-[var(--color-brand-dark)] transition-colors font-medium"
-                style={{ fontFamily: "var(--font-body)" }}
+
               >
                 Log out
               </button>
@@ -67,7 +66,7 @@ export function LandingNav() {
               <Link
                 href="/login"
                 className="text-sm text-[var(--color-neutral-gray)] hover:text-[var(--color-brand-dark)] transition-colors font-medium"
-                style={{ fontFamily: "var(--font-body)" }}
+
               >
                 Log in
               </Link>
@@ -89,10 +88,9 @@ export function LandingNav() {
             {/* CTA — bolder green */}
             <Link
               href="/estimate/new"
-              className="px-5 py-2 text-xs font-bold uppercase tracking-widest rounded-full text-white transition-all hover:shadow-md"
-              style={{ background: "#16a34a" }}
+              className="dark-pill px-5 py-2 text-xs font-bold uppercase tracking-widest"
             >
-              Start Building
+              Upload a Drawing
             </Link>
           </div>
         </div>
@@ -106,7 +104,7 @@ export function LandingNav() {
                 href={href}
                 onClick={() => setMenuOpen(false)}
                 className="text-sm text-[var(--color-neutral-gray)] hover:text-[var(--color-brand-dark)] transition-colors font-medium py-1"
-                style={{ fontFamily: "var(--font-body)" }}
+
               >
                 {label}
               </a>
@@ -115,7 +113,7 @@ export function LandingNav() {
               <button
                 onClick={() => { handleLogout(); setMenuOpen(false); }}
                 className="text-sm text-[var(--color-neutral-gray)] hover:text-[var(--color-brand-dark)] transition-colors font-medium py-1 text-left"
-                style={{ fontFamily: "var(--font-body)" }}
+
               >
                 Log out
               </button>
@@ -124,7 +122,7 @@ export function LandingNav() {
                 href="/login"
                 onClick={() => setMenuOpen(false)}
                 className="text-sm text-[var(--color-neutral-gray)] hover:text-[var(--color-brand-dark)] transition-colors font-medium py-1"
-                style={{ fontFamily: "var(--font-body)" }}
+
               >
                 Log in
               </Link>

@@ -58,7 +58,7 @@ export default function ViewEstimatePage() {
 
   return (
     <div className="min-h-screen warm-gradient-page">
-      <AppNav />
+      <AppNav active="/estimate/new" />
 
       <div className="max-w-3xl mx-auto px-4 sm:px-8 py-8">
         <div className="flex items-center justify-between mb-6">
@@ -173,6 +173,54 @@ export default function ViewEstimatePage() {
             </table>
           </div>
         )}
+
+        {/* Flywheel actions */}
+        <div className="bg-white ghost-border rounded-xl p-5 mb-6">
+          <h2
+            className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-muted)] mb-3"
+            style={{ fontFamily: "var(--font-label)" }}
+          >
+            Next steps
+          </h2>
+          <div className="flex flex-wrap gap-3">
+            <button
+              onClick={() => router.push("/similar")}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-black/10 text-[13px] font-medium text-[var(--color-text-secondary)] hover:border-[var(--color-brand-dark)] hover:text-[var(--color-brand-dark)] transition-colors"
+              style={{ fontFamily: "var(--font-body)" }}
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+              </svg>
+              Find similar parts
+            </button>
+            <button
+              onClick={() => {
+                const cost = Number(data.total_cost ?? 0);
+                const params = new URLSearchParams();
+                params.set("type", "rfq");
+                if (cost > 0) params.set("should_cost", String(cost));
+                router.push(`/workflows/new?${params}`);
+              }}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-black/10 text-[13px] font-medium text-[var(--color-text-secondary)] hover:border-[var(--color-brand-dark)] hover:text-[var(--color-brand-dark)] transition-colors"
+              style={{ fontFamily: "var(--font-body)" }}
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+              </svg>
+              Generate RFQ
+            </button>
+            <button
+              onClick={() => router.push(`/workflows/new?type=negotiate`)}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-black/10 text-[13px] font-medium text-[var(--color-text-secondary)] hover:border-[var(--color-brand-dark)] hover:text-[var(--color-brand-dark)] transition-colors"
+              style={{ fontFamily: "var(--font-body)" }}
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Start negotiation
+            </button>
+          </div>
+        </div>
 
         <button
           onClick={() => router.push("/dashboard")}
