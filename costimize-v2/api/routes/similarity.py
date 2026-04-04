@@ -84,13 +84,18 @@ async def embed_drawing(
     # Generate text description for BM25 hybrid search (non-blocking on failure)
     text_description = _describe_drawing(image_bytes)
 
+    # Parse key attributes from the text description for structured metadata
+    metadata = {"filename": file.filename}
+    if text_description:
+        metadata["description"] = text_description[:200]
+
     sb = get_supabase_admin()
     result = sb.table("drawings").insert({
         "user_id": user_id,
         "file_url": file.filename,
         "embedding": embedding.tolist(),
         "text_description": text_description,
-        "metadata": {"filename": file.filename},
+        "metadata": metadata,
     }).execute()
 
     drawing_id = result.data[0]["id"] if result.data else "unknown"
@@ -159,7 +164,10 @@ async def search_similar(
         SimilarityMatch(
             drawing_id=row["id"],
             score=row["similarity"],
-            metadata=row.get("metadata", {}),
+            metadata={
+                **row.get("metadata", {}),
+                "text_description": row.get("text_description", ""),
+            },
         )
         for row in (result.data or [])
     ]

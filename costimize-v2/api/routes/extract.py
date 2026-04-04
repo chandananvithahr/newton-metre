@@ -1,13 +1,16 @@
 """POST /api/extract -- upload drawing, AI extracts dimensions + processes."""
+import logging
 from pathlib import Path
 from typing import List
-from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
+from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, Request, UploadFile
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
-from api.deps import get_current_user_id
+from api.deps import get_current_user_id, get_supabase_admin
 from api.cost_tracker import check_budget, check_user_budget, log_usage
 from api.schemas import ExtractionResponse
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 limiter = Limiter(key_func=get_remote_address)
@@ -33,10 +36,45 @@ ALLOWED_EXTENSIONS = {
 }
 
 
+def _auto_embed_drawing(image_bytes: bytes, filename: str, user_id: str) -> None:
+    """Background task: embed the drawing into the similarity index.
+
+    Silently skips on any failure — the user shouldn't be blocked by this.
+    """
+    try:
+        from engines.similarity.preprocessor import preprocess_drawing
+        from engines.similarity.embedder import embed_image
+
+        embed_img, _thumbnail = preprocess_drawing(image_bytes, filename)
+        embedding = embed_image(embed_img)
+
+        # Generate text description for BM25 hybrid search
+        from api.routes.similarity import _describe_drawing
+        text_description = _describe_drawing(image_bytes)
+
+        metadata = {"filename": filename, "source": "auto_embed"}
+        if text_description:
+            metadata["description"] = text_description[:200]
+
+        sb = get_supabase_admin()
+        sb.table("drawings").insert({
+            "user_id": user_id,
+            "file_url": filename,
+            "embedding": embedding.tolist(),
+            "text_description": text_description,
+            "metadata": metadata,
+        }).execute()
+
+        logger.info("Auto-embedded drawing '%s' for user %s", filename, user_id)
+    except Exception as e:
+        logger.warning("Auto-embed failed for '%s': %s", filename, e)
+
+
 @router.post("/extract", response_model=ExtractionResponse)
 @limiter.limit("10/minute")
 async def extract_drawing(
     request: Request,
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     user_id: str = Depends(get_current_user_id),
 ) -> ExtractionResponse:
@@ -98,6 +136,9 @@ async def extract_drawing(
         )
 
     log_usage(user_id, "extract", 0.002, {"filename": file.filename})
+
+    # Auto-embed into similarity index (background — doesn't block response)
+    background_tasks.add_task(_auto_embed_drawing, raw_bytes, filename, user_id)
 
     material = result.get("material")
     overall_confidence = result.get("confidence", "low")
