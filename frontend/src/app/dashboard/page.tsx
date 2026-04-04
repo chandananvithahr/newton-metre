@@ -161,7 +161,7 @@ export default function DashboardPage() {
             Should-cost in 30 seconds. Your company&apos;s history, searchable. AI procurement on autopilot.
           </p>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
 
             {/* Should-Cost */}
             <button
@@ -226,6 +226,31 @@ export default function DashboardPage() {
               </p>
               <span className="text-[12px] text-[var(--color-brand-dark)] font-bold uppercase tracking-widest group-hover:underline" style={{ fontFamily: "var(--font-label)" }}>
                 Start workflow →
+              </span>
+            </button>
+
+            {/* MPN Search */}
+            <button
+              onClick={() => router.push("/mpn")}
+              className="group bg-white ghost-border rounded-xl p-8 text-left hover:ambient-shadow transition-all duration-200 relative overflow-hidden"
+            >
+              <div className="absolute top-3 right-3">
+                <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-full bg-emerald-100 text-emerald-700" style={{ fontFamily: "var(--font-label)" }}>New</span>
+              </div>
+              <div className="w-10 h-10 logo-gradient rounded-lg flex items-center justify-center mb-5">
+                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 013.75 9.375v-4.5zM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 01-1.125-1.125v-4.5zM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0113.5 9.375v-4.5z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 6.75h.75v.75h-.75v-.75zM6.75 16.5h.75v.75h-.75v-.75zM16.5 6.75h.75v.75h-.75v-.75zM13.5 13.5h.75v.75h-.75v-.75zM13.5 19.5h.75v.75h-.75v-.75zM19.5 13.5h.75v.75h-.75v-.75zM19.5 19.5h.75v.75h-.75v-.75zM16.5 16.5h.75v.75h-.75v-.75z" />
+                </svg>
+              </div>
+              <h2 className="text-[16px] font-bold text-[var(--color-text-primary)] mb-2 group-hover:text-[var(--color-brand-dark)]" style={{ fontFamily: "var(--font-body)" }}>
+                Part Number
+              </h2>
+              <p className="text-[14px] text-[var(--color-text-description)] leading-relaxed mb-5" style={{ fontFamily: "var(--font-body)" }}>
+                Look up any MPN. Market price, supplier options, negotiation room.
+              </p>
+              <span className="text-[12px] text-[var(--color-brand-dark)] font-bold uppercase tracking-widest group-hover:underline" style={{ fontFamily: "var(--font-label)" }}>
+                Search MPN →
               </span>
             </button>
 

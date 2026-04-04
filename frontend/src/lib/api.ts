@@ -416,6 +416,16 @@ export async function rejectWorkflow(
   return res.json();
 }
 
+// ── MPN Lookup API ────────────────────────────────────────────────────────────
+
+export async function lookupMPN(mpn: string, qty = 1) {
+  const headers = await getAuthHeaders();
+  const params = new URLSearchParams({ mpn, qty: String(qty) });
+  const res = await safeFetch(`${API_URL}/api/mpn/lookup?${params}`, { headers });
+  if (!res.ok) throw new Error(await parseErrorResponse(res, "MPN lookup failed. Check the part number and try again."));
+  return res.json();
+}
+
 export async function estimateRFQ(lineItems: RFQLineItemResult[]): Promise<RFQEstimateResponse> {
   const headers = await getAuthHeaders();
 

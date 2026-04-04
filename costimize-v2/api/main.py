@@ -9,7 +9,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
-from api.routes import agent, assembly, extract, estimate, material, similarity, estimates, usage, rfq, chat
+from api.routes import agent, assembly, extract, estimate, material, mpn, similarity, estimates, usage, rfq, chat
 
 logger = logging.getLogger("costimize")
 logging.basicConfig(level=logging.INFO)
@@ -52,6 +52,7 @@ async def global_exception_handler(request: Request, exc: Exception) -> JSONResp
 
 
 app.include_router(agent.router, prefix="/api")
+app.include_router(mpn.router, prefix="/api")
 app.include_router(extract.router, prefix="/api")
 app.include_router(assembly.router, prefix="/api")
 app.include_router(estimate.router, prefix="/api")
