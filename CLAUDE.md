@@ -39,11 +39,11 @@ See `docs/POSITIONING.md` for full multi-audience messaging and one-liners.
 
 ### `frontend/` — Next.js Web App (Vercel)
 
-7 pages: landing (aPriori/CADDi-inspired, multi-audience), login/signup, dashboard, new estimate, estimate detail, similarity search, RFQ extraction. Tailwind CSS v4 with "Tactical Elegance" design system (Newsreader + Space Grotesk fonts, deep blue #00288e, tonal surface layering #faf8ff). Landing page has dedicated should-cost section (4 audience cards) and dedicated similarity search section (CADDi-style knowledge-as-asset). See `DESIGN.md` for full spec. Vercel Analytics enabled.
+7 pages: landing, login/signup, dashboard (3-card: should-cost, similarity, chat), new estimate (single + assembly with ZIP upload), estimate detail, similarity search, full-page chat. **Split-screen layout:** all authenticated pages have a fixed 380px ChatPanel on the right (ChatGPT-style AI assistant, Gemini-powered). AppShell in root layout handles the split; landing and login get full width. Color scheme standardized to CSS design tokens. Tailwind CSS v4 with "Tactical Elegance" design system (Newsreader + Space Grotesk fonts, deep blue #00288e, tonal surface layering #faf8ff). Landing page has dedicated should-cost section (4 audience cards) and dedicated similarity search section (CADDi-style knowledge-as-asset). See `DESIGN.md` for full spec. Vercel Analytics enabled.
 
 ### `costimize-v2/` — Python Engines + FastAPI Backend (Railway)
 
-4 part types (mechanical, sheet metal, PCB, cable), physics-based engines, 164 passing tests. FastAPI API serves the frontend.
+4 part types (mechanical, sheet metal, PCB, cable), physics-based engines, 8 procurement agents, 347 passing tests. FastAPI API serves the frontend.
 
 ### Root files (`app.py`, `vision.py`, `cost_engine.py`) — Legacy v1
 
@@ -65,7 +65,8 @@ Original monolithic CNC turning-only estimator. Kept for reference.
 | **Similarity Search** | Gemini API + pgvector → DINOv2 + nomic-embed (self-hosted target) | Drawing visual similarity via 768-dim embeddings |
 | **Inference Server** | Cloud APIs (now) → vLLM on RunPod/on-prem (target) | OpenAI-compatible API, model-agnostic |
 | **Analytics** | Vercel Analytics + usage_log table | Page views + API usage tracking |
-| **Testing** | pytest | 164 tests across 12 test files |
+| **AI Procurement** | Raw Python agents (no frameworks) | 8 agents, state machine, 3-layer memory, checkpoint/resume |
+| **Testing** | pytest | 347 tests across 20 test files |
 | **Language** | Python 3.11+ (backend), TypeScript (frontend) | |
 
 ### Commands
@@ -86,7 +87,8 @@ pip install -r api/requirements.txt
 uvicorn api.main:app --reload                 # http://localhost:8000
 
 # Tests
-cd costimize-v2 && python -m pytest tests/ -v # Run all 164 tests
+cd costimize-v2 && python -m pytest tests/ -v            # Run all 347 tests
+cd costimize-v2 && python -m pytest tests/test_agent_*.py # Run 183 agent tests only
 ```
 
 ### Environment Variables
@@ -120,24 +122,49 @@ cd costimize-v2 && python -m pytest tests/ -v # Run all 164 tests
 ```
 frontend/                             # Next.js frontend (Vercel)
 ├── src/app/
-│   ├── layout.tsx                    # Root layout, Google Fonts, Vercel Analytics
-│   ├── globals.css                   # Tailwind v4 + design system tokens
+│   ├── layout.tsx                    # Root layout, Google Fonts, AppShell wrapper, Vercel Analytics
+│   ├── globals.css                   # Tailwind v4 + design system tokens (all colors as CSS custom properties)
 │   ├── page.tsx                      # Landing page (hero, problem, should-cost, similarity search, how-it-works, built-for-india, pricing)
 │   ├── login/page.tsx                # Signup/login with Supabase Auth
-│   ├── dashboard/page.tsx            # Stats, actions, recent estimates table
-│   ├── estimate/new/page.tsx         # Upload → extract → review → calculate → result
+│   ├── dashboard/page.tsx            # 3-card hub: should-cost, similarity search, chat + history sidebar
+│   ├── estimate/new/page.tsx         # Upload → extract → review → calculate → result (single + assembly with ZIP)
 │   ├── estimate/[id]/page.tsx        # Estimate detail view
+│   ├── chat/page.tsx                 # Full-page chat (also available as side panel on all pages)
 │   └── similar/page.tsx              # Multi-file similarity search
+├── src/components/
+│   ├── app-shell.tsx                 # Split-screen wrapper: page content (left) + ChatPanel (right 380px)
+│   ├── chat-widget.tsx               # ChatPanel component — ChatGPT-style AI chat (Gemini-powered)
+│   ├── app-nav.tsx                   # Top navigation bar for authenticated pages
+│   ├── landing-nav.tsx               # Navigation bar for landing page
+│   ├── Toast.tsx                     # Toast notification system
+│   └── landing/                      # Landing page section components
 ├── src/lib/
-│   ├── api.ts                        # API client with safeFetch error handling
+│   ├── api.ts                        # API client with safeFetch error handling + chat API
 │   └── supabase.ts                   # Supabase browser client
-├── src/middleware.ts                  # Auth middleware (protects /dashboard, /estimate, /similar)
+├── src/middleware.ts                  # Auth middleware (protects /dashboard, /estimate, /similar, /chat)
 └── .env.local                        # Supabase + API URL config
 
 costimize-v2/
 ├── app.py                        # Tab router + sidebar PO upload (~40 lines)
 ├── config.py                     # All rates, constants, API keys (single source of truth)
 ├── requirements.txt
+│
+├── agents/                       # Multi-agent procurement framework (Product 3)
+│   ├── __init__.py
+│   ├── types.py                  # WorkflowState, ExecutionMode, AgentResult, WorkflowContext (frozen)
+│   ├── base.py                   # BaseAgent Protocol (duck typing) + AgentRegistry
+│   ├── engine.py                 # AgentEngine: pipeline routing, parallel exec, approval gates
+│   ├── checkpoint.py             # Supabase persistence, row-level locking for resume
+│   ├── llm.py                    # LLM-agnostic client (Gemini/OpenAI/vLLM → one interface)
+│   ├── memory.py                 # 3-layer: WorkingMemory + EpisodicMemory + SemanticMemory
+│   ├── extraction_agent.py       # Wraps extractors/vision.py
+│   ├── cost_agent.py             # Wraps all 4 cost engines, auto part-type detection
+│   ├── similarity_agent.py       # Wraps similarity searcher, graceful degradation
+│   ├── rfq_agent.py              # RFQ email construction + forbidden content scanning
+│   ├── quote_comparison_agent.py # Quote normalization, anomaly detection, vendor ranking
+│   ├── negotiation_agent.py      # MESO counter-offers, 3 execution modes, memory-driven
+│   ├── proposal_agent.py         # Management-ready procurement proposals
+│   └── meeting_agent.py          # Pre-meeting briefs + post-meeting analysis
 │
 ├── ui/
 │   ├── components.py             # Shared widgets (cost table, historical comparison, confidence badges)
@@ -204,7 +231,15 @@ costimize-v2/
 │
 ├── papers/                       # Reference PDFs — LOCAL ONLY, stripped from git history
 │
-├── docs/research/                # 23 research docs (17,000+ lines total)
+├── supabase/migrations/          # Database migrations
+│   ├── 005_agent_workflows.sql   # agent_workflows + agent_checkpoints + agent_audit_log
+│   ├── 006_suppliers.sql         # suppliers + supplier_contacts
+│   ├── 007_negotiation_memory.sql # negotiation_episodes + supplier_intelligence
+│   ├── 008_rfq_templates.sql     # rfq_templates with default Indian mfg template
+│   ├── 009_vendor_quotes.sql     # vendor_quotes + quote_comparisons
+│   └── 010_procurement_proposals.sql # procurement_proposals
+│
+├── docs/research/                # 24 research docs (20,000+ lines total)
 │   ├── MASTER-RESEARCH-REPORT.md # Single source of truth — all research consolidated
 │   ├── comprehensive-market-strategy-research.md
 │   ├── PDF-PARSING-DEEP-DIVE.md
@@ -228,12 +263,13 @@ costimize-v2/
 │   ├── MACHINERYS-HANDBOOK-EXTRACTION.md  # Cutting speeds, power constants, econometrics, tolerances
 │   ├── KENNAMETAL-DATA-EXTRACTION.md      # Unit power constants, carbide grades, grooving speeds, cross-validation
 │   ├── INDIAN-MANUFACTURING-DATA-EXTRACTION.md  # BIS steel grades, govt machine hour rates, Totem cutting data
-│   └── SIMILARITY-SEARCH-DEEP-DIVE.md    # Full tech landscape: Google ScaNN, embeddings, ColPali, RAG, GraphRAG, infra costs, ROI, company brain strategy
+│   ├── SIMILARITY-SEARCH-DEEP-DIVE.md    # Full tech landscape: Google ScaNN, embeddings, ColPali, RAG, GraphRAG, infra costs, ROI, company brain strategy
+│   └── MULTI-AGENT-ARCHITECTURE-RESEARCH.md  # 22 sources: agent frameworks, Pactum AI patterns, state machines, negotiation memory
 │
 ├── demos/
 │   └── dinov2_demo.py            # Interactive DINOv2 demo (requires torch, for learning)
 │
-└── tests/                        # 164 tests across 12 files
+└── tests/                        # 347 tests across 20 files
     ├── test_config.py            # 2 tests
     ├── test_mechanical_engine.py  # 19 tests (physics-based MRR, Sandvik, Taylor)
     ├── test_sheet_metal_engine.py # 28 tests (laser cutting, bending, material, integration)
@@ -246,7 +282,15 @@ costimize-v2/
     ├── test_material_scraper.py  # 3 tests
     ├── test_history.py           # 5 tests
     ├── test_validation.py        # 29 tests (comparator, arbitrator, interactive, orchestrator)
-    └── test_similarity.py        # 32 tests (preprocessor, ranker, indexer, searcher)
+    ├── test_similarity.py        # 32 tests (preprocessor, ranker, indexer, searcher)
+    ├── test_agent_base.py        # 31 tests (types, enums, registry, protocol)
+    ├── test_agent_engine.py      # 18 tests (routing, pipelines, parallel, approval gates, resume)
+    ├── test_agent_wrappers.py    # 30 tests (extraction, cost, similarity agent wrappers)
+    ├── test_agent_rfq.py         # 17 tests (RFQ validation, forbidden content, email gen)
+    ├── test_agent_quote_comparison.py  # 19 tests (normalization, anomalies, ranking)
+    ├── test_agent_memory.py      # 31 tests (WorkingMemory, EpisodicMemory, SemanticMemory)
+    ├── test_agent_negotiation.py # 14 tests (counter-offers, analysis, target pricing)
+    └── test_agent_proposal_meeting.py  # 23 tests (proposals, briefs, meeting analysis)
 ```
 
 ### Data Flow
@@ -258,6 +302,71 @@ costimize-v2/
 5. **Similarity:** Upload 2+ drawings → embed (Gemini Embedding 2 / DINOv2 / image hash) → hybrid search (vector + BM25) → re-rank (FlashRank) → multi-signal rank (visual+material+dimension+process+tolerance+finish) → show matches
 6. **All tabs:** Historical PO records loaded from sidebar → matched against current estimate → comparison displayed
 7. **Training data:** Every validated mechanical estimate auto-saved to data/validation/ for future ML
+8. **Agent workflows:** API triggers pipeline → agents execute sequentially/parallel → checkpoint at approval gates → human approves → resume → complete
+
+### Multi-Agent Procurement Architecture (agents/)
+
+**Product 3: AI Procurement Worker.** Raw Python, no frameworks. Extends existing `orchestrator.py` pattern.
+
+#### Agent Framework
+- **BaseAgent Protocol** — duck typing: any class with `name`, `validate_inputs()`, `execute()` qualifies
+- **AgentRegistry** — register/get agents by name, enforces uniqueness
+- **AgentEngine** — deterministic pipeline routing via `PIPELINES` dict (not LLM-decided)
+- **PipelineStep** — `parallel_with` for concurrent agents, `approval_required` for HITL gates
+- **ThreadPoolExecutor** for parallel execution (extends validation/orchestrator.py pattern)
+
+#### State Machine
+`CREATED → PLANNING → AWAITING_APPROVAL → EXECUTING → COMPLETED / FAILED / REJECTED`
+
+#### Execution Modes (ABC Classification)
+- **AUTO** (Class C, < ₹5K): agents run end-to-end, human approves final output
+- **HITL** (Class B, ₹5K-50K): pauses at `approval_required` steps, human reviews and resumes
+- **MANUAL** (Class A, > ₹50K): generates analysis + talking points only, human leads
+
+#### Pipeline Definitions
+```python
+PIPELINES = {
+    "estimate":          extraction → cost + similarity (parallel)
+    "rfq":               extraction → cost + similarity → rfq [approval]
+    "compare_quotes":    quote_comparison
+    "negotiate":         quote_comparison → negotiation [approval]
+    "full_procurement":  extraction → cost + similarity → rfq [approval]
+    "proposal":          quote_comparison → proposal
+    "meeting_brief":     meeting
+}
+```
+
+#### 3-Layer Negotiation Memory (the compounding moat)
+- **WorkingMemory** — frozen dataclass, in-process: target_price, current_offer, concession_budget, rounds
+- **EpisodicMemory** — Supabase table `negotiation_episodes`: what happened in each negotiation
+- **SemanticMemory** — Supabase table `supplier_intelligence`: patterns extracted across episodes (typical_discount, negotiation_rounds). Evidence count tracks reliability. Compounds with every deal.
+
+#### Checkpoint/Resume
+- Every state transition persisted to Supabase (`agent_workflows` + `agent_checkpoints`)
+- Row-level locking for concurrent safety on approval
+- Audit trail in `agent_audit_log` (never breaks main flow)
+- Resume: load checkpoint → apply modifications → continue pipeline from where it paused
+
+#### LLM Client (`agents/llm.py`)
+- Centralized `call_llm()` normalizes Gemini/OpenAI/vLLM to one interface
+- Auto-selects provider from env: `GEMINI_API_KEY` → Gemini, `OPENAI_API_KEY` → OpenAI
+- `OPENAI_BASE_URL` → vLLM (self-hosted). Swap model via config, not code rewrite
+- `parse_json_response()` strips markdown fences and trailing commas
+
+#### API Endpoints (`/api/agent/`)
+- `POST /agent/workflows` — create and run workflow
+- `GET /agent/workflows/{id}` — status and outputs
+- `POST /agent/workflows/{id}/approve` — approve checkpoint, resume
+- `POST /agent/workflows/{id}/reject` — reject checkpoint
+- `GET /agent/workflows` — list user's workflows
+
+#### Database (6 migrations)
+- `005_agent_workflows.sql` — workflows + checkpoints + audit_log (RLS: service_role only)
+- `006_suppliers.sql` — suppliers + contacts (company-scoped)
+- `007_negotiation_memory.sql` — episodes + supplier_intelligence
+- `008_rfq_templates.sql` — email templates (default Indian manufacturing template seeded)
+- `009_vendor_quotes.sql` — vendor_quotes + quote_comparisons
+- `010_procurement_proposals.sql` — procurement proposals with approval tracking
 
 ### Cost Engine Architecture
 
@@ -393,6 +502,20 @@ In-app conversational AI agent + progressive migration from cloud APIs to own fi
 - Inspired by [github.com/karpathy/autoresearch](https://github.com/karpathy/autoresearch) — AI agent experiments autonomously, ~100 experiments overnight
 
 See `AI-AGENT-ROADMAP.md` for the full 11-section strategy document.
+
+### Multi-Agent Architecture (April 2026)
+
+22-source research covering agent frameworks, Pactum AI patterns, state machines, negotiation memory. Key decisions:
+
+- **Raw Python over frameworks** — no CrewAI/AutoGen/LangGraph. 72% of enterprise AI uses multi-agent, but framework lock-in is real
+- **Pactum AI as reference** — hybrid rule-based + LLM architecture (physics engines calculate, LLMs communicate). Walmart case: 2,000+ suppliers, 3% savings, 35 days payment term extension
+- **Deterministic routing** — `PIPELINES` dict maps workflow types to agent sequences. LLM never decides routing
+- **MESO strategy** — Multiple Equivalent Simultaneous Offers from Pactum research for negotiation
+- **Forbidden content scanning** — all supplier-facing emails checked for should-cost/target price/budget leakage
+- **8 agents built** — extraction, cost, similarity (wrap existing code) + rfq, quote_comparison, negotiation, proposal, meeting (new capabilities)
+- **183 tests** across 8 test files, all passing
+
+See `MULTI-AGENT-ARCHITECTURE-RESEARCH.md` for the full research report.
 
 ---
 
