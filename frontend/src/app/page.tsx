@@ -61,7 +61,7 @@ function Hero() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
               </svg>
             </div>
-            <div className="text-[17px] font-bold text-[#1a1a1a] mb-1.5">Should-Cost</div>
+            <div className="text-[17px] font-bold text-[#1a1a1a] mb-1.5">Cost Estimator</div>
             <p className="text-[13px] font-medium text-[#525252] mb-5">Instant cost breakdown from any drawing</p>
             <ul className="space-y-3 mb-6 flex-1">
               {[
@@ -93,14 +93,14 @@ function Hero() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
               </svg>
             </div>
-            <div className="text-[17px] font-bold text-[#1a1a1a] mb-1.5">Similarity Search</div>
-            <p className="text-[13px] font-medium text-[#525252] mb-5">Your company&apos;s brain. A genie for insights.</p>
+            <div className="text-[17px] font-bold text-[#1a1a1a] mb-1.5">Company Brain</div>
+            <p className="text-[13px] font-medium text-[#525252] mb-5">Every department gets an instant analyst</p>
             <ul className="space-y-3 mb-6 flex-1">
               {[
-                "Dump all your company data in",
-                "Get detailed insights instantly",
-                "An analyst for every manufacturer",
-                "Answers that will surprise you",
+                "Design: find the part before you redesign it",
+                "Procurement: see what you paid, who, when",
+                "Quality: surface all past failures instantly",
+                "Sales: quote while the customer is on the phone",
               ].map((point) => (
                 <li key={point} className="flex items-start gap-2.5 text-[14px] text-[#525252]">
                   <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#1a1a1a]/25 shrink-0" />
@@ -116,25 +116,23 @@ function Hero() {
 
         {/* AI Procurement */}
         <HeroCard delay={0.6}>
-          <div
+          <Link
+            href="/mpn"
             className="group flex flex-col h-full bg-white/80 backdrop-blur-sm border border-black/6 rounded-2xl p-8 sm:p-10 relative overflow-hidden hover:bg-white hover:shadow-xl hover:shadow-black/5 hover:border-black/10 transition-all duration-300"
           >
-            <div className="absolute top-4 right-4">
-              <span className="text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-orange-50 text-orange-600 border border-orange-200/60">Coming Soon</span>
-            </div>
             <div className="w-12 h-12 logo-gradient rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
               <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
               </svg>
             </div>
-            <div className="text-[17px] font-bold text-[#1a1a1a] mb-1.5">AI Procurement</div>
-            <p className="text-[13px] font-medium text-[#525252] mb-5">AI does the groundwork. You make the call.</p>
+            <div className="text-[17px] font-bold text-[#1a1a1a] mb-1.5">Supplier Intelligence</div>
+            <p className="text-[13px] font-medium text-[#525252] mb-5">Look up any part number. Know the market price before you negotiate.</p>
             <ul className="space-y-3 mb-6 flex-1">
               {[
-                "Reads your entire PO history",
-                "Builds supplier comparison matrix",
-                "Surfaces negotiation patterns",
-                "Save 15–20% on every purchase",
+                "MPN lookup — connectors, bearings, ICs, fasteners",
+                "Market price range + negotiation headroom",
+                "Supplier options with live availability",
+                "One click to RFQ or AI negotiation",
               ].map((point) => (
                 <li key={point} className="flex items-start gap-2.5 text-[14px] text-[#525252]">
                   <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#1a1a1a]/25 shrink-0" />
@@ -142,10 +140,10 @@ function Hero() {
                 </li>
               ))}
             </ul>
-            <Link href="/login?waitlist=enterprise" className="text-[11px] text-[#1a1a1a] font-bold uppercase tracking-widest group-hover:underline inline-flex items-center gap-1.5 group-hover:gap-2.5 transition-all">
-              Join waitlist <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
+            <span className="text-[11px] text-[#1a1a1a] font-bold uppercase tracking-widest group-hover:underline inline-flex items-center gap-1.5 group-hover:gap-2.5 transition-all">
+              Search a part number <ArrowRight className="w-3.5 h-3.5" />
+            </span>
+          </Link>
         </HeroCard>
       </div>
     </section>
@@ -361,7 +359,7 @@ function ShouldCost() {
 /* ── Similarity Search ────────────────────────────────── */
 function SimilaritySearch() {
   return (
-    <section className="py-28 bg-[#09090B] text-white overflow-hidden">
+    <section className="py-28 bg-white overflow-hidden border-t border-black/5">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-8">
         <motion.div
           className="text-center max-w-3xl mx-auto mb-20"
@@ -370,15 +368,15 @@ function SimilaritySearch() {
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.6 }}
         >
-          <div className="text-white/30 text-[11px] font-bold uppercase tracking-widest mb-6 font-mono">
+          <div className="text-[#A3A3A3] text-[11px] font-bold uppercase tracking-widest mb-6 font-mono">
             02 / 03 · Company Knowledge Engine
           </div>
-          <h2 className="text-4xl sm:text-5xl font-bold mb-8 tracking-tight leading-tight">
+          <h2 className="text-4xl sm:text-5xl font-bold mb-8 tracking-tight leading-tight text-[#1a1a1a]">
             Your company already knows.
             <br />
-            <span className="text-white/40">It just can&apos;t remember.</span>
+            <span className="text-[#A3A3A3]">It just can&apos;t remember.</span>
           </h2>
-          <p className="text-lg text-white/50 leading-relaxed">
+          <p className="text-lg text-[#525252] leading-relaxed">
             10,000+ drawings in shared drives. Cost data in spreadsheets. 20
             years of tribal knowledge in your senior engineer&apos;s head. When
             they retire, it walks out the door. Newton-Metre turns scattered
@@ -391,60 +389,53 @@ function SimilaritySearch() {
             {[
               {
                 dept: "Design Engineering",
-                title:
-                  "She spent 3 days designing a bracket. It already existed.",
+                title: "She spent 3 days designing a bracket. It already existed.",
                 desc: "70–80% of new designs are variants of existing parts. Find the match in seconds, tweak 10%, ship in hours. Each avoided new part saves $15,000.",
               },
               {
                 dept: "Procurement",
-                title:
-                  "You paid ₹32,000 last year. They\u2019re quoting ₹48,000.",
+                title: "You paid ₹32,000 last year. They're quoting ₹48,000.",
                 desc: "Every past PO, negotiation outcome, and discount pattern — searchable. Know what you paid, when, and from whom.",
               },
               {
                 dept: "Quality",
-                title:
-                  "25% of your quality issues are repeat failures. Preventable.",
+                title: "25% of your quality issues are repeat failures. Preventable.",
                 desc: "When a defect appears, instantly find every past NCR for similar parts. Inspection reports, FAI docs, failure histories — indexed forever.",
               },
               {
                 dept: "Sales",
-                title:
-                  "Customer called. You quoted in 10 minutes. Competitor took 3 days.",
+                title: "Customer called. You quoted in 10 minutes. Competitor took 3 days.",
                 desc: "Upload a sketch, find 5 similar parts from history, give a ballpark price — while the customer is still on the phone.",
               },
               {
                 dept: "Import / Export",
-                title:
-                  "11,000 HS codes. You classified it wrong. Again.",
+                title: "11,000 HS codes. You classified it wrong. Again.",
                 desc: "Find the 5 most similar past imports, surface their HS codes and FTA routes. Indian manufacturers leave 70% of FTA benefits on the table.",
               },
               {
                 dept: "Finance",
-                title:
-                  "\u20B93.2 crore on turned parts last year. You had no idea.",
+                title: "₹3.2 crore on turned parts last year. You had no idea.",
                 desc: "Spend analysis by part family, material, supplier. Budget vs. actual on every category. Visibility into where the money actually goes.",
               },
               {
                 dept: "Supply Planning",
-                title:
-                  "AI predicted demand 3 months out. You ordered before the rush.",
+                title: "AI predicted demand 3 months out. You ordered before the rush.",
                 desc: "Your PO history feeds a forecasting engine that predicts demand by part family, spots seasonal patterns, and calculates reorder points.",
               },
             ].map((item, i) => (
               <motion.div
                 key={i}
-                className="relative pl-8 border-l border-white/10 hover:border-l-orange-500/50 transition-colors"
+                className="relative pl-8 border-l-2 border-black/8 hover:border-orange-500/60 transition-colors"
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: "-40px" }}
                 transition={{ duration: 0.4, delay: i * 0.08 }}
               >
-                <div className="text-[11px] font-bold text-white/30 uppercase tracking-widest mb-2">
+                <div className="text-[11px] font-bold text-orange-500 uppercase tracking-widest mb-2">
                   {item.dept}
                 </div>
-                <div className="text-xl font-bold mb-3">{item.title}</div>
-                <p className="text-white/50 text-[15px] leading-relaxed">
+                <div className="text-xl font-bold mb-3 text-[#1a1a1a]">{item.title}</div>
+                <p className="text-[#525252] text-[15px] leading-relaxed">
                   {item.desc}
                 </p>
               </motion.div>
@@ -457,65 +448,48 @@ function SimilaritySearch() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-white/10">
+            <div className="bg-[#f9fafb] rounded-2xl p-8 border border-black/6">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
-                  <Search className="w-4 h-4 text-white/60" />
+                <div className="w-8 h-8 rounded-lg bg-[#1a1a1a]/8 flex items-center justify-center">
+                  <Search className="w-4 h-4 text-[#525252]" />
                 </div>
-                <span className="text-[11px] font-bold uppercase tracking-widest text-white/30">
+                <span className="text-[11px] font-bold uppercase tracking-widest text-[#A3A3A3]">
                   Search Results
                 </span>
               </div>
 
               <div className="space-y-2">
                 {[
-                  {
-                    name: "Bracket_Assy_Rev3.pdf",
-                    type: "Manufacturing Drawing",
-                    match: "94%",
-                  },
-                  {
-                    name: "Inspection_Report_Q3.pdf",
-                    type: "QA Certificate",
-                    match: "89%",
-                  },
-                  {
-                    name: "PO_Supplier_Tata_2025.pdf",
-                    type: "Purchase Order",
-                    match: "85%",
-                  },
-                  {
-                    name: "CNC_Setup_Sheet_M12.pdf",
-                    type: "Process Record",
-                    match: "82%",
-                  },
+                  { name: "Bracket_Assy_Rev3.pdf", type: "Manufacturing Drawing", match: "94%" },
+                  { name: "Inspection_Report_Q3.pdf", type: "QA Certificate", match: "89%" },
+                  { name: "PO_Supplier_Tata_2025.pdf", type: "Purchase Order", match: "85%" },
+                  { name: "CNC_Setup_Sheet_M12.pdf", type: "Process Record", match: "82%" },
                 ].map((item, i) => (
                   <div
                     key={i}
-                    className="p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all cursor-pointer flex items-center justify-between"
+                    className="p-4 rounded-xl bg-white border border-black/5 hover:border-black/10 hover:shadow-sm transition-all cursor-pointer flex items-center justify-between"
                   >
                     <div>
-                      <div className="text-sm font-medium mb-0.5 font-mono">
+                      <div className="text-sm font-medium mb-0.5 font-mono text-[#1a1a1a]">
                         {item.name}
                       </div>
-                      <div className="text-[10px] text-white/30 uppercase tracking-widest">
+                      <div className="text-[10px] text-[#A3A3A3] uppercase tracking-widest">
                         {item.type}
                       </div>
                     </div>
-                    <span className="text-xs font-bold text-emerald-400 font-mono">
+                    <span className="text-xs font-bold text-orange-500 font-mono">
                       {item.match}
                     </span>
                   </div>
                 ))}
               </div>
 
-              <div className="mt-6 pt-6 border-t border-white/10">
+              <div className="mt-6 pt-6 border-t border-black/5">
                 <Link
                   href="/similar"
-                  className="w-full py-4 rounded-full bg-white text-[#09090B] text-xs font-bold uppercase tracking-widest hover:bg-white/90 transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-4 rounded-full bg-[#1a1a1a] text-white text-xs font-bold uppercase tracking-widest hover:bg-[#333] transition-colors flex items-center justify-center gap-2"
                 >
-                  Search Your Company History{" "}
-                  <ArrowRight className="w-4 h-4" />
+                  Search Your Company History <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
             </div>
@@ -529,7 +503,7 @@ function SimilaritySearch() {
 /* ── AI Worker Trailer ────────────────────────────────── */
 function AIWorkerTrailer() {
   return (
-    <section className="py-32 px-4 sm:px-8 bg-[#09090B] border-t border-white/5">
+    <section className="py-32 px-4 sm:px-8 warm-gradient-subtle border-t border-black/5">
       <div className="max-w-[900px] mx-auto">
         <motion.div
           className="text-center mb-16"
@@ -538,15 +512,15 @@ function AIWorkerTrailer() {
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.6 }}
         >
-          <div className="text-[11px] tracking-widest text-white/50 uppercase font-bold mb-8 font-mono">
-            03 / 03 · Coming Soon · Enterprise
+          <div className="text-[11px] tracking-widest text-[#A3A3A3] uppercase font-bold mb-4 font-mono">
+            03 / 03 · AI Procurement Worker
           </div>
 
-          <h2 className="text-4xl sm:text-5xl font-bold text-white tracking-tight leading-tight mb-6">
+          <h2 className="text-4xl sm:text-5xl font-bold text-[#1a1a1a] tracking-tight leading-tight mb-6">
             Better decisions. Faster.
           </h2>
 
-          <p className="text-lg text-white/70 leading-relaxed max-w-[640px] mx-auto">
+          <p className="text-lg text-[#525252] leading-relaxed max-w-[640px] mx-auto">
             Your company&apos;s PO history, vendor master, negotiation
             transcripts, and approval templates &mdash; turned into live
             intelligence. AI reads your data. You make the call.
@@ -554,16 +528,16 @@ function AIWorkerTrailer() {
         </motion.div>
 
         {/* Two columns: off-the-shelf + negotiation intelligence */}
-        <div className="grid md:grid-cols-2 gap-8 mb-16">
+        <div className="grid md:grid-cols-2 gap-8 mb-12">
           {/* Off-the-shelf procurement */}
           <motion.div
-            className="bg-white/5 rounded-2xl p-8 border border-white/5 hover:bg-white/8 transition-colors duration-300"
+            className="bg-white rounded-2xl p-8 border border-black/6 hover:shadow-lg hover:shadow-black/5 hover:-translate-y-1 transition-all duration-300"
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.5 }}
           >
-            <div className="text-[11px] font-bold text-white/60 uppercase tracking-widest mb-4 font-mono">
+            <div className="text-[11px] font-bold text-orange-500 uppercase tracking-widest mb-5 font-mono">
               70% of your spend · Off-the-shelf items
             </div>
             <div className="space-y-4">
@@ -573,10 +547,7 @@ function AIWorkerTrailer() {
                 "Builds a supplier matrix: qty tiers, volume history, discount patterns",
                 "Sends alternates to design for verification — accept/reject saved forever",
               ].map((line, i) => (
-                <div
-                  key={i}
-                  className="border-l-2 border-white/20 pl-5 py-1 text-white/70 text-[15px] leading-relaxed"
-                >
+                <div key={i} className="border-l-2 border-black/10 pl-5 py-0.5 text-[#525252] text-[14px] leading-relaxed">
                   {line}
                 </div>
               ))}
@@ -585,13 +556,13 @@ function AIWorkerTrailer() {
 
           {/* Negotiation intelligence */}
           <motion.div
-            className="bg-white/5 rounded-2xl p-8 border border-white/5 hover:bg-white/8 transition-colors duration-300"
+            className="bg-white rounded-2xl p-8 border border-black/6 hover:shadow-lg hover:shadow-black/5 hover:-translate-y-1 transition-all duration-300"
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.5, delay: 0.15 }}
           >
-            <div className="text-[11px] font-bold text-white/60 uppercase tracking-widest mb-4 font-mono">
+            <div className="text-[11px] font-bold text-orange-500 uppercase tracking-widest mb-5 font-mono">
               Live negotiation intelligence
             </div>
             <div className="space-y-4">
@@ -601,10 +572,7 @@ function AIWorkerTrailer() {
                 "Surfaces what arguments worked before and where they cave",
                 "Every outcome saved — next negotiation is sharper than the last",
               ].map((line, i) => (
-                <div
-                  key={i}
-                  className="border-l-2 border-white/20 pl-5 py-1 text-white/70 text-[15px] leading-relaxed"
-                >
+                <div key={i} className="border-l-2 border-black/10 pl-5 py-0.5 text-[#525252] text-[14px] leading-relaxed">
                   {line}
                 </div>
               ))}
@@ -614,18 +582,26 @@ function AIWorkerTrailer() {
 
         {/* Bottom: compounding moat */}
         <div className="text-center">
-          <p className="text-white/60 text-sm mb-8 max-w-lg mx-auto">
+          <p className="text-[#525252] text-[15px] leading-relaxed mb-8 max-w-lg mx-auto">
             Every interaction makes the system smarter. Alternate approvals,
             negotiation outcomes, vendor performance, price trends &mdash; all
             searchable, all compounding. Your company&apos;s institutional
             memory grows with every deal, every search, every decision.
           </p>
-          <Link
-            href="/login?waitlist=enterprise"
-            className="inline-flex items-center gap-2 border border-white/20 text-white text-xs font-bold uppercase tracking-widest rounded-full px-8 py-4 hover:border-white/40 transition-colors"
-          >
-            Join the waitlist <ArrowRight className="w-4 h-4" />
-          </Link>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <Link
+              href="/mpn"
+              className="inline-flex items-center gap-2 bg-[#1a1a1a] text-white text-xs font-bold uppercase tracking-widest rounded-full px-8 py-4 hover:bg-[#333] transition-colors"
+            >
+              Try MPN Search <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
+              href="/workflows"
+              className="inline-flex items-center gap-2 border border-black/10 text-[#1a1a1a] text-xs font-bold uppercase tracking-widest rounded-full px-8 py-4 hover:bg-[#f9fafb] transition-colors"
+            >
+              Start a workflow <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
       </div>
     </section>
@@ -660,6 +636,7 @@ function Pricing() {
                 "10 estimates / month",
                 "Should-cost breakdown",
                 "Similarity search",
+                "MPN part number lookup",
                 "PDF, DXF & image uploads",
               ].map((f) => (
                 <li
