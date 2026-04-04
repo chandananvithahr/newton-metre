@@ -290,3 +290,244 @@ class SemanticMemory:
             else:
                 lines.append(f"- {p.pattern_type}: {p.pattern_data} ({reliability})")
         return "\n".join(lines)
+
+
+# --- Graph Queries (cross-supplier relational intelligence) ---
+
+class SupplierGraphQuery:
+    """Relational queries across suppliers, episodes, and intelligence patterns.
+
+    Answers questions like:
+    - "Which suppliers give best prices for SS304 turned parts?"
+    - "Which vendors improved terms after round 2?"
+    - "What's our average cost for turned aluminum parts?"
+    - "Who has the highest discount rate on machined parts?"
+    """
+
+    def best_suppliers_for(
+        self,
+        company_id: str,
+        part_family: str | None = None,
+        max_price: float | None = None,
+        limit: int = 5,
+    ) -> list[dict]:
+        """Return suppliers ranked by best final price for a given part family.
+
+        Returns list of dicts: {supplier_id, supplier_name, avg_final_price,
+                                avg_discount_pct, episode_count, avg_rounds}
+        """
+        try:
+            from api.deps import get_supabase_admin
+            db = get_supabase_admin()
+
+            query = (
+                db.table("negotiation_episodes")
+                .select("supplier_id, final_price, initial_quote, rounds, part_family, suppliers(name)")
+                .eq("company_id", company_id)
+                .eq("outcome", "accepted")
+                .not_.is_("final_price", "null")
+            )
+            if part_family:
+                query = query.ilike("part_family", f"%{part_family}%")
+            if max_price:
+                query = query.lte("final_price", max_price)
+
+            result = query.limit(200).execute()
+            rows = result.data or []
+
+            # Aggregate by supplier
+            agg: dict[str, dict] = {}
+            for row in rows:
+                sid = row["supplier_id"]
+                if not sid:
+                    continue
+                if sid not in agg:
+                    agg[sid] = {
+                        "supplier_id": sid,
+                        "supplier_name": row.get("suppliers", {}).get("name", sid) if row.get("suppliers") else sid,
+                        "prices": [],
+                        "discounts": [],
+                        "rounds": [],
+                    }
+                agg[sid]["prices"].append(float(row["final_price"] or 0))
+                if row.get("initial_quote") and row["initial_quote"] > 0:
+                    disc = (float(row["initial_quote"]) - float(row["final_price"] or 0)) / float(row["initial_quote"]) * 100
+                    agg[sid]["discounts"].append(disc)
+                agg[sid]["rounds"].append(row.get("rounds", 0))
+
+            results = []
+            for sid, data in agg.items():
+                prices = data["prices"]
+                results.append({
+                    "supplier_id": sid,
+                    "supplier_name": data["supplier_name"],
+                    "avg_final_price": round(sum(prices) / len(prices), 2),
+                    "avg_discount_pct": round(sum(data["discounts"]) / len(data["discounts"]), 1) if data["discounts"] else 0.0,
+                    "episode_count": len(prices),
+                    "avg_rounds": round(sum(data["rounds"]) / len(data["rounds"]), 1),
+                })
+
+            # Sort by avg final price ascending (cheapest first)
+            results.sort(key=lambda x: x["avg_final_price"])
+            return results[:limit]
+
+        except Exception as exc:
+            logger.warning("Graph query failed: %s", exc)
+            return []
+
+    def suppliers_who_improved(
+        self,
+        company_id: str,
+        min_improvement_rounds: int = 2,
+        limit: int = 5,
+    ) -> list[dict]:
+        """Return suppliers who consistently improve terms after multiple rounds.
+
+        Returns list of dicts: {supplier_id, supplier_name, avg_discount_pct,
+                                 avg_rounds, episode_count}
+        Filters to suppliers whose avg_rounds >= min_improvement_rounds.
+        """
+        try:
+            from api.deps import get_supabase_admin
+            db = get_supabase_admin()
+
+            result = (
+                db.table("negotiation_episodes")
+                .select("supplier_id, final_price, initial_quote, rounds, suppliers(name)")
+                .eq("company_id", company_id)
+                .eq("outcome", "accepted")
+                .gte("rounds", min_improvement_rounds)
+                .not_.is_("final_price", "null")
+                .limit(200)
+                .execute()
+            )
+            rows = result.data or []
+
+            agg: dict[str, dict] = {}
+            for row in rows:
+                sid = row["supplier_id"]
+                if not sid:
+                    continue
+                if sid not in agg:
+                    agg[sid] = {
+                        "supplier_id": sid,
+                        "supplier_name": row.get("suppliers", {}).get("name", sid) if row.get("suppliers") else sid,
+                        "discounts": [],
+                        "rounds": [],
+                    }
+                if row.get("initial_quote") and float(row["initial_quote"]) > 0:
+                    disc = (float(row["initial_quote"]) - float(row["final_price"] or 0)) / float(row["initial_quote"]) * 100
+                    agg[sid]["discounts"].append(disc)
+                agg[sid]["rounds"].append(row.get("rounds", 1))
+
+            results = []
+            for sid, data in agg.items():
+                if not data["discounts"]:
+                    continue
+                results.append({
+                    "supplier_id": sid,
+                    "supplier_name": data["supplier_name"],
+                    "avg_discount_pct": round(sum(data["discounts"]) / len(data["discounts"]), 1),
+                    "avg_rounds": round(sum(data["rounds"]) / len(data["rounds"]), 1),
+                    "episode_count": len(data["discounts"]),
+                })
+
+            results.sort(key=lambda x: x["avg_discount_pct"], reverse=True)
+            return results[:limit]
+
+        except Exception as exc:
+            logger.warning("Graph query (improved) failed: %s", exc)
+            return []
+
+    def portfolio_summary(self, company_id: str) -> dict:
+        """Aggregate statistics across all negotiations.
+
+        Returns: {total_episodes, total_savings_inr, avg_discount_pct,
+                  avg_rounds, top_part_families, accepted_rate}
+        """
+        try:
+            from api.deps import get_supabase_admin
+            db = get_supabase_admin()
+
+            result = (
+                db.table("negotiation_episodes")
+                .select("final_price, initial_quote, rounds, outcome, part_family")
+                .eq("company_id", company_id)
+                .limit(500)
+                .execute()
+            )
+            rows = result.data or []
+            if not rows:
+                return {}
+
+            total = len(rows)
+            accepted = [r for r in rows if r.get("outcome") == "accepted"]
+            savings = []
+            rounds_list = []
+            family_counts: dict[str, int] = {}
+
+            for r in accepted:
+                if r.get("initial_quote") and r.get("final_price"):
+                    savings.append(float(r["initial_quote"]) - float(r["final_price"]))
+                rounds_list.append(r.get("rounds", 0))
+                fam = r.get("part_family", "unknown")
+                family_counts[fam] = family_counts.get(fam, 0) + 1
+
+            top_families = sorted(family_counts.items(), key=lambda x: x[1], reverse=True)[:3]
+
+            return {
+                "total_episodes": total,
+                "accepted_rate": round(len(accepted) / total * 100, 1) if total else 0,
+                "total_savings_inr": round(sum(savings), 2),
+                "avg_savings_per_deal_inr": round(sum(savings) / len(savings), 2) if savings else 0,
+                "avg_rounds": round(sum(rounds_list) / len(rounds_list), 1) if rounds_list else 0,
+                "top_part_families": [f for f, _ in top_families],
+            }
+
+        except Exception as exc:
+            logger.warning("Portfolio summary failed: %s", exc)
+            return {}
+
+    def to_prompt_context(
+        self,
+        company_id: str,
+        part_family: str | None = None,
+        max_price: float | None = None,
+    ) -> str:
+        """Generate context string for chat injection about supplier graph intelligence."""
+        lines = []
+
+        best = self.best_suppliers_for(company_id, part_family=part_family, max_price=max_price)
+        if best:
+            lines.append("=== SUPPLIER INTELLIGENCE (from negotiation history) ===")
+            scope = f" for {part_family}" if part_family else ""
+            lines.append(f"Best suppliers{scope} by negotiated price:")
+            for s in best:
+                lines.append(
+                    f"  - {s['supplier_name']}: avg ₹{s['avg_final_price']:.0f} "
+                    f"({s['avg_discount_pct']:.1f}% avg discount, "
+                    f"{s['episode_count']} deals, {s['avg_rounds']} avg rounds)"
+                )
+
+        improved = self.suppliers_who_improved(company_id)
+        if improved:
+            if not lines:
+                lines.append("=== SUPPLIER INTELLIGENCE (from negotiation history) ===")
+            lines.append("Suppliers who respond well to multi-round negotiation:")
+            for s in improved[:3]:
+                lines.append(
+                    f"  - {s['supplier_name']}: {s['avg_discount_pct']:.1f}% avg discount "
+                    f"over {s['avg_rounds']:.1f} rounds ({s['episode_count']} deals)"
+                )
+
+        summary = self.portfolio_summary(company_id)
+        if summary:
+            if not lines:
+                lines.append("=== SUPPLIER INTELLIGENCE (from negotiation history) ===")
+            lines.append(
+                f"Portfolio: {summary['total_episodes']} negotiations, "
+                f"₹{summary['total_savings_inr']:.0f} total savings, "
+                f"{summary['accepted_rate']}% acceptance rate"
+            )
+
+        return "\n".join(lines) if lines else ""
