@@ -180,9 +180,10 @@ select:focus {
   z-index: 1;
 }
 
-/* Logo gradient — green to orange */
+/* Logo — deep dark with subtle depth */
 .logo-gradient {
-  background: linear-gradient(135deg, #059669 0%, #f97316 100%);
+  background: #1a1a1a;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 .dark-pill {
   background-color: #1a1a1a;
