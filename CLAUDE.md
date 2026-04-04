@@ -33,7 +33,7 @@ Built for Indian manufacturing economics (₹ currency, INR pricing).
 
 **Critical insight (70/30 split):** 70% of procurement spend is off-the-shelf MPN-based items (connectors, fasteners, bearings) — where similarity search + negotiation intelligence matters most. Only 30% is manufactured-to-drawing parts where should-cost shines. The AI must serve both.
 
-**AI independence roadmap:** Currently API-dependent (Gemini/GPT-4o). Progressively migrating to own fine-tuned models: Qwen2.5-VL-7B (extraction), Qwen2.5-32B (agent), DINOv2 (embeddings). Target: zero cloud API dependency by month 6, on-prem deployable for defense by month 9. See `costimize-v2/docs/research/AI-AGENT-ROADMAP.md` for full strategy.
+**AI independence roadmap:** Currently API-dependent (Gemini/GPT-4o). Progressively migrating to own fine-tuned models: GLM-OCR 0.9B (text extraction), Qwen2.5-VL-7B (vision extraction), Gemma 4 (agent/reasoning, replaces Qwen2.5-32B plan), DINOv2 (embeddings), TimesFM 2.5 (forecasting). Target: zero cloud API dependency by month 6, on-prem deployable for defense by month 9. See `costimize-v2/docs/research/AI-AGENT-ROADMAP.md` for full strategy.
 
 See `docs/POSITIONING.md` for full multi-audience messaging and one-liners.
 
@@ -73,7 +73,8 @@ Original monolithic CNC turning-only estimator. Kept for reference.
 | **Auth** | Supabase Auth (JWT) | Backend validates on every route |
 | **AI Vision** | OpenAI GPT-4o (primary), Google Gemini (fallback) → Qwen2.5-VL-7B (self-hosted target) | Extracts dimensions + processes |
 | **AI Validation** | Gemini 1.5 Flash → Qwen2.5-7B (self-hosted target) | Cross-checks physics engine estimates |
-| **AI Agent** | Gemini Flash (now) → Qwen2.5-32B-Instruct (self-hosted target) | In-app conversational agent with tool-calling |
+| **AI Agent** | Gemini Flash (now) → Gemma 4 (self-hosted target) | In-app conversational agent with tool-calling |
+| **Forecasting** | TimesFM 2.5 (200M, zero-shot, Apache 2.0) | Demand prediction, price trends, lead time forecasting |
 | **Similarity Search** | Gemini API + pgvector → DINOv2 + nomic-embed (self-hosted target) | Drawing visual similarity via 768-dim embeddings |
 | **Inference Server** | Cloud APIs (now) → vLLM on RunPod/on-prem (target) | OpenAI-compatible API, model-agnostic |
 | **Analytics** | Vercel Analytics + usage_log table | Page views + API usage tracking |
@@ -222,7 +223,9 @@ costimize-v2/
 │   ├── vision.py                 # AI drawing analysis (GPT-4o / Gemini fallback)
 │   ├── process_detector.py       # AI + rule-based process detection
 │   ├── bom_extractor.py          # AI extracts BOM from PDF
-│   └── gemini_estimator.py       # Gemini end-to-end cost estimate (for validation loop)
+│   ├── gemini_estimator.py       # Gemini end-to-end cost estimate (for validation loop)
+│   ├── pdf_classifier.py         # GPT-4o-mini classifies PDFs → rfq/drawing/contract/spec_sheet/other
+│   └── rfq_extractor.py          # GPT-4o extracts RFQ line items (dimensions + processes) via PyMuPDF
 │
 ├── scrapers/
 │   ├── component_scraper.py      # DigiKey/Mouser web scraping with 24hr cache
@@ -445,10 +448,11 @@ PIPELINES = {
 - **Rule-based fallbacks** — process detection works without AI
 - **24hr cache** on all scraped prices
 - **Physics first, ML later** — physics-based models for day-one accuracy, ML correction factors after collecting estimate-vs-actual pairs
-- **Self-hosted AI roadmap** — All AI (extraction, agent, embeddings) migrating from cloud APIs to self-hosted fine-tuned models. See `AI-AGENT-ROADMAP.md`. Timeline: extraction Month 2, embeddings Month 4, agent Month 5, full self-hosted Month 6, defense on-prem Month 9
+- **Self-hosted AI roadmap** — All AI migrating to self-hosted: GLM-OCR (text) + Gemma 4 (reasoning/agent) + DINOv2 (visual) + TimesFM 2.5 (forecasting). See `AI-AGENT-ROADMAP.md`. Timeline: extraction Month 2, embeddings Month 4, agent Month 5, full self-hosted Month 6, defense on-prem Month 9
 - **LLM-agnostic agent** — Agent layer is tool definitions + routing, talks to any OpenAI-compatible API. Swapping Gemini → vLLM is a config change, not a rewrite
 - **Training data collection** — Every cloud API call logged as training data (extraction pairs, agent conversations, similarity feedback). Tables: training_extractions, training_conversations, training_similarity
-- **No silent tracking** — cost estimation and similarity search are separate features with no data sharing
+- **No silent tracking** — cost estimation and similarity search are HARD-SEPARATED: (1) cost estimation never feeds similarity index, (2) similarity is session-scoped for free users (nothing persisted), (3) enterprise tier gets persistent index via explicit opt-in, (4) minimum 2 drawings required for similarity, (5) if user deletes history, data is gone. Defense buyers are paranoid about data.
+- **Per-user AI budget** — $0.50 per 48 hours per user, $20/day global cap. Enforced via `check_user_budget()` in `api/cost_tracker.py`. HTTP 429 when exceeded.
 - **Dual pipeline strategy** — keep VLM-only (working) alongside any future YOLO+VLM pipeline, benchmark to decide
 - **Native parsing over rasterization** — DXF/DWG: parse entities with `ezdxf` (exact coordinates). STEP: parse geometry with OCP. PDF: extract text with pdfplumber first. NEVER convert to image for extraction — PNG only as last resort for scanned PDFs at 300+ DPI minimum. No external CAD software needed.
 - **VLM fine-tuning dataset** — User's own Indian manufacturing drawings (DWG/DXF/STEP/PDF) are the training data. Pipeline: convert to PNG (300+ DPI, never JPEG) → auto-annotate with GPT-4o → LoRA fine-tune Qwen2.5-VL-7B (~$10-20). Supplement with: TechING (HuggingFace), DeepCAD (178K models), ABC Dataset (1M STEP).
@@ -535,9 +539,20 @@ See `MULTI-AGENT-ARCHITECTURE-RESEARCH.md` for the full research report.
 
 The original single-process CNC turning estimator. Monolithic `app.py` (1146 lines). Not actively developed.
 
-## Git Notes
+## Git Workflow
 
+- **Always use branches** — never push directly to master. Feature branch → PR via `gh pr create` → merge. Use worktrees for isolation.
 - **books/**, **papers/**, **sandvik/** directories exist locally but are stripped from git history (200MB+ PDFs)
 - Root `.gitignore` uses `/lib/` (not `lib/`) to avoid blocking `frontend/src/lib/`
 - costimize-v2 was originally a git submodule, now inlined into the monorepo
 - Backend deploys from a separate clean directory (`C:\Users\chand\costimize-deploy`), NOT from the monorepo
+
+## Working Style
+
+- **Claude is the tech lead** — make all tech decisions, don't present options. User is the product owner (domain expert, not a developer).
+- **AI is a WORKER, not a copilot** — never say "copilot" or "assistant" in any copy, docs, or architecture. "AI does X. You approve." Not "AI helps you do X."
+- **Ship in 2-10 day sprints** — not enterprise roadmaps. Use free/open-source tools. Break features into small shippable increments.
+- **5-phase launch process** — (1) Discovery: ask questions, challenge assumptions (2) Planning: propose v1, explain in plain language (3) Building: build in visible stages, test everything (4) Polish: professional quality, handle edge cases (5) Handoff: deploy, document, suggest v2 improvements.
+- **QA everything before deploy** — test all auth flows, redirects, nav states, empty/loading/error states. User should never find edge case bugs.
+- **Copy rules** — never say "physics" or show formulas in user-facing copy. Sell the answer, not the method. Multi-audience positioning (procurement, design, QA, leadership). Similarity search = "knowledge as asset" (CADDi-inspired), must appear in 3+ places.
+- **Verify file writes** — after writing session/save files, always `ls -la` to confirm they exist. User burned by phantom saves.

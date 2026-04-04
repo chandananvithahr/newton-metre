@@ -302,6 +302,120 @@ export async function deleteChatSession(sessionId: string): Promise<void> {
   if (!res.ok) throw new Error("Failed to delete chat session.");
 }
 
+// ── Agent Workflow API ─────────────────────────────────────────────────────
+
+export type WorkflowState =
+  | "created"
+  | "planning"
+  | "awaiting_approval"
+  | "executing"
+  | "completed"
+  | "failed"
+  | "rejected";
+
+export type ExecutionMode = "auto" | "hitl" | "manual";
+
+export interface WorkflowSummary {
+  id: string;
+  workflow_type: string;
+  state: WorkflowState;
+  execution_mode: ExecutionMode;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WorkflowDetail {
+  workflow_id: string;
+  workflow_type: string;
+  state: WorkflowState;
+  execution_mode: ExecutionMode;
+  inputs: Record<string, unknown>;
+  outputs: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WorkflowTypeInfo {
+  type: string;
+  steps: string[];
+}
+
+export async function getWorkflowTypes(): Promise<WorkflowTypeInfo[]> {
+  const headers = await getAuthHeaders();
+  const res = await safeFetch(`${API_URL}/api/agent/workflows/types`, { headers });
+  if (!res.ok) throw new Error("Failed to load workflow types.");
+  const data = await res.json();
+  return data.workflows;
+}
+
+export async function createWorkflow(
+  workflowType: string,
+  inputs: Record<string, unknown> = {},
+  executionMode: ExecutionMode = "hitl",
+): Promise<{ workflow_id: string; state: WorkflowState; outputs: Record<string, unknown> }> {
+  const headers = await getAuthHeaders();
+  const res = await safeFetch(`${API_URL}/api/agent/workflows`, {
+    method: "POST",
+    headers: { ...headers, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      workflow_type: workflowType,
+      inputs,
+      execution_mode: executionMode,
+    }),
+  });
+  if (!res.ok) throw new Error(await parseErrorResponse(res, "Failed to create workflow."));
+  return res.json();
+}
+
+export async function getWorkflow(workflowId: string): Promise<WorkflowDetail> {
+  const headers = await getAuthHeaders();
+  const res = await safeFetch(`${API_URL}/api/agent/workflows/${workflowId}`, { headers });
+  if (!res.ok) throw new Error("Workflow not found.");
+  return res.json();
+}
+
+export async function listWorkflows(
+  state?: WorkflowState,
+  limit = 20,
+): Promise<WorkflowSummary[]> {
+  const headers = await getAuthHeaders();
+  const params = new URLSearchParams();
+  if (state) params.set("state", state);
+  params.set("limit", String(limit));
+  const res = await safeFetch(`${API_URL}/api/agent/workflows?${params}`, { headers });
+  if (!res.ok) throw new Error("Failed to load workflows.");
+  const data = await res.json();
+  return data.workflows;
+}
+
+export async function approveWorkflow(
+  workflowId: string,
+  modifications?: Record<string, unknown>,
+): Promise<{ workflow_id: string; state: WorkflowState; outputs: Record<string, unknown> }> {
+  const headers = await getAuthHeaders();
+  const res = await safeFetch(`${API_URL}/api/agent/workflows/${workflowId}/approve`, {
+    method: "POST",
+    headers: { ...headers, "Content-Type": "application/json" },
+    body: JSON.stringify({ modifications: modifications ?? null }),
+  });
+  if (!res.ok) throw new Error(await parseErrorResponse(res, "Failed to approve workflow."));
+  return res.json();
+}
+
+export async function rejectWorkflow(
+  workflowId: string,
+  reason = "",
+): Promise<{ workflow_id: string; state: WorkflowState }> {
+  const headers = await getAuthHeaders();
+  const res = await safeFetch(`${API_URL}/api/agent/workflows/${workflowId}/reject`, {
+    method: "POST",
+    headers: { ...headers, "Content-Type": "application/json" },
+    body: JSON.stringify({ reason }),
+  });
+  if (!res.ok) throw new Error(await parseErrorResponse(res, "Failed to reject workflow."));
+  return res.json();
+}
+
 export async function estimateRFQ(lineItems: RFQLineItemResult[]): Promise<RFQEstimateResponse> {
   const headers = await getAuthHeaders();
 

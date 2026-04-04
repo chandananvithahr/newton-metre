@@ -42,23 +42,23 @@ function Hero() {
           {/* Badge */}
           <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/80 text-[var(--color-brand-dark)] text-[11px] font-bold uppercase tracking-widest mb-8 border border-black/8 shadow-sm">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            Your AI procurement worker is ready
+            Manufacturing intelligence.
           </div>
 
           {/* Headline */}
           <h1 className="text-4xl sm:text-5xl lg:text-[56px] font-medium text-[var(--color-brand-dark)] leading-[1.08] tracking-tight mb-6" style={{ fontFamily: "var(--font-headline)" }}>
-            Know what it <em className="text-orange-500">should</em> cost.
-            <br />Before they quote.
+            The company brain
+            <br />for <em className="text-orange-500">manufacturers.</em>
           </h1>
 
           <p className="text-lg text-[var(--color-neutral-gray)] leading-relaxed max-w-xl mx-auto mb-10" style={{ fontFamily: "var(--font-body)" }}>
-            Should-cost breakdowns in 30 seconds. Every similar part your company ever made, searchable. An AI that negotiates your Class C items while you focus on strategy.
+            Should-cost in 30 seconds. Every drawing, PO, and spec your company ever created &mdash; searchable. An AI workforce that handles RFQs, negotiations, and demand forecasting while you focus on what matters.
           </p>
 
           {/* Prompt-style input bar */}
           <div className="max-w-xl mx-auto mb-8">
             <div className="bg-white rounded-full shadow-lg shadow-black/5 border border-black/5 p-2 flex items-center gap-3">
-              <span className="text-[var(--color-text-disabled)] text-sm pl-5 flex-1 text-left truncate" style={{ fontFamily: "var(--font-body)" }}>Upload a drawing to get a should-cost breakdown...</span>
+              <span className="text-[var(--color-text-disabled)] text-sm pl-5 flex-1 text-left truncate" style={{ fontFamily: "var(--font-body)" }}>Upload a drawing, search your history, or ask anything...</span>
               <Link
                 href="/estimate/new"
                 className="w-10 h-10 rounded-full bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center shrink-0 transition-colors"
@@ -242,7 +242,8 @@ function SimilaritySearch() {
               { dept: "Quality", title: "25% of your quality issues are repeat failures. Preventable.", desc: "When a defect appears, instantly find every past NCR for similar parts. Inspection reports, FAI docs, failure histories — indexed forever." },
               { dept: "Sales", title: "Customer called. You quoted in 10 minutes. Competitor took 3 days.", desc: "Upload a sketch, find 5 similar parts from history, give a ballpark price — while the customer is still on the phone." },
               { dept: "Import / Export", title: "11,000 HS codes. You classified it wrong. Again.", desc: "Find the 5 most similar past imports, surface their HS codes and FTA routes. Indian manufacturers leave 70% of FTA benefits on the table." },
-              { dept: "Finance", title: "₹3.2 crore spent on turned parts last year. You had no idea.", desc: "Spend analysis by part family, material, supplier. Budget vs. actual on every category. Cost trends over time. Finally, visibility into where the money actually goes." },
+              { dept: "Finance", title: "\u20B93.2 crore on turned parts last year. You had no idea.", desc: "Spend analysis by part family, material, supplier. Budget vs. actual on every category. Cost trends over time. Visibility into where the money actually goes." },
+              { dept: "Supply Planning", title: "AI predicted demand 3 months out. You ordered before the rush.", desc: "Your PO history feeds a forecasting engine that predicts demand by part family, spots seasonal patterns, and calculates reorder points. No more stockouts." },
             ].map((item, i) => (
               <div key={i} className="relative pl-8 border-l border-white/10 group hover:border-l-orange-400/50 transition-colors">
                 <div className="text-[11px] font-bold text-white/40 uppercase tracking-widest mb-2" style={{ fontFamily: "var(--font-label)" }}>{item.dept}</div>
@@ -558,7 +559,7 @@ function CtaBanner() {
       <div className="max-w-[600px] mx-auto text-center relative z-10">
         <div className="bg-[#fefce8]/90 backdrop-blur-sm rounded-2xl px-10 py-10 border border-black/5">
           <h2 className="text-3xl sm:text-4xl font-medium text-[var(--color-brand-dark)] mb-4 tracking-tight" style={{ fontFamily: "var(--font-headline)" }}>
-            Stop overpaying. Start knowing.
+            Your company already knows. Let it remember.
           </h2>
           <Link
             href="/estimate/new"
