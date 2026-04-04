@@ -26,88 +26,67 @@ function Hero() {
             Before they quote.
           </h1>
 
-          <div className="max-w-[600px] mx-auto mb-10 space-y-3 text-lg text-[#525252] leading-relaxed">
-            <p>Should-cost in 30 seconds.</p>
-            <p>Every drawing, PO, and spec your company ever created &mdash; searchable.</p>
-            <p>Drop one file for instant insight, or upload your entire history.</p>
-            <p>AI that surfaces what your team would never find.</p>
-          </div>
+          {/* Three product cards */}
+          <div className="grid sm:grid-cols-3 gap-5 max-w-[960px] mx-auto text-left mt-10">
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
+            {/* Should-Cost */}
             <Link
               href="/estimate/new"
-              className="dark-pill inline-flex items-center gap-2 px-8 py-4 text-xs font-bold uppercase tracking-widest"
+              className="group bg-white/80 backdrop-blur-sm border border-black/5 rounded-xl p-7 hover:bg-white hover:shadow-lg hover:shadow-black/5 hover:border-black/10 transition-all"
             >
-              Upload a Drawing <ArrowRight className="w-4 h-4" />
-            </Link>
-            <a
-              href="#capabilities"
-              className="text-sm text-[#525252] hover:text-[#1a1a1a] transition-colors inline-flex items-center gap-1.5"
-            >
-              See how it works <ArrowRight className="w-3.5 h-3.5" />
-            </a>
-          </div>
-
-          <p className="text-[11px] text-[#525252] uppercase tracking-[0.15em] font-medium mb-6">
-            Three products. One platform.
-          </p>
-          <div className="grid sm:grid-cols-3 gap-4 max-w-[800px] mx-auto text-left">
-            <Link
-              href="/estimate/new"
-              className="group bg-white/80 backdrop-blur-sm border border-black/5 rounded-xl p-6 hover:bg-white hover:shadow-lg hover:shadow-black/5 hover:border-black/10 transition-all"
-            >
-              <div className="w-9 h-9 logo-gradient rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <div className="w-10 h-10 logo-gradient rounded-lg flex items-center justify-center mb-5">
+                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                 </svg>
               </div>
-              <div className="text-sm font-bold text-[#1a1a1a] mb-1.5">Should-Cost</div>
-              <p className="text-[13px] text-[#525252] leading-relaxed mb-3">
-                Upload a drawing. Line-by-line cost in 30 seconds.
+              <div className="text-[15px] font-bold text-[#1a1a1a] mb-2">Should-Cost Estimation</div>
+              <p className="text-[13px] text-[#525252] leading-relaxed mb-4">
+                Upload a mechanical drawing. Get an instant cost breakdown &mdash; every manufacturing process listed with individual costs. Material, machining, finishing, overhead. Walk into any negotiation with the real number.
               </p>
-              <span className="text-[11px] text-[#1a1a1a] font-bold uppercase tracking-widest group-hover:underline">
-                Upload drawing →
+              <span className="text-[11px] text-[#1a1a1a] font-bold uppercase tracking-widest group-hover:underline inline-flex items-center gap-1">
+                Upload a drawing <ArrowRight className="w-3 h-3" />
               </span>
             </Link>
 
+            {/* Similarity Search */}
             <Link
               href="/similar"
-              className="group bg-white/80 backdrop-blur-sm border border-black/5 rounded-xl p-6 hover:bg-white hover:shadow-lg hover:shadow-black/5 hover:border-black/10 transition-all"
+              className="group bg-white/80 backdrop-blur-sm border border-black/5 rounded-xl p-7 hover:bg-white hover:shadow-lg hover:shadow-black/5 hover:border-black/10 transition-all"
             >
-              <div className="w-9 h-9 logo-gradient rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <div className="w-10 h-10 logo-gradient rounded-lg flex items-center justify-center mb-5">
+                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
                 </svg>
               </div>
-              <div className="text-sm font-bold text-[#1a1a1a] mb-1.5">Similarity Search</div>
-              <p className="text-[13px] text-[#525252] leading-relaxed mb-3">
-                Every drawing, PO, spec — searchable. 7 departments, one search bar.
+              <div className="text-[15px] font-bold text-[#1a1a1a] mb-2">Similarity Search</div>
+              <p className="text-[13px] text-[#525252] leading-relaxed mb-4">
+                Search from your company brain. Upload docs from any department &mdash; drawings, POs, specs, quality reports &mdash; and get insights that everyone else missed. Design, procurement, quality, sales, finance, import/export, supply planning. One search bar, seven departments.
               </p>
-              <span className="text-[11px] text-[#1a1a1a] font-bold uppercase tracking-widest group-hover:underline">
-                Search history →
+              <span className="text-[11px] text-[#1a1a1a] font-bold uppercase tracking-widest group-hover:underline inline-flex items-center gap-1">
+                Search your history <ArrowRight className="w-3 h-3" />
               </span>
             </Link>
 
-            <Link
-              href="/login"
-              className="group bg-white/80 backdrop-blur-sm border border-black/5 rounded-xl p-6 hover:bg-white hover:shadow-lg hover:shadow-black/5 hover:border-black/10 transition-all relative overflow-hidden"
+            {/* AI Procurement */}
+            <div
+              className="group bg-white/80 backdrop-blur-sm border border-black/5 rounded-xl p-7 relative overflow-hidden"
             >
               <div className="absolute top-3 right-3">
-                <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-full bg-orange-100 text-orange-700">Enterprise</span>
+                <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-full bg-orange-100 text-orange-700">Coming Soon</span>
               </div>
-              <div className="w-9 h-9 logo-gradient rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <div className="w-10 h-10 logo-gradient rounded-lg flex items-center justify-center mb-5">
+                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
                 </svg>
               </div>
-              <div className="text-sm font-bold text-[#1a1a1a] mb-1.5">AI Procurement</div>
-              <p className="text-[13px] text-[#525252] leading-relaxed mb-3">
-                Supplier intelligence, negotiation briefs, better decisions.
+              <div className="text-[15px] font-bold text-[#1a1a1a] mb-2">AI Procurement</div>
+              <p className="text-[13px] text-[#525252] leading-relaxed mb-4">
+                AI reads your PO history, vendor master, and past negotiations. Builds a supplier matrix with qty tiers, discount patterns, and exact % targets. Finds alternate parts, sends them to design for verification. Every negotiation outcome saved &mdash; next one is sharper. You make the call, AI does the groundwork.
               </p>
-              <span className="text-[11px] text-[#1a1a1a] font-bold uppercase tracking-widest group-hover:underline">
-                Join waitlist →
-              </span>
-            </Link>
+              <Link href="/login?waitlist=enterprise" className="text-[11px] text-[#1a1a1a] font-bold uppercase tracking-widest group-hover:underline inline-flex items-center gap-1">
+                Join waitlist <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
           </div>
         </motion.div>
       </div>
