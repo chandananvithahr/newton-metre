@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { ArrowRight, CheckCircle2, Search } from "lucide-react";
@@ -652,6 +653,121 @@ function AIWorkerTrailer() {
   );
 }
 
+/* ── ROI Calculator ───────────────────────────────────── */
+function ROICalculator() {
+  const [spend, setSpend] = useState(5);        // crores
+  const [saving, setSaving] = useState(8);       // pct
+
+  const spendInr    = spend * 1_00_00_000;
+  const savingsInr  = spendInr * (saving / 100);
+  const annualCost  = 4_999 * 12;               // Pro plan
+  const roi         = Math.round(savingsInr / annualCost);
+  const fmt         = (n: number) =>
+    n >= 1_00_00_000
+      ? `₹${(n / 1_00_00_000).toFixed(1)} Cr`
+      : n >= 1_00_000
+      ? `₹${(n / 1_00_000).toFixed(0)}L`
+      : `₹${n.toLocaleString("en-IN")}`;
+
+  return (
+    <section className="py-28 px-4 sm:px-8 bg-[#09090B] text-white">
+      <div className="max-w-[1200px] mx-auto">
+        <div className="text-center mb-16">
+          <div className="text-[11px] font-bold uppercase tracking-widest text-white/30 mb-4 font-mono">
+            ROI calculator
+          </div>
+          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">
+            What&apos;s your overspend worth?
+          </h2>
+          <p className="text-lg text-white/50 max-w-xl mx-auto">
+            Indian manufacturers overpay by 8–14% on average. One corrected
+            quote pays for a year of Newton-Metre.
+          </p>
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-12 items-center max-w-4xl mx-auto">
+          {/* Sliders */}
+          <div className="space-y-8">
+            <div>
+              <div className="flex justify-between items-baseline mb-3">
+                <label className="text-[12px] font-bold uppercase tracking-widest text-white/40 font-mono">
+                  Annual procurement spend
+                </label>
+                <span className="text-xl font-bold font-mono text-white">
+                  ₹{spend} Cr
+                </span>
+              </div>
+              <input
+                type="range"
+                min={1}
+                max={100}
+                step={1}
+                value={spend}
+                onChange={(e) => setSpend(Number(e.target.value))}
+                className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer accent-orange-500"
+              />
+              <div className="flex justify-between text-[10px] text-white/20 font-mono mt-1.5">
+                <span>₹1 Cr</span><span>₹100 Cr</span>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between items-baseline mb-3">
+                <label className="text-[12px] font-bold uppercase tracking-widest text-white/40 font-mono">
+                  Negotiation improvement
+                </label>
+                <span className="text-xl font-bold font-mono text-white">
+                  {saving}%
+                </span>
+              </div>
+              <input
+                type="range"
+                min={2}
+                max={20}
+                step={1}
+                value={saving}
+                onChange={(e) => setSaving(Number(e.target.value))}
+                className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer accent-orange-500"
+              />
+              <div className="flex justify-between text-[10px] text-white/20 font-mono mt-1.5">
+                <span>2% (conservative)</span><span>20% (aggressive)</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Result card */}
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
+            <div className="space-y-5">
+              <div className="flex justify-between items-center pb-4 border-b border-white/10">
+                <span className="text-sm text-white/40">Procurement spend</span>
+                <span className="font-mono font-bold text-white">{fmt(spendInr)}/yr</span>
+              </div>
+              <div className="flex justify-between items-center pb-4 border-b border-white/10">
+                <span className="text-sm text-white/40">Savings at {saving}%</span>
+                <span className="font-mono font-bold text-emerald-400 text-lg">{fmt(savingsInr)}/yr</span>
+              </div>
+              <div className="flex justify-between items-center pb-4 border-b border-white/10">
+                <span className="text-sm text-white/40">Newton-Metre Pro</span>
+                <span className="font-mono text-white/60">₹59,988/yr</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-bold text-white">Return on investment</span>
+                <span className="font-mono font-bold text-orange-400 text-2xl">{roi}x</span>
+              </div>
+            </div>
+            <Link
+              href="/login"
+              className="block w-full mt-8 py-3.5 rounded-full bg-white text-[#09090B] text-xs font-bold uppercase tracking-widest text-center hover:bg-white/90 transition-colors"
+            >
+              Start saving — free
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ── Pricing ───────────────────────────────────────────── */
 function Pricing() {
   return (
@@ -838,6 +954,7 @@ export default function LandingPage() {
         <ShouldCost />
         <SimilaritySearch />
         <AIWorkerTrailer />
+        <ROICalculator />
         <Pricing />
       </main>
       <Footer />
