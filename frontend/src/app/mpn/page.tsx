@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { track } from "@vercel/analytics";
 import { lookupMPN } from "@/lib/api";
 import { AppNav } from "@/components/app-nav";
 
@@ -67,6 +68,7 @@ export default function MPNSearchPage() {
     try {
       const data = await lookupMPN(mpn.trim(), parseInt(qty) || 1);
       setResult(data);
+      track("mpn_lookup", { mpn: mpn.trim().toUpperCase(), qty: parseInt(qty) || 1, category: data.category });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Lookup failed");
     }

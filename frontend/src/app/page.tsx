@@ -62,13 +62,13 @@ function Hero() {
               </svg>
             </div>
             <div className="text-[17px] font-bold text-[#1a1a1a] mb-1.5">Cost Estimator</div>
-            <p className="text-[13px] font-medium text-[#525252] mb-5">Instant cost breakdown from any drawing</p>
+            <p className="text-[13px] font-medium text-[#525252] mb-5">Know the real cost before the supplier quotes</p>
             <ul className="space-y-3 mb-6 flex-1">
               {[
                 "Upload DWG, DXF, STEP, or PDF",
-                "Every manufacturing process breakdown",
-                "Negotiation-ready in 30 seconds",
-                "Save 15–20% on every item",
+                "Material + machining + finishing — line by line",
+                "Supplier quoted ₹48K. It should cost ₹32K.",
+                "Walk into every negotiation with a number",
               ].map((point) => (
                 <li key={point} className="flex items-start gap-2.5 text-[14px] text-[#525252]">
                   <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#1a1a1a]/25 shrink-0" />
@@ -94,13 +94,13 @@ function Hero() {
               </svg>
             </div>
             <div className="text-[17px] font-bold text-[#1a1a1a] mb-1.5">Company Brain</div>
-            <p className="text-[13px] font-medium text-[#525252] mb-5">Every department gets an instant analyst</p>
+            <p className="text-[13px] font-medium text-[#525252] mb-5">20 years of company knowledge. Searchable in seconds.</p>
             <ul className="space-y-3 mb-6 flex-1">
               {[
-                "Design: find the part before you redesign it",
-                "Procurement: see what you paid, who, when",
-                "Quality: surface all past failures instantly",
-                "Sales: quote while the customer is on the phone",
+                "Design: 159 hrs/yr on BOM admin. Gone.",
+                "QA: every NCR, FAI, failure — found instantly",
+                "Procurement: 75% of quotes are wrong. Check yours.",
+                "Sales: quote in the call, not 3 days later",
               ].map((point) => (
                 <li key={point} className="flex items-start gap-2.5 text-[14px] text-[#525252]">
                   <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#1a1a1a]/25 shrink-0" />
@@ -117,7 +117,7 @@ function Hero() {
         {/* AI Procurement */}
         <HeroCard delay={0.6}>
           <Link
-            href="/mpn"
+            href="/waitlist"
             className="group flex flex-col h-full bg-white/80 backdrop-blur-sm border border-black/6 rounded-2xl p-8 sm:p-10 relative overflow-hidden hover:bg-white hover:shadow-xl hover:shadow-black/5 hover:border-black/10 transition-all duration-300"
           >
             <div className="w-12 h-12 logo-gradient rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
@@ -125,14 +125,14 @@ function Hero() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
               </svg>
             </div>
-            <div className="text-[17px] font-bold text-[#1a1a1a] mb-1.5">Supplier Intelligence</div>
-            <p className="text-[13px] font-medium text-[#525252] mb-5">Look up any part number. Know the market price before you negotiate.</p>
+            <div className="text-[17px] font-bold text-[#1a1a1a] mb-1.5">Procurement Intel</div>
+            <p className="text-[13px] font-medium text-[#525252] mb-5">Walk into every negotiation knowing what to ask for — and why</p>
             <ul className="space-y-3 mb-6 flex-1">
               {[
-                "MPN lookup — connectors, bearings, ICs, fasteners",
-                "Market price range + negotiation headroom",
-                "Supplier options with live availability",
-                "One click to RFQ or AI negotiation",
+                "Supplier matrix — rank all vendors by price, delivery & risk in one view",
+                "Negotiation brief in 30 sec — last 3 deals, your opening number, the lever to pull",
+                "Supplier gave 14% last time. AI says push for 18%. Here's how.",
+                "MPN lookup — live market price before you open their email",
               ].map((point) => (
                 <li key={point} className="flex items-start gap-2.5 text-[14px] text-[#525252]">
                   <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#1a1a1a]/25 shrink-0" />
@@ -141,7 +141,7 @@ function Hero() {
               ))}
             </ul>
             <span className="text-[11px] text-[#1a1a1a] font-bold uppercase tracking-widest group-hover:underline inline-flex items-center gap-1.5 group-hover:gap-2.5 transition-all">
-              Search a part number <ArrowRight className="w-3.5 h-3.5" />
+              Join the waitlist <ArrowRight className="w-3.5 h-3.5" />
             </span>
           </Link>
         </HeroCard>
@@ -527,11 +527,10 @@ function AIWorkerTrailer() {
           </p>
         </motion.div>
 
-        {/* Two columns: off-the-shelf + negotiation intelligence */}
-        <div className="grid md:grid-cols-2 gap-8 mb-12">
-          {/* Off-the-shelf procurement */}
+        {/* Two-column breakdown: 70% spend + negotiation */}
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
           <motion.div
-            className="bg-white rounded-2xl p-8 border border-black/6 hover:shadow-lg hover:shadow-black/5 hover:-translate-y-1 transition-all duration-300"
+            className="bg-white rounded-2xl p-8 border border-black/6"
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-60px" }}
@@ -547,20 +546,18 @@ function AIWorkerTrailer() {
                 "Builds a supplier matrix: qty tiers, volume history, discount patterns",
                 "Sends alternates to design for verification — accept/reject saved forever",
               ].map((line, i) => (
-                <div key={i} className="border-l-2 border-black/10 pl-5 py-0.5 text-[#525252] text-[14px] leading-relaxed">
+                <div key={i} className="border-l-2 border-black/8 pl-5 py-0.5 text-[#525252] text-[14px] leading-relaxed">
                   {line}
                 </div>
               ))}
             </div>
           </motion.div>
-
-          {/* Negotiation intelligence */}
           <motion.div
-            className="bg-white rounded-2xl p-8 border border-black/6 hover:shadow-lg hover:shadow-black/5 hover:-translate-y-1 transition-all duration-300"
+            className="bg-white rounded-2xl p-8 border border-black/6"
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.5, delay: 0.15 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
           >
             <div className="text-[11px] font-bold text-orange-500 uppercase tracking-widest mb-5 font-mono">
               Live negotiation intelligence
@@ -568,16 +565,71 @@ function AIWorkerTrailer() {
             <div className="space-y-4">
               {[
                 "Before the meeting — AI reads every past negotiation with this vendor",
-                "Gives exact % targets: \"This supplier typically gives 14% on this volume\"",
+                `Gives exact % targets: "This supplier typically gives 14% on this volume"`,
                 "Surfaces what arguments worked before and where they cave",
                 "Every outcome saved — next negotiation is sharper than the last",
               ].map((line, i) => (
-                <div key={i} className="border-l-2 border-black/10 pl-5 py-0.5 text-[#525252] text-[14px] leading-relaxed">
+                <div key={i} className="border-l-2 border-black/8 pl-5 py-0.5 text-[#525252] text-[14px] leading-relaxed">
                   {line}
                 </div>
               ))}
             </div>
           </motion.div>
+        </div>
+
+        {/* Department scenario cards */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mb-12">
+          {[
+            {
+              dept: "Procurement",
+              headline: "They quoted ₹48,000. You paid ₹32,000 last year.",
+              desc: "AI surfaces your exact PO history, discount patterns, and negotiation wins before the meeting. Walk in knowing the number.",
+            },
+            {
+              dept: "Design Engineering",
+              headline: "MPN went EOL. 3 verified alternates found in 40 seconds.",
+              desc: "AI cross-references your approved parts list with supplier catalogs. Design reviews, approvals saved forever — no email chains.",
+            },
+            {
+              dept: "Finance",
+              headline: "₹2.4 crore in off-contract spend. Found before the audit.",
+              desc: "Every purchase benchmarked against approved vendor rates. Maverick spend flagged in real time. Budget vs. actual on every category.",
+            },
+            {
+              dept: "Quality",
+              headline: "Supplier defect rate: 4.2%. You were giving them 40% more volume.",
+              desc: "Scorecards built from every NCR, FAI, and incoming inspection record. Updated with every delivery. No spreadsheet required.",
+            },
+            {
+              dept: "Supply Planning",
+              headline: "Lead times jumped 6 → 14 weeks. AI flagged it 90 days ago.",
+              desc: "PO history feeds a forecasting engine that spots disruptions before they hit your line. Reorder points calculated, not guessed.",
+            },
+            {
+              dept: "Leadership",
+              headline: "₹50 crore procurement spend. Understood in 3 minutes.",
+              desc: "Spend by category, supplier, department. Every saving identified, every risk surfaced. The brief your team never had time to write.",
+            },
+          ].map((item, i) => (
+            <motion.div
+              key={i}
+              className="bg-white rounded-2xl p-7 border border-black/6 hover:shadow-lg hover:shadow-black/5 hover:-translate-y-1 transition-all duration-300 flex flex-col"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.4, delay: i * 0.07 }}
+            >
+              <div className="text-[10px] font-bold text-orange-500 uppercase tracking-widest mb-3 font-mono">
+                {item.dept}
+              </div>
+              <div className="text-[15px] font-bold text-[#1a1a1a] leading-snug mb-3 flex-1">
+                {item.headline}
+              </div>
+              <p className="text-[13px] text-[#525252] leading-relaxed">
+                {item.desc}
+              </p>
+            </motion.div>
+          ))}
         </div>
 
         {/* Bottom: compounding moat */}
@@ -588,20 +640,12 @@ function AIWorkerTrailer() {
             searchable, all compounding. Your company&apos;s institutional
             memory grows with every deal, every search, every decision.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            <Link
-              href="/mpn"
-              className="inline-flex items-center gap-2 bg-[#1a1a1a] text-white text-xs font-bold uppercase tracking-widest rounded-full px-8 py-4 hover:bg-[#333] transition-colors"
-            >
-              Try MPN Search <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link
-              href="/workflows"
-              className="inline-flex items-center gap-2 border border-black/10 text-[#1a1a1a] text-xs font-bold uppercase tracking-widest rounded-full px-8 py-4 hover:bg-[#f9fafb] transition-colors"
-            >
-              Start a workflow <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
+          <Link
+            href="/waitlist"
+            className="inline-flex items-center gap-2 bg-[#1a1a1a] text-white text-xs font-bold uppercase tracking-widest rounded-full px-8 py-4 hover:bg-[#333] transition-colors"
+          >
+            Join the waitlist <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
       </div>
     </section>
@@ -611,7 +655,7 @@ function AIWorkerTrailer() {
 /* ── Pricing ───────────────────────────────────────────── */
 function Pricing() {
   return (
-    <section id="pricing" className="py-28 px-4 sm:px-8 warm-gradient-subtle">
+    <section id="pricing" className="py-28 px-4 sm:px-8 bg-white border-t border-black/5">
       <div className="max-w-[1200px] mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-4xl sm:text-5xl font-bold text-[#1a1a1a] tracking-tight mb-4">
@@ -623,26 +667,22 @@ function Pricing() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 max-w-[800px] mx-auto">
-          {/* Free */}
-          <div className="p-8 rounded-2xl bg-white border border-black/5 flex flex-col">
-            <div className="text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a] mb-2">
+          {/* Free — light card */}
+          <div className="p-8 rounded-2xl bg-[#f9fafb] border border-black/6 flex flex-col">
+            <div className="text-[11px] font-bold uppercase tracking-widest text-[#A3A3A3] mb-3 font-mono">
               Free
             </div>
-            <div className="text-4xl font-bold text-[#1a1a1a] font-mono mb-6">
-              ₹0
-            </div>
+            <div className="text-5xl font-bold text-[#1a1a1a] font-mono mb-1">₹0</div>
+            <p className="text-[13px] text-[#A3A3A3] mb-8">No credit card required</p>
             <ul className="space-y-3 mb-8 flex-1">
               {[
                 "10 estimates / month",
-                "Should-cost breakdown",
-                "Similarity search",
+                "Cost estimator breakdown",
+                "Company brain search",
                 "MPN part number lookup",
                 "PDF, DXF & image uploads",
               ].map((f) => (
-                <li
-                  key={f}
-                  className="flex items-center gap-2.5 text-[15px] text-[#525252]"
-                >
+                <li key={f} className="flex items-center gap-2.5 text-[14px] text-[#525252]">
                   <CheckCircle2 className="w-4 h-4 text-orange-500 shrink-0" />
                   {f}
                 </li>
@@ -650,44 +690,47 @@ function Pricing() {
             </ul>
             <Link
               href="/login"
-              className="dark-pill block w-full py-3.5 text-xs font-bold uppercase tracking-widest text-center"
+              className="block w-full py-3.5 rounded-full border border-black/15 text-xs font-bold uppercase tracking-widest text-center text-[#1a1a1a] hover:bg-white transition-colors"
             >
-              Get started
+              Get started free
             </Link>
           </div>
 
-          {/* Pro */}
-          <div className="p-8 rounded-2xl bg-white border border-black/5 flex flex-col">
-            <div className="text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a] mb-2">
+          {/* Pro — dark card, stands out */}
+          <div className="p-8 rounded-2xl bg-[#1a1a1a] flex flex-col relative overflow-hidden">
+            <div className="absolute top-5 right-5">
+              <span className="text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">
+                Most popular
+              </span>
+            </div>
+            <div className="text-[11px] font-bold uppercase tracking-widest text-white/40 mb-3 font-mono">
               Pro
             </div>
-            <div className="flex items-baseline gap-1 mb-6">
-              <span className="text-4xl font-bold text-[#1a1a1a] font-mono">
-                ₹4,999
-              </span>
-              <span className="text-sm text-[#A3A3A3]">/mo</span>
+            <div className="flex items-baseline gap-1 mb-1">
+              <span className="text-5xl font-bold text-white font-mono">₹4,999</span>
+              <span className="text-sm text-white/40">/mo</span>
             </div>
+            <p className="text-[13px] text-white/40 mb-8">One corrected quote covers it</p>
             <ul className="space-y-3 mb-8 flex-1">
               {[
                 "Unlimited estimates",
-                "AI procurement (when available)",
+                "MPN lookup — market price before you negotiate",
+                "AI procurement worker — RFQ, compare, negotiate",
+                "Similarity search across full drawing library",
                 "Priority support",
                 "Team features",
               ].map((f) => (
-                <li
-                  key={f}
-                  className="flex items-center gap-2.5 text-[15px] text-[#525252]"
-                >
-                  <CheckCircle2 className="w-4 h-4 text-orange-500 shrink-0" />
+                <li key={f} className="flex items-center gap-2.5 text-[14px] text-white/80">
+                  <CheckCircle2 className="w-4 h-4 text-orange-400 shrink-0" />
                   {f}
                 </li>
               ))}
             </ul>
             <Link
-              href="/login?waitlist=pro"
-              className="block w-full py-3.5 rounded-full border border-black/10 text-xs font-bold uppercase tracking-widest text-center text-[#1a1a1a] hover:bg-[#f9fafb] transition-colors"
+              href="/login"
+              className="block w-full py-3.5 rounded-full bg-white text-[#1a1a1a] text-xs font-bold uppercase tracking-widest text-center hover:bg-white/90 transition-colors"
             >
-              Join waitlist
+              Get started
             </Link>
           </div>
         </div>
