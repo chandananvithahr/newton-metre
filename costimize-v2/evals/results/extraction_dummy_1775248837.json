@@ -1,0 +1,11 @@
+{
+  "provider": "dummy",
+  "test_count": 5,
+  "avg_field_accuracy": 0.0,
+  "avg_dimension_accuracy": 0.0,
+  "avg_process_f1": 0.0,
+  "material_accuracy": 0.0,
+  "part_type_accuracy": 0.0,
+  "schema_compliance": 0.0,
+  "errors": 5
+}

@@ -89,7 +89,7 @@ def _make_ai_result(unit_cost: float = 835.0, material: str = "EN8 Steel") -> Ge
         detected_processes=("turning",),
         detected_dimensions={"outer_diameter_mm": 60, "length_mm": 100, "inner_diameter_mm": 0},
         reasoning="Standard turning part",
-        model_used="gemini-1.5-flash",
+        model_used="gemini-2.0-flash-lite",
     )
 
 
@@ -247,7 +247,7 @@ class TestInteractive:
             detected_processes=("turning",),
             detected_dimensions={"outer_diameter_mm": 80, "length_mm": 100, "inner_diameter_mm": 0},
             reasoning="",
-            model_used="gemini-1.5-flash",
+            model_used="gemini-2.0-flash-lite",
         )
         result = generate_clarifying_questions(
             physics, ai_with_diff_dims, delta_pct=20.0,
@@ -268,7 +268,7 @@ class TestInteractive:
             detected_processes=("turning", "grinding_cylindrical", "heat_treatment"),
             detected_dimensions={"outer_diameter_mm": 60, "length_mm": 100},
             reasoning="",
-            model_used="gemini-1.5-flash",
+            model_used="gemini-2.0-flash-lite",
         )
         result = generate_clarifying_questions(
             physics, ai_with_extra, delta_pct=20.0,

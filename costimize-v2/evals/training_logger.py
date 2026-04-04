@@ -13,13 +13,13 @@ Usage:
     from evals.training_logger import log_extraction, log_agent_turn, log_similarity_feedback
 
     # After extraction
-    log_extraction(image_bytes, model_output, model_name="gemini-1.5-flash")
+    log_extraction(image_bytes, model_output, model_name="gemini-2.0-flash-lite")
 
     # After user corrects extraction
     log_extraction_correction(extraction_id, corrections={"material": "SS316"})
 
     # After agent conversation turn
-    log_agent_turn(user_message, tool_calls, final_response, model_name="gemini-1.5-flash")
+    log_agent_turn(user_message, tool_calls, final_response, model_name="gemini-2.0-flash-lite")
 
     # After user confirms/rejects similarity result
     log_similarity_feedback(query_id, result_id, relevant=True)

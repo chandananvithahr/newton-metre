@@ -63,7 +63,7 @@ def _extract_openai(pdf_bytes: bytes) -> list[dict]:
 def _extract_gemini(pdf_bytes: bytes) -> list[dict]:
     import google.generativeai as genai
     genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel("gemini-2.0-flash-lite")
     response = model.generate_content(
         [BOM_PROMPT, {"mime_type": "application/pdf", "data": pdf_bytes}],
         generation_config={"max_output_tokens": 4000},

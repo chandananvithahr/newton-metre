@@ -110,7 +110,7 @@ def _propose_modification(current_prompt: str, target: str,
     import google.generativeai as genai
 
     genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel("gemini-2.0-flash-lite")
 
     history_text = ""
     if history:

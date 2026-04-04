@@ -163,7 +163,7 @@ def _call_gemini(messages: list[dict]) -> str:
     """Call Gemini API."""
     import google.generativeai as genai
     genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel("gemini-2.0-flash-lite")
 
     # Convert messages to Gemini format
     system_msg = ""
@@ -213,7 +213,7 @@ def _summarize_messages(messages: list[dict]) -> str:
     if GEMINI_API_KEY:
         import google.generativeai as genai
         genai.configure(api_key=GEMINI_API_KEY)
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        model = genai.GenerativeModel("gemini-2.0-flash-lite")
         response = model.generate_content(prompt)
         return response.text.strip()
 
@@ -237,7 +237,7 @@ def _auto_title(user_message: str) -> str:
         try:
             import google.generativeai as genai
             genai.configure(api_key=GEMINI_API_KEY)
-            model = genai.GenerativeModel("gemini-1.5-flash")
+            model = genai.GenerativeModel("gemini-2.0-flash-lite")
             response = model.generate_content(
                 f"Generate a 3-5 word title for this manufacturing question. "
                 f"No quotes, no punctuation:\n\n{user_message[:200]}"

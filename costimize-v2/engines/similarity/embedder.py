@@ -97,7 +97,7 @@ def _embed_with_gemini(image: Image.Image) -> np.ndarray:
     genai.configure(api_key=GEMINI_API_KEY)
 
     # Step 1: Describe the drawing with Gemini Flash
-    vision_model = genai.GenerativeModel("gemini-1.5-flash")
+    vision_model = genai.GenerativeModel("gemini-2.0-flash-lite")
     buf = io.BytesIO()
     image.save(buf, format="PNG")
     img_bytes = buf.getvalue()

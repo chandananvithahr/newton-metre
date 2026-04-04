@@ -155,7 +155,7 @@ def analyze_multi_view_drawing(images: list[bytes]) -> dict:
 def _analyze_multi_with_gemini(images: list[bytes]) -> dict:
     import google.generativeai as genai
     genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel("gemini-2.0-flash-lite")
     parts = [MULTI_VIEW_PROMPT_PREFIX]
     for i, img in enumerate(images):
         parts.append(f"\n--- Sheet {i + 1} of {len(images)} ---\n")
@@ -228,7 +228,7 @@ def _analyze_with_openai(image_bytes: bytes) -> dict:
 def _analyze_with_gemini(image_bytes: bytes) -> dict:
     import google.generativeai as genai
     genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel("gemini-2.0-flash-lite")
     response = model.generate_content(
         [EXTRACTION_PROMPT, {"mime_type": "image/png", "data": image_bytes}],
         generation_config={"max_output_tokens": 2000},
@@ -283,7 +283,7 @@ def _analyze_step_with_openai(step_text: str) -> dict:
 def _analyze_step_with_gemini(step_text: str) -> dict:
     import google.generativeai as genai
     genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel("gemini-2.0-flash-lite")
     response = model.generate_content(
         f"{STEP_EXTRACTION_PROMPT}\n\n{step_text}",
         generation_config={"max_output_tokens": 2000},

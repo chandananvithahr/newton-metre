@@ -81,7 +81,7 @@ def fetch_material_from_ai(name: str) -> Material:
 def _fetch_with_gemini(name: str, api_key: str) -> dict:
     import google.generativeai as genai
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel("gemini-2.0-flash-lite")
     response = model.generate_content(
         _FETCH_PROMPT.format(name=name),
         generation_config={"max_output_tokens": 500},

@@ -1,0 +1,9 @@
+{
+  "embedder": "metadata",
+  "query_count": 5,
+  "avg_recall_at_5": 0.8,
+  "avg_precision_at_5": 0.48,
+  "avg_ndcg_at_10": 0.9785235788504185,
+  "mrr": 1.0,
+  "errors": 0
+}

@@ -17,7 +17,7 @@ from config import GEMINI_API_KEY, OPENAI_API_KEY
 logger = logging.getLogger("agents.llm")
 
 # Default model — override via env or per-call
-DEFAULT_MODEL = os.getenv("AGENT_LLM_MODEL", "gemini-1.5-flash")
+DEFAULT_MODEL = os.getenv("AGENT_LLM_MODEL", "gemini-2.0-flash-lite")
 DEFAULT_TIMEOUT_SEC = 60
 
 
@@ -69,7 +69,7 @@ def call_llm(
     elif OPENAI_API_KEY:
         response = _call_openai(messages, resolved_model, max_tokens, temperature, json_mode, tools, timeout)
     elif GEMINI_API_KEY:
-        response = _call_gemini(messages, "gemini-1.5-flash", max_tokens, temperature, json_mode, tools)
+        response = _call_gemini(messages, "gemini-2.0-flash-lite", max_tokens, temperature, json_mode, tools)
     else:
         raise RuntimeError("No LLM API key configured. Set GEMINI_API_KEY or OPENAI_API_KEY.")
 

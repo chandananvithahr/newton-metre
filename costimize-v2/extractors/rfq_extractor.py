@@ -185,7 +185,7 @@ def _extract_with_gemini(text: str) -> dict:
 
     genai.configure(api_key=GEMINI_API_KEY)
     # Use 1.5-pro for RFQ extraction — better at long structured tables than flash
-    model = genai.GenerativeModel("gemini-1.5-pro")
+    model = genai.GenerativeModel("gemini-2.0-flash")
     prompt = _RFQ_EXTRACTION_PROMPT.format(text=text)
     response = model.generate_content(prompt, generation_config={"max_output_tokens": 4000})
     return _parse_rfq(response.text.strip())

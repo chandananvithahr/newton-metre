@@ -92,7 +92,7 @@ def estimate_cost_from_drawing(
 
     import google.generativeai as genai
     genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel("gemini-2.0-flash-lite")
 
     hint_text = f"Material hint from user: {material_hint}" if material_hint else ""
     prompt = COST_ESTIMATION_PROMPT.format(
@@ -131,5 +131,5 @@ def estimate_cost_from_drawing(
         detected_processes=tuple(processes),
         detected_dimensions=data.get("detected_dimensions", {}),
         reasoning=str(data.get("reasoning", "")),
-        model_used="gemini-1.5-flash",
+        model_used="gemini-2.0-flash-lite",
     )

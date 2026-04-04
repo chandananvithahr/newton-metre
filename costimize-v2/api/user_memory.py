@@ -53,7 +53,7 @@ def _call_llm_extract(message: str, gemini_key: str) -> dict:
     try:
         import google.generativeai as genai
         genai.configure(api_key=gemini_key)
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        model = genai.GenerativeModel("gemini-2.0-flash-lite")
         prompt = _EXTRACTION_PROMPT.format(message=message[:500])
         response = model.generate_content(prompt)
         text = response.text.strip()

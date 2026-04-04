@@ -1,0 +1,21 @@
+[
+  {
+    "timestamp": "2026-03-30T12:06:50.630872+00:00",
+    "drawing_filename": "manual_entry",
+    "material_name": "Mild Steel IS2062",
+    "dimensions": {},
+    "processes": [
+      "turning",
+      "facing",
+      "drilling"
+    ],
+    "quantity": 10,
+    "physics_cost": 329.06,
+    "ai_cost": null,
+    "final_cost": 329.06,
+    "confidence_tier": "degraded",
+    "delta_pct": 0.0,
+    "user_corrections": {},
+    "arbitration_reasoning": null
+  }
+]

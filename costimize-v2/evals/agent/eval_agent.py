@@ -152,7 +152,7 @@ def _call_agent_for_tools(message: str, provider: str = "gemini") -> tuple[list[
                 )]
             ))
 
-        model = genai.GenerativeModel("gemini-1.5-flash", system_instruction=SYSTEM_PROMPT)
+        model = genai.GenerativeModel("gemini-2.0-flash-lite", system_instruction=SYSTEM_PROMPT)
         response = model.generate_content(
             message,
             tools=tools_for_gemini,
