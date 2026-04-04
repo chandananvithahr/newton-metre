@@ -12,36 +12,13 @@ from api.deps import get_current_user_id, get_supabase_admin
 from api.cost_tracker import check_budget, check_user_budget, log_usage
 from api.wiki_loader import get_wiki_context
 from api.context_preload import get_operational_context
-from api.user_memory import load_user_context, extract_and_save
-from agents.memory import SupplierGraphQuery
+# FROZEN: user memory + supplier graph — re-enable when we have real users + negotiation data
+# from api.user_memory import load_user_context, extract_and_save
+# from agents.memory import SupplierGraphQuery
 
 logger = logging.getLogger("costimize")
 router = APIRouter()
 limiter = Limiter(key_func=get_remote_address)
-
-_SUPPLIER_KEYWORDS = {
-    "supplier", "vendor", "negotiate", "negotiation", "quote", "discount",
-    "best price", "cheapest", "savings", "procurement", "rfq", "best supplier",
-    "which supplier", "who gives", "who offers", "improved terms",
-}
-_graph_query = SupplierGraphQuery()
-
-
-def _is_supplier_query(message: str) -> bool:
-    """Detect if message is asking about supplier intelligence."""
-    msg_lower = message.lower()
-    return any(kw in msg_lower for kw in _SUPPLIER_KEYWORDS)
-
-
-def _get_company_id(user_id: str, sb) -> str | None:
-    """Get company_id for a user. Falls back to user_id if no company mapping."""
-    try:
-        resp = sb.table("suppliers").select("company_id").eq("company_id", user_id).limit(1).execute()
-        if resp.data:
-            return resp.data[0]["company_id"]
-    except Exception:
-        pass
-    return user_id  # fallback: treat user_id as company_id
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -131,21 +108,17 @@ def _build_messages(
     system_prompt: str,
     estimate_context: str,
     wiki_context: str,
-    user_memory: str,
-    supplier_context: str,
     summary: Optional[str],
     recent_messages: list[dict],
     user_message: str,
 ) -> list[dict]:
     """Assemble the message list for the AI call.
 
-    Layer order (most stable → most specific):
+    Layer order:
     1. System prompt + operational constants (always-on, ~700 tokens)
     2. Wiki knowledge (query-routed, ~5K tokens)
-    3. User memory (personalization, ~200 tokens)
-    4. Supplier graph intelligence (query-routed, ~500 tokens)
-    5. Estimate context (task-specific)
-    6. Conversation summary + recent messages
+    3. Estimate context (task-specific)
+    4. Conversation summary + recent messages
     """
     messages = []
 
@@ -153,10 +126,6 @@ def _build_messages(
     sys_content += f"\n\n{get_operational_context()}"
     if wiki_context:
         sys_content += f"\n\n{wiki_context}"
-    if user_memory:
-        sys_content += f"\n\n{user_memory}"
-    if supplier_context:
-        sys_content += f"\n\n{supplier_context}"
     if estimate_context:
         sys_content += f"\n\n{estimate_context}"
     if summary:
@@ -372,20 +341,9 @@ async def chat(
     # Get wiki knowledge context based on user's question
     wiki_context = get_wiki_context(body.message)
 
-    # Load user memory (personalization from past sessions)
-    user_memory = load_user_context(user_id, sb)
-
-    # Load supplier graph intelligence if relevant query
-    supplier_context = ""
-    if _is_supplier_query(body.message):
-        company_id = _get_company_id(user_id, sb)
-        if company_id:
-            supplier_context = _graph_query.to_prompt_context(company_id)
-
     # Build AI messages
     ai_messages = _build_messages(
-        SYSTEM_PROMPT, estimate_context, wiki_context, user_memory,
-        supplier_context, summary, recent, body.message
+        SYSTEM_PROMPT, estimate_context, wiki_context, summary, recent, body.message
     )
 
     # Call AI
@@ -412,9 +370,6 @@ async def chat(
     ]).execute()
 
     log_usage(user_id, "chat", 0.001, {"session_id": session_id})
-
-    # Extract and save user preferences from this message (best-effort, non-blocking)
-    extract_and_save(user_id, body.message, sb, GEMINI_API_KEY)
 
     return ChatResponse(reply=reply, session_id=session_id, title=title)
 
