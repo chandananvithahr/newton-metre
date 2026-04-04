@@ -3,6 +3,7 @@ import Link from "next/link";
 const NAV_LINKS = [
   { href: "/estimate/new", label: "Should-Cost" },
   { href: "/similar", label: "Similarity" },
+  { href: "/library", label: "Library" },
   { href: "/mpn", label: "Part Search" },
   { href: "/workflows", label: "Workflows" },
   { href: "/chat", label: "Chat" },

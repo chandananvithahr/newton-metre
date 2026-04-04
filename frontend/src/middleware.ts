@@ -36,7 +36,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  const protectedPaths = ["/estimate", "/similar", "/chat", "/workflows", "/mpn"];
+  const protectedPaths = ["/estimate", "/similar", "/chat", "/workflows", "/mpn", "/library"];
   const isProtected = protectedPaths.some((p) =>
     request.nextUrl.pathname.startsWith(p),
   );
@@ -58,5 +58,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/estimate/:path*", "/similar/:path*", "/chat/:path*", "/workflows/:path*", "/mpn/:path*", "/login"],
+  matcher: ["/dashboard/:path*", "/estimate/:path*", "/similar/:path*", "/chat/:path*", "/workflows/:path*", "/mpn/:path*", "/library/:path*", "/login"],
 };
