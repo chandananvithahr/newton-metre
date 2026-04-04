@@ -47,6 +47,7 @@ function LoginContent() {
   const [emailSent, setEmailSent] = useState(false);
 
   const redirectTo = searchParams.get("redirect");
+  const waitlistProduct = searchParams.get("waitlist");
 
   useEffect(() => {
     const callbackError = searchParams.get("error");
@@ -110,6 +111,7 @@ function LoginContent() {
               full_name: fullName,
               company,
               sourcing_country: country,
+              ...(waitlistProduct ? { waitlist_product: waitlistProduct } : {}),
             },
           },
         });
@@ -210,10 +212,10 @@ function LoginContent() {
             ) : (
               <>
                 <h1 className="text-2xl mb-1 text-center tracking-tight text-[var(--color-text-primary)] font-bold" style={{ fontFamily: "var(--font-headline)" }}>
-                  {isSignUp ? "Create your account" : "Welcome back"}
+                  {isSignUp ? (waitlistProduct === "procurement-brain" ? "Join the waitlist" : "Create your account") : "Welcome back"}
                 </h1>
                 <p className="text-[var(--color-text-description)] text-sm text-center mb-8" style={{ fontFamily: "var(--font-body)" }}>
-                  {isSignUp ? "Start estimating costs in under a minute." : "Log in to continue."}
+                  {isSignUp ? (waitlistProduct === "procurement-brain" ? "Be first to access Procurement Intel." : "Start estimating costs in under a minute.") : "Log in to continue."}
                 </p>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
