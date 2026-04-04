@@ -404,7 +404,7 @@ export default function NewEstimatePage() {
   function MissionLog({ lines, subtitle }: { lines: string[]; subtitle?: string }) {
     return (
       <div className="min-h-screen warm-gradient-page">
-        <AppNav />
+        <AppNav active="/estimate/new" />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-12">
           <StepProgress />
           <div className="bg-white rounded-xl ghost-border ambient-shadow p-10">
@@ -440,7 +440,7 @@ export default function NewEstimatePage() {
   if (step === "type") {
     return (
       <div className="min-h-screen warm-gradient-page">
-        <AppNav />
+        <AppNav active="/estimate/new" />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-12">
           <h1 className="text-4xl mb-2 tracking-tight text-[var(--color-text-primary)]" style={{ fontFamily: "var(--font-headline)" }}>What are we costing?</h1>
           <p className="text-[var(--color-text-description)] mb-8 text-base leading-relaxed">
@@ -487,7 +487,7 @@ export default function NewEstimatePage() {
   if (step === "upload") {
     return (
       <div className="min-h-screen warm-gradient-page">
-        <AppNav />
+        <AppNav active="/estimate/new" />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-12">
           <StepProgress />
           <button
@@ -627,7 +627,7 @@ export default function NewEstimatePage() {
 
     return (
       <div className="min-h-screen warm-gradient-page">
-        <AppNav />
+        <AppNav active="/estimate/new" />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-8">
           <StepProgress />
           <h1 className="text-4xl mb-2 tracking-tight text-[var(--color-text-primary)]" style={{ fontFamily: "var(--font-headline)" }}>Here&apos;s what we found</h1>
@@ -721,7 +721,7 @@ export default function NewEstimatePage() {
   if (step === "result" && result) {
     return (
       <div className="min-h-screen warm-gradient-page">
-        <AppNav />
+        <AppNav active="/estimate/new" />
         <div className="max-w-3xl mx-auto px-4 sm:px-8 py-8">
           <StepProgress />
           <div className="flex items-center justify-between mb-6">
@@ -869,7 +869,7 @@ export default function NewEstimatePage() {
     const canAnalyze = asmComponents.length >= 2;
     return (
       <div className="min-h-screen warm-gradient-page">
-        <AppNav />
+        <AppNav active="/estimate/new" />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-12">
           <button onClick={() => setStep("type")} className="flex items-center gap-2 text-[var(--color-text-description)] hover:text-[var(--color-text-description)] text-sm mb-6 transition-colors">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
@@ -1010,7 +1010,7 @@ export default function NewEstimatePage() {
 
     return (
       <div className="min-h-screen warm-gradient-page">
-        <AppNav />
+        <AppNav active="/estimate/new" />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-8">
           <h1 className="text-3xl mb-2 tracking-tight text-[var(--color-text-primary)]" style={{ fontFamily: "var(--font-headline)" }}>Review Components</h1>
           <p className="text-[var(--color-text-description)] text-sm mb-6">
@@ -1132,7 +1132,7 @@ export default function NewEstimatePage() {
   if (step === "assembly-joining") {
     return (
       <div className="min-h-screen warm-gradient-page">
-        <AppNav />
+        <AppNav active="/estimate/new" />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-8">
           <h1 className="text-3xl mb-2 tracking-tight text-[var(--color-text-primary)]" style={{ fontFamily: "var(--font-headline)" }}>Joining Method</h1>
           <p className="text-[var(--color-text-description)] text-sm mb-8">
@@ -1218,7 +1218,7 @@ export default function NewEstimatePage() {
     const r = assemblyResult;
     return (
       <div className="min-h-screen warm-gradient-page">
-        <AppNav />
+        <AppNav active="/estimate/new" />
         <div className="max-w-3xl mx-auto px-4 sm:px-8 py-8">
           <div className="mb-6">
             <h1 className="text-3xl tracking-tight text-[var(--color-text-primary)]" style={{ fontFamily: "var(--font-headline)" }}>Assembly Should-Cost</h1>

@@ -8,6 +8,7 @@ import {
   type WorkflowSummary,
   type WorkflowState,
 } from "@/lib/api";
+import { AppNav } from "@/components/app-nav";
 
 const STATE_BADGE: Record<WorkflowState, { label: string; color: string }> = {
   created:           { label: "Created",     color: "bg-gray-100 text-gray-700" },
@@ -71,6 +72,7 @@ export default function WorkflowsPage() {
 
   return (
     <div className="min-h-screen warm-gradient-page">
+      <AppNav active="/workflows" />
       <div className="max-w-4xl mx-auto px-4 sm:px-8 py-10">
 
         {/* Header */}
