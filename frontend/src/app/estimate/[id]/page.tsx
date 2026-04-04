@@ -181,6 +181,7 @@ export default function ViewEstimatePage() {
           Back to Dashboard
         </button>
       </div>
+
     </div>
   );
 }

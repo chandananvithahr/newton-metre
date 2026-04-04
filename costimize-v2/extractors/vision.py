@@ -119,13 +119,15 @@ Return ONLY the JSON object, no markdown fences or extra text."""
 MULTI_VIEW_PROMPT_PREFIX = """You are an expert mechanical engineer analyzing MULTIPLE SHEETS of an engineering drawing for the SAME part.
 These sheets show different views (front view, side view, section view, detail view, isometric) of a single manufactured part.
 
-CRITICAL FIRST STEP — check if all sheets belong to the SAME part:
-- Look for part numbers, drawing numbers, title blocks on each sheet
-- Check if geometries are compatible (a shaft shown in two views vs two completely different parts)
-- If the sheets appear to show DIFFERENT, UNRELATED parts, respond ONLY with:
+IMPORTANT: The user has already confirmed these sheets belong to the same part.
+- If sheets look identical or very similar, that is FINE — they are duplicate views or the same drawing page. Proceed with extraction.
+- If sheets share the same drawing number, title block, or compatible geometries, they are the SAME part. Proceed with extraction.
+- ONLY flag a mismatch if the sheets show CLEARLY DIFFERENT, UNRELATED parts (e.g., a gear vs a bracket with completely different drawing numbers and geometries).
+- When in doubt, assume they are the same part and proceed with extraction.
+- If you must flag a mismatch, respond ONLY with:
   {"mismatch": true, "reason": "<brief explanation of why they differ>"}
 
-If all sheets show the SAME part, extract COMPLETE information by combining all views.
+Extract COMPLETE information by combining all views.
 Use each view to fill in dimensions that may not be visible in other views.
 
 """ + EXTRACTION_PROMPT

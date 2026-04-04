@@ -271,10 +271,36 @@ export default function NewEstimatePage() {
 
   // ─── Assembly handlers ────────────────────────────────────────────────────
 
-  function handleAsmFilesAdded(files: FileList | null) {
+  async function handleAsmFilesAdded(files: FileList | null) {
     if (!files) return;
-    const next = Array.from(files).map(newAsmComponent);
-    setAsmComponents((prev) => [...prev, ...next]);
+    const DRAWING_EXTS = [".pdf", ".png", ".jpg", ".jpeg", ".dxf", ".dwg", ".step", ".stp", ".tiff", ".webp"];
+    const allFiles: File[] = [];
+
+    for (const f of Array.from(files)) {
+      if (f.name.toLowerCase().endsWith(".zip")) {
+        try {
+          const JSZip = (await import("jszip")).default;
+          const zip = await JSZip.loadAsync(f);
+          const entries = Object.values(zip.files).filter(
+            (entry) => !entry.dir && DRAWING_EXTS.some((ext) => entry.name.toLowerCase().endsWith(ext))
+          );
+          for (const entry of entries) {
+            const blob = await entry.async("blob");
+            const name = entry.name.split("/").pop() || entry.name;
+            allFiles.push(new File([blob], name, { type: blob.type || "application/octet-stream" }));
+          }
+        } catch {
+          setError(`Failed to extract ${f.name}. Make sure it's a valid ZIP file.`);
+        }
+      } else {
+        allFiles.push(f);
+      }
+    }
+
+    if (allFiles.length > 0) {
+      const next = allFiles.map(newAsmComponent);
+      setAsmComponents((prev) => [...prev, ...next]);
+    }
   }
 
   function handleAsmRemoveComponent(id: string) {
@@ -895,8 +921,8 @@ export default function NewEstimatePage() {
               </svg>
             </div>
             <p className="text-sm text-[var(--color-text-description)]">{asmComponents.length === 0 ? "Add component drawings" : "Add more components"}</p>
-            <p className="text-xs text-[var(--color-text-muted)] mt-1">PDF, PNG, or JPG — one file per component</p>
-            <input id="asm-file-input" type="file" accept=".pdf,.png,.jpg,.jpeg,.dxf,.dwg,.step,.stp" multiple onChange={(e) => handleAsmFilesAdded(e.target.files)} className="hidden" />
+            <p className="text-xs text-[var(--color-text-muted)] mt-1">PDF, PNG, DXF, DWG, STEP — or a ZIP file containing all component drawings</p>
+            <input id="asm-file-input" type="file" accept=".pdf,.png,.jpg,.jpeg,.dxf,.dwg,.step,.stp,.zip" multiple onChange={(e) => handleAsmFilesAdded(e.target.files)} className="hidden" />
           </div>
 
           <div className="flex items-center gap-4 mb-6">

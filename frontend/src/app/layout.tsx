@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Newsreader, Space_Grotesk, DM_Mono, IBM_Plex_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { ToastProvider } from "@/components/Toast";
+import { AppShell } from "@/components/app-shell";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
@@ -54,7 +55,9 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen antialiased">
         <ToastProvider>
-          {children}
+          <AppShell>
+            {children}
+          </AppShell>
         </ToastProvider>
         <Analytics />
       </body>

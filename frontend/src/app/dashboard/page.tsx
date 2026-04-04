@@ -75,7 +75,7 @@ export default function DashboardPage() {
   const { today, yesterday, older } = groupByDate(estimates);
 
   return (
-    <div className="flex h-screen warm-gradient-page overflow-hidden">
+    <div className="flex h-full min-h-screen warm-gradient-page overflow-hidden">
 
       {/* ── Sidebar — history ─────────────────────────────────── */}
       <aside className="w-60 bg-white/80 backdrop-blur-sm border-r border-black/10 flex flex-col h-full shrink-0">
