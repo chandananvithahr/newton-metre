@@ -87,7 +87,7 @@ export default function DashboardPage() {
               <div className="absolute inset-0 logo-gradient rounded-xl" />
               <span className="relative text-white font-mono font-bold text-sm tracking-tighter">N·m</span>
             </div>
-            <span className="text-[var(--color-brand-dark)] text-lg font-semibold tracking-tight" style={{ fontFamily: "var(--font-headline)", fontStyle: "italic" }}>Newton-Metre</span>
+            <span className="text-[var(--color-brand-dark)] text-lg font-bold tracking-tight" style={{ fontFamily: "var(--font-body)" }}>Newton-Metre</span>
           </Link>
         </div>
 

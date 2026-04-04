@@ -132,181 +132,9 @@ cd costimize-v2 && python -m pytest tests/test_agent_*.py # Run 183 agent tests 
 
 ### Project Structure
 
-```
-frontend/                             # Next.js frontend (Vercel)
-├── src/app/
-│   ├── layout.tsx                    # Root layout, Google Fonts, AppShell wrapper, Vercel Analytics
-│   ├── globals.css                   # Tailwind v4 + design system tokens (all colors as CSS custom properties)
-│   ├── page.tsx                      # Landing page (hero, problem, should-cost, similarity search, how-it-works, built-for-india, pricing)
-│   ├── login/page.tsx                # Signup/login with Supabase Auth
-│   ├── dashboard/page.tsx            # 3-card hub: should-cost, similarity search, chat + history sidebar
-│   ├── estimate/new/page.tsx         # Upload → extract → review → calculate → result (single + assembly with ZIP)
-│   ├── estimate/[id]/page.tsx        # Estimate detail view
-│   ├── chat/page.tsx                 # Full-page chat (also available as side panel on all pages)
-│   └── similar/page.tsx              # Multi-file similarity search
-├── src/components/
-│   ├── app-shell.tsx                 # Split-screen wrapper: page content (left) + ChatPanel (right 380px)
-│   ├── chat-widget.tsx               # ChatPanel component — ChatGPT-style AI chat (Gemini-powered)
-│   ├── app-nav.tsx                   # Top navigation bar for authenticated pages
-│   ├── landing-nav.tsx               # Navigation bar for landing page
-│   ├── Toast.tsx                     # Toast notification system
-│   └── landing/                      # Landing page section components
-├── src/lib/
-│   ├── api.ts                        # API client with safeFetch error handling + chat API
-│   └── supabase.ts                   # Supabase browser client
-├── src/middleware.ts                  # Auth middleware (protects /dashboard, /estimate, /similar, /chat)
-└── .env.local                        # Supabase + API URL config
+**Frontend** (`frontend/`): Next.js pages in `src/app/` (landing, login, dashboard, estimate/new, estimate/[id], chat, similar, workflows). Components in `src/components/` (app-shell, chat-widget, app-nav, landing-nav, Toast). Lib: `src/lib/api.ts` + `supabase.ts`. Auth middleware in `src/middleware.ts`.
 
-costimize-v2/
-├── app.py                        # Tab router + sidebar PO upload (~40 lines)
-├── config.py                     # All rates, constants, API keys (single source of truth)
-├── requirements.txt
-│
-├── agents/                       # Multi-agent procurement framework (Product 3)
-│   ├── __init__.py
-│   ├── types.py                  # WorkflowState, ExecutionMode, AgentResult, WorkflowContext (frozen)
-│   ├── base.py                   # BaseAgent Protocol (duck typing) + AgentRegistry
-│   ├── engine.py                 # AgentEngine: pipeline routing, parallel exec, approval gates
-│   ├── checkpoint.py             # Supabase persistence, row-level locking for resume
-│   ├── llm.py                    # LLM-agnostic client (Gemini/OpenAI/vLLM → one interface)
-│   ├── memory.py                 # 3-layer: WorkingMemory + EpisodicMemory + SemanticMemory
-│   ├── extraction_agent.py       # Wraps extractors/vision.py
-│   ├── cost_agent.py             # Wraps all 4 cost engines, auto part-type detection
-│   ├── similarity_agent.py       # Wraps similarity searcher, graceful degradation
-│   ├── rfq_agent.py              # RFQ email construction + forbidden content scanning
-│   ├── quote_comparison_agent.py # Quote normalization, anomaly detection, vendor ranking
-│   ├── negotiation_agent.py      # MESO counter-offers, 3 execution modes, memory-driven
-│   ├── proposal_agent.py         # Management-ready procurement proposals
-│   └── meeting_agent.py          # Pre-meeting briefs + post-meeting analysis
-│
-├── ui/
-│   ├── components.py             # Shared widgets (cost table, historical comparison, confidence badges)
-│   ├── mechanical_tab.py         # Mechanical parts UI (upload → extract → validate → display)
-│   ├── pcb_tab.py                # PCB assembly UI (BOM → prices → calculate → display)
-│   ├── cable_tab.py              # Cable assembly UI (BOM → calculate → display)
-│   └── similarity_tab.py         # Similarity search UI (upload 2+ drawings → compare)
-│
-├── engines/
-│   ├── mechanical/
-│   │   ├── cost_engine.py        # Multi-process cost calculator (frozen dataclass output)
-│   │   ├── cutting_data.py       # Physics-based cutting parameters — Sandvik kc1, Taylor tool life, MRR data for 9 materials
-│   │   ├── process_db.py         # 18 processes with MRR-based time estimation (physics, not heuristics)
-│   │   ├── material_db.py        # Material prices, densities, machinability
-│   │   ├── surface_treatment_db.py  # 40+ surface treatments (electroplating, anodizing, conversion, spray, paint, PVD/CVD)
-│   │   └── heat_treatment_db.py  # 15 heat treatment processes (hardening, carburizing, nitriding, etc.)
-│   ├── sheet_metal/
-│   │   ├── cost_engine.py        # Sheet metal should-cost calculator (frozen dataclass output)
-│   │   ├── cutting_db.py         # Fiber laser 3kW cutting speeds for 6 material groups × 9 thicknesses
-│   │   ├── bending_db.py         # Press brake tonnage formula, bend time, K-factors
-│   │   └── material_db.py        # 9 sheet materials, nesting utilization calculator
-│   ├── pcb/
-│   │   ├── cost_engine.py        # PCB assembly cost calculator
-│   │   ├── bom_parser.py         # CSV/Excel BOM auto-column detection
-│   │   └── fab_cost.py           # Bare board fabrication cost model
-│   ├── cable/
-│   │   ├── cost_engine.py        # Cable assembly cost calculator
-│   │   └── bom_parser.py         # Reuses PCB parser + wire/connector counting
-│   ├── validation/
-│   │   ├── orchestrator.py       # THE BRAIN: parallel physics + Gemini, routes by confidence tier
-│   │   ├── comparator.py         # Delta %, confidence tier enum (HIGH/MEDIUM/LOW/INSUFFICIENT)
-│   │   ├── arbitrator.py         # AI agent resolves 7-15% gaps via Gemini
-│   │   ├── interactive.py        # Generates clarifying questions for >15% gaps (max 2 rounds)
-│   │   └── data_collector.py     # JSON persistence + ML training data export
-│   └── similarity/
-│       ├── preprocessor.py       # Any format (PDF/DXF/image) → clean image + thumbnail
-│       ├── embedder.py           # 3 strategies: Gemini API (0 RAM) → image hash (0 deps) → DINOv2 (future)
-│       ├── indexer.py            # FAISS + numpy brute-force fallback, JSON metadata sidecar
-│       ├── ranker.py             # 4-signal weighted ranking (visual+material+dimension+process)
-│       └── searcher.py           # Full search API (preprocess → embed → search → rank)
-│
-├── extractors/
-│   ├── vision.py                 # AI drawing analysis (GPT-4o / Gemini fallback)
-│   ├── process_detector.py       # AI + rule-based process detection
-│   ├── bom_extractor.py          # AI extracts BOM from PDF
-│   ├── gemini_estimator.py       # Gemini end-to-end cost estimate (for validation loop)
-│   ├── pdf_classifier.py         # GPT-4o-mini classifies PDFs → rfq/drawing/contract/spec_sheet/other
-│   └── rfq_extractor.py          # GPT-4o extracts RFQ line items (dimensions + processes) via PyMuPDF
-│
-├── scrapers/
-│   ├── component_scraper.py      # DigiKey/Mouser web scraping with 24hr cache
-│   └── material_scraper.py       # Metal raw material prices (INR) with cache
-│
-├── history/
-│   ├── po_parser.py              # Parse Excel/CSV purchase orders
-│   ├── po_store.py               # JSON storage with deduplication
-│   └── po_matcher.py             # Part number exact match + description keyword fallback
-│
-├── data/
-│   ├── materials.json            # 9 materials (Aluminum through Titanium)
-│   ├── processes.json            # 18 manufacturing processes
-│   ├── cache/                    # Scraped price cache (24hr TTL)
-│   ├── history/                  # Stored historical PO records (JSON)
-│   ├── validation/               # Validated estimate pairs for ML training
-│   └── similarity/               # Vector index + metadata (session-scoped for regular users)
-│
-├── papers/                       # Reference PDFs — LOCAL ONLY, stripped from git history
-│
-├── supabase/migrations/          # Database migrations
-│   ├── 005_agent_workflows.sql   # agent_workflows + agent_checkpoints + agent_audit_log
-│   ├── 006_suppliers.sql         # suppliers + supplier_contacts
-│   ├── 007_negotiation_memory.sql # negotiation_episodes + supplier_intelligence
-│   ├── 008_rfq_templates.sql     # rfq_templates with default Indian mfg template
-│   ├── 009_vendor_quotes.sql     # vendor_quotes + quote_comparisons
-│   └── 010_procurement_proposals.sql # procurement_proposals
-│
-├── docs/research/                # 24 research docs (20,000+ lines total)
-│   ├── MASTER-RESEARCH-REPORT.md # Single source of truth — all research consolidated
-│   ├── comprehensive-market-strategy-research.md
-│   ├── PDF-PARSING-DEEP-DIVE.md
-│   ├── dxf-extraction-deep-dive.md
-│   ├── indian-manufacturing-drawings-research.md
-│   ├── cad-software-file-formats-by-country.md
-│   ├── PHYSICS-ENGINE-KNOWLEDGE-MAP.md    # Formulas, cutting params from 8 PDFs + 30 papers
-│   ├── SANDVIK-DATA-EXTRACTION.md         # kc1 values, power formulas, tool life factors
-│   ├── MANUFACTURING-PROCESSES-BY-INDUSTRY.md  # 130+ processes × defense/aero/auto with standards
-│   ├── BIBLIOGRAPHY-SOURCES.md            # 60+ books, papers, sources prioritized
-│   ├── sheet-metal-cost-estimation.md     # Laser, bending, stamping, deep drawing models
-│   ├── INDIAN-REGIONAL-COSTS.md           # Labour/machine rates for 15 cities, power for 13 states
-│   ├── ML-STRATEGY-FOR-COST-ESTIMATION.md # Physics+ML hybrid, 4-phase roadmap
-│   ├── PROCESS-80-20-ANALYSIS.md          # Big 6 processes = 60-65% of parts
-│   ├── SURFACE-TREATMENT-PROCESSES.md     # 45+ processes, Indian rates, mil-specs
-│   ├── GITHUB-REPOS-SURVEY.md            # 79 repos, no open-source should-cost tool exists
-│   ├── INDUSTRY-REPORTS-AND-BOOKS.md     # SIAM, CII, ACMA, DRDO reports + catalogs
-│   ├── BOOTHROYD-ECONOMICS-EXTRACTION.md  # Ch6 cost formulas, Taylor tool life, nonproductive time
-│   ├── SIAM-REPORT-EXTRACTION.md          # Indian auto industry 31M vehicles, regional hubs
-│   ├── PRACTICAL-MACHINING-DATA.md        # Theory vs shop floor derating, cycle time breakdowns
-│   ├── MACHINERYS-HANDBOOK-EXTRACTION.md  # Cutting speeds, power constants, econometrics, tolerances
-│   ├── KENNAMETAL-DATA-EXTRACTION.md      # Unit power constants, carbide grades, grooving speeds, cross-validation
-│   ├── INDIAN-MANUFACTURING-DATA-EXTRACTION.md  # BIS steel grades, govt machine hour rates, Totem cutting data
-│   ├── SIMILARITY-SEARCH-DEEP-DIVE.md    # Full tech landscape: Google ScaNN, embeddings, ColPali, RAG, GraphRAG, infra costs, ROI, company brain strategy
-│   └── MULTI-AGENT-ARCHITECTURE-RESEARCH.md  # 22 sources: agent frameworks, Pactum AI patterns, state machines, negotiation memory
-│
-├── demos/
-│   └── dinov2_demo.py            # Interactive DINOv2 demo (requires torch, for learning)
-│
-└── tests/                        # 347 tests across 20 files
-    ├── test_config.py            # 2 tests
-    ├── test_mechanical_engine.py  # 19 tests (physics-based MRR, Sandvik, Taylor)
-    ├── test_sheet_metal_engine.py # 28 tests (laser cutting, bending, material, integration)
-    ├── test_surface_treatment.py  # 19 tests (40+ processes, area costing, H.E. baking)
-    ├── test_heat_treatment.py    # 12 tests (15 processes, weight costing)
-    ├── test_extractors.py        # 6 tests
-    ├── test_pcb_engine.py        # 5 tests
-    ├── test_cable_engine.py      # 3 tests
-    ├── test_component_scraper.py  # 3 tests
-    ├── test_material_scraper.py  # 3 tests
-    ├── test_history.py           # 5 tests
-    ├── test_validation.py        # 29 tests (comparator, arbitrator, interactive, orchestrator)
-    ├── test_similarity.py        # 32 tests (preprocessor, ranker, indexer, searcher)
-    ├── test_agent_base.py        # 31 tests (types, enums, registry, protocol)
-    ├── test_agent_engine.py      # 18 tests (routing, pipelines, parallel, approval gates, resume)
-    ├── test_agent_wrappers.py    # 30 tests (extraction, cost, similarity agent wrappers)
-    ├── test_agent_rfq.py         # 17 tests (RFQ validation, forbidden content, email gen)
-    ├── test_agent_quote_comparison.py  # 19 tests (normalization, anomalies, ranking)
-    ├── test_agent_memory.py      # 31 tests (WorkingMemory, EpisodicMemory, SemanticMemory)
-    ├── test_agent_negotiation.py # 14 tests (counter-offers, analysis, target pricing)
-    └── test_agent_proposal_meeting.py  # 23 tests (proposals, briefs, meeting analysis)
-```
+**Backend** (`costimize-v2/`): `agents/` (8 procurement agents + engine + memory + checkpoint), `engines/` (mechanical, sheet_metal, pcb, cable, validation, similarity), `extractors/` (vision, process_detector, bom, gemini_estimator, pdf_classifier, rfq), `scrapers/` (component, material), `history/` (po_parser/store/matcher), `ui/` (Streamlit tabs), `tests/` (347 tests, 20 files), `docs/research/` (24 docs — see `MASTER-RESEARCH-REPORT.md`), `supabase/migrations/` (005-010).
 
 ### Data Flow
 
@@ -459,81 +287,9 @@ PIPELINES = {
 
 ---
 
-## Research & Strategy (docs/research/)
+## Research & Strategy
 
-Comprehensive research conducted March-April 2026 covering:
-- **Competitive landscape:** aPriori (physics, 3D only), CADDi ($1.4B, 28 patents, similarity search), IndustrialMind.ai (direct competitor, ex-Tesla, wrapping APIs)
-- **VLM benchmarks:** Qwen2.5-VL-7B beats GPT-4o on document understanding. Fine-tuning path: LoRA on 1,000 drawings for $6-16
-- **CAPP papers:** ARKNESS (KG + 3B Llama = GPT-4o on machining), CAPP-GPT (process planning from CAD B-Rep)
-- **Format priorities:** PDF (have it) → STEP (next, 2-3 days) → DXF → DWG
-- **Business model:** Per-estimate → SaaS → enterprise on-prem
-- **80/20 analysis:** Big 6 processes cover 60-65% of all parts; machining + sheet metal + casting + forging = 80%
-- **ML strategy:** Physics stays foundation; ML adds correction factors after 50-100 estimate-actual pairs; no public cost datasets exist (our moat)
-- **Indian regional costs:** Labour/machine rates for 15 cities; 25% cost spread between cheapest (Pithampur) and most expensive (Bangalore)
-- **Surface treatments:** 45+ processes documented with Indian rates, mil-specs, H.E. baking requirements
-- **GitHub landscape:** 79 repos surveyed; zero open-source should-cost tools exist; SVGnest (2.5K stars) for nesting, AAGNet for feature recognition
-- **Industry reports:** SIAM, CII, ACMA, DRDO/HAL reports identified; CMTI Machine Hour Rate Guide is #1 Indian-specific resource
-- **Boothroyd economics:** Ch6 cost formulas, Taylor tool life optimization, nonproductive time = 50-60% of cycle (key insight)
-- **SIAM auto industry:** 31M vehicles produced, 43L PV sold, regional hub mapping for component demand
-- **Practical machining:** Theory vs shop floor derating (0.65-0.85×), cycle time breakdowns, Indian rates
-- **Machinery's Handbook:** Cutting speeds for 20+ materials × 5 tool types, power constants Kp/C/W, machining econometrics (Taylor/Colding/ECT), sheet metal bend formulas, machinability ratings, tolerance IT grades by process
-- **Kennametal:** Unit power constants for 16 materials (AISI grades), carbide grade compositions, grooving/parting speeds for all ISO groups, machinability factors, cross-validation against Sandvik kc1 values
-- **Indian manufacturing data:** BIS steel grades (IS 2062, IS 1570) mapped to ISO groups, government machine hour rates from MSME Kolkata & CTR Ludhiana, Totem catalog cutting speeds, EN-to-IS grade cross-references
-
-See `MASTER-RESEARCH-REPORT.md` for the consolidated single source of truth.
-
-### Similarity Search & Company Brain (April 2026)
-
-Deep research across 8 parallel agents covering Google ScaNN/Vertex AI, embedding models (DINOv2/CLIP/SigLIP2/ColPali), RAG/GraphRAG/LightRAG, 40+ GitHub repos, 30+ papers, infrastructure costs at 4 scales, ROI analysis, and competitive positioning. Key findings:
-
-- **Embedding quality is the bottleneck**, not the vector DB or ANN algorithm
-- **DINOv2 is 2.3x better than CLIP** for visual similarity (64% vs 28%)
-- **ColFlor (174M params)** fits 8GB RAM for on-prem defense — 17x smaller than ColPali, 1.8% quality drop
-- **Gemini Embedding 2** embeds PDFs directly (up to 6 pages), 768-dim with Matryoshka
-- **pgvector is sufficient** until 50M+ vectors (471 QPS at 99% recall with pgvectorscale)
-- **Company brain market: $7.66B → $51.36B by 2030** (47% CAGR)
-- **ROI: 43x** for a $50M-procurement manufacturer ($4.3M savings on $100K/year subscription)
-- **No competitor does should-cost + similarity + company memory** from 2D drawings
-
-See `SIMILARITY-SEARCH-DEEP-DIVE.md` for the full 14-section deep dive.
-
-### AI Agent & Self-Hosted AI Strategy (April 2026)
-
-In-app conversational AI agent + progressive migration from cloud APIs to own fine-tuned models. Key decisions:
-
-- **Agent architecture** — LLM-agnostic tool orchestration. 5 tools: search_estimates, find_similar_parts, get_supplier_history, explain_cost_breakdown, calculate_quick_cost. OpenAI-compatible API interface = swap models via config
-- **Fine-tuning priority** — (1) Extraction: Qwen2.5-VL-7B, 200+ drawings, $7-13/run. (2) Embeddings: DINOv2, 500+ pairs, $3-5/run. (3) Agent: Qwen2.5-32B, 500+ conversations, $13-26/run. (4) Validation: Qwen2.5-7B, 300+ pairs, $5-10/run
-- **Self-hosted stack** — vLLM + TEI on single A6000 (48GB) or RTX 4090 (24GB). All models fit: extraction (5GB) + agent (20GB) + embeddings (0.7GB) = 25.7GB
-- **Defense on-prem** — Ship GPU box ($1,800-4,500) with Ubuntu + vLLM + fine-tuned models. Air-gapped. No internet required
-- **Data collection** — Every cloud API call logged as training triple. Automatic annotation pipeline: user corrections = gold labels
-- **Total fine-tuning cost: ~$50-80** over 6 months. **Breakeven vs cloud: ~50-100 active users**
-- **Open-source function calling** — Qwen2.5-32B-Instruct is top-3 on Berkeley Function-Calling Leaderboard. Minimum reliable size for tool use: 32B params
-
-**AI Evals (Karpathy autoresearch pattern):**
-- **promptfoo** (primary) — YAML config, side-by-side model comparison, JSON schema assertions, CI/CD integration
-- **deepeval** (Python) — pytest-style, 14+ metrics, tool correctness, LLM-as-judge
-- **Autoresearch loop** — modify prompt/model → run eval suite → keep if improved → discard if regressed → repeat
-- Golden datasets in `costimize-v2/evals/`: 50 extraction test cases, 50 agent tool-calling cases, 20 similarity queries
-- Decision rule: fine-tuned model replaces cloud API only when eval metrics match or beat baseline
-- Inspired by [github.com/karpathy/autoresearch](https://github.com/karpathy/autoresearch) — AI agent experiments autonomously, ~100 experiments overnight
-
-See `AI-AGENT-ROADMAP.md` for the full 11-section strategy document.
-
-### Multi-Agent Architecture (April 2026)
-
-22-source research covering agent frameworks, Pactum AI patterns, state machines, negotiation memory. Key decisions:
-
-- **Raw Python over frameworks** — no CrewAI/AutoGen/LangGraph. 72% of enterprise AI uses multi-agent, but framework lock-in is real
-- **Pactum AI as reference** — hybrid rule-based + LLM architecture (physics engines calculate, LLMs communicate). Walmart case: 2,000+ suppliers, 3% savings, 35 days payment term extension
-- **Deterministic routing** — `PIPELINES` dict maps workflow types to agent sequences. LLM never decides routing
-- **MESO strategy** — Multiple Equivalent Simultaneous Offers from Pactum research for negotiation
-- **Forbidden content scanning** — all supplier-facing emails checked for should-cost/target price/budget leakage
-- **8 agents built** — extraction, cost, similarity (wrap existing code) + rfq, quote_comparison, negotiation, proposal, meeting (new capabilities)
-- **183 tests** across 8 test files, all passing
-
-See `MULTI-AGENT-ARCHITECTURE-RESEARCH.md` for the full research report.
-
----
+24 research docs in `docs/research/` (20,000+ lines). See `MASTER-RESEARCH-REPORT.md` for consolidated findings. Key docs: `SIMILARITY-SEARCH-DEEP-DIVE.md`, `MULTI-AGENT-ARCHITECTURE-RESEARCH.md`, `AI-AGENT-ROADMAP.md`, `PHYSICS-ENGINE-KNOWLEDGE-MAP.md`.
 
 ## Legacy v1 (Root Files)
 
@@ -556,3 +312,53 @@ The original single-process CNC turning estimator. Monolithic `app.py` (1146 lin
 - **QA everything before deploy** — test all auth flows, redirects, nav states, empty/loading/error states. User should never find edge case bugs.
 - **Copy rules** — never say "physics" or show formulas in user-facing copy. Sell the answer, not the method. Multi-audience positioning (procurement, design, QA, leadership). Similarity search = "knowledge as asset" (CADDi-inspired), must appear in 3+ places.
 - **Verify file writes** — after writing session/save files, always `ls -la` to confirm they exist. User burned by phantom saves.
+
+## Execution Discipline
+
+### 1. Plan Mode Default
+- Enter plan mode for ANY non-trivial task (3+ steps or architectural decisions).
+- If something goes sideways, STOP and re-plan immediately — don't keep pushing.
+- Use plan mode for verification steps, not just building.
+- Write detailed specs upfront to reduce ambiguity.
+
+### 2. Subagent Strategy
+- Use subagents liberally to keep main context window clean.
+- Offload research, exploration, and parallel analysis to subagents.
+- For complex problems, throw more compute at it via subagents.
+- One task per subagent for focused execution.
+
+### 3. Self-Improvement Loop
+- After ANY correction from the user: update `tasks/lessons.md` with the pattern.
+- Write rules for yourself that prevent the same mistake.
+- Ruthlessly iterate on these lessons until mistake rate drops.
+- Review lessons at session start for relevant project.
+
+### 4. Verification Before Done
+- Never mark a task complete without proving it works.
+- Diff behavior between main and your changes when relevant.
+- Ask yourself: "Would a staff engineer approve this?"
+- Run tests, check logs, demonstrate correctness.
+
+### 5. Demand Elegance (Balanced)
+- For non-trivial changes: pause and ask "is there a more elegant way?"
+- If a fix feels hacky: "Knowing everything I know now, implement the elegant solution."
+- Skip this for simple, obvious fixes — don't over-engineer.
+- Challenge your own work before presenting it.
+
+### 6. Autonomous Bug Fixing
+- When given a bug report: just fix it. Don't ask for hand-holding.
+- Point at logs, errors, failing tests — then resolve them.
+- Zero context switching required from the user.
+- Go fix failing CI tests without being told how.
+
+### Task Management
+1. **Plan First**: Write plan to `tasks/todo.md` with checkable items.
+2. **Verify Plan**: Check in before starting implementation.
+3. **Track Progress**: Mark items complete as you go.
+4. **Explain Changes**: High-level summary at each step.
+5. **Document Results**: Add review section to `tasks/todo.md`.
+6. **Capture Lessons**: Update `tasks/lessons.md` after corrections.
+
+### Core Principles
+- **Simplicity First**: Make every change as simple as possible. Impact minimal code.
+- **No Laziness**: Find root causes. No temporary fixes. Senior developer standards.

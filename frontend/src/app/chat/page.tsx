@@ -166,7 +166,7 @@ export default function ChatPage() {
               <div className="absolute inset-0 logo-gradient rounded-xl" />
               <span className="relative text-white font-mono font-bold text-xs tracking-tighter">N·m</span>
             </div>
-            <span className="text-[var(--color-brand-dark)] text-lg font-semibold tracking-tight" style={{ fontFamily: "var(--font-headline)", fontStyle: "italic" }}>
+            <span className="text-[var(--color-brand-dark)] text-lg font-bold tracking-tight" style={{ fontFamily: "var(--font-body)" }}>
               Newton-Metre
             </span>
           </Link>

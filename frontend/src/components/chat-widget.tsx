@@ -85,7 +85,7 @@ export function ChatPanel() {
             <span className="relative text-white font-mono font-bold text-sm tracking-tighter">N·m</span>
           </div>
           <div>
-            <span className="text-[var(--color-brand-dark)] text-[15px] font-semibold tracking-tight" style={{ fontFamily: "var(--font-headline)", fontStyle: "italic" }}>
+            <span className="text-[var(--color-brand-dark)] text-[15px] font-bold tracking-tight" style={{ fontFamily: "var(--font-body)" }}>
               Newton-Metre
             </span>
             <p className="text-[10px] text-[var(--color-text-muted)] font-medium uppercase tracking-[0.15em]" style={{ fontFamily: "var(--font-label)" }}>

@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 const NAV_LINKS = [
-  { href: "/dashboard", label: "Dashboard" },
   { href: "/estimate/new", label: "Should-Cost" },
   { href: "/similar", label: "Similarity" },
   { href: "/workflows", label: "Workflows" },
@@ -22,7 +21,7 @@ export function AppNav({ children, active }: AppNavProps) {
             <div className="absolute inset-0 bg-[var(--color-brand-dark)] rounded-xl" />
             <span className="relative text-white font-mono font-bold text-sm tracking-tighter">N·m</span>
           </div>
-          <span className="text-[var(--color-brand-dark)] text-xl font-semibold tracking-tight" style={{ fontFamily: "var(--font-headline)", fontStyle: "italic" }}>
+          <span className="text-[var(--color-brand-dark)] text-xl font-bold tracking-tight" style={{ fontFamily: "var(--font-body)" }}>
             Newton-Metre
           </span>
         </Link>

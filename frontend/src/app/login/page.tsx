@@ -155,7 +155,7 @@ function LoginContent() {
             <div className="absolute inset-0 bg-[var(--color-brand-dark)] rounded-xl" />
             <span className="relative text-white font-mono font-bold text-sm tracking-tighter">N·m</span>
           </div>
-          <span className="text-[var(--color-brand-dark)] text-xl font-semibold tracking-tight" style={{ fontFamily: "var(--font-headline)", fontStyle: "italic" }}>
+          <span className="text-[var(--color-brand-dark)] text-xl font-bold tracking-tight" style={{ fontFamily: "var(--font-body)" }}>
             Newton-Metre
           </span>
         </Link>
