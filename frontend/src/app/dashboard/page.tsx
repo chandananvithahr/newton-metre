@@ -84,10 +84,10 @@ export default function DashboardPage() {
         <div className="px-4 pt-5 pb-4 border-b border-black/5">
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="relative w-9 h-9 flex items-center justify-center shrink-0">
-              <div className="absolute inset-0 bg-[#1a1a1a] rounded-xl" />
+              <div className="absolute inset-0 bg-[var(--color-brand-dark)] rounded-xl" />
               <span className="relative text-white font-mono font-bold text-sm tracking-tighter">N·m</span>
             </div>
-            <span className="text-[#1a1a1a] text-lg font-semibold tracking-tight" style={{ fontFamily: "var(--font-headline)", fontStyle: "italic" }}>Newton-Metre</span>
+            <span className="text-[var(--color-brand-dark)] text-lg font-semibold tracking-tight" style={{ fontFamily: "var(--font-headline)", fontStyle: "italic" }}>Newton-Metre</span>
           </Link>
         </div>
 
@@ -95,17 +95,17 @@ export default function DashboardPage() {
         <div className="flex-1 overflow-y-auto px-3 py-4 space-y-4">
           {loading ? (
             <div className="flex justify-center py-8">
-              <div className="w-4 h-4 border-2 border-black/5 border-t-[#1a1a1a] rounded-full animate-spin" />
+              <div className="w-4 h-4 border-2 border-black/5 border-t-[var(--color-brand-dark)] rounded-full animate-spin" />
             </div>
           ) : estimates.length === 0 ? (
-            <p className="text-[11px] text-[#757684] text-center py-6" style={{ fontFamily: "var(--font-mono)" }}>
+            <p className="text-[11px] text-[var(--color-text-muted)] text-center py-6" style={{ fontFamily: "var(--font-mono)" }}>
               No estimates yet
             </p>
           ) : (
             <>
               {today.length > 0 && (
                 <div>
-                  <p className="text-[10px] text-[#757684] uppercase tracking-[0.2em] px-2 mb-1.5 font-bold" style={{ fontFamily: "var(--font-label)" }}>Today</p>
+                  <p className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-[0.2em] px-2 mb-1.5 font-bold" style={{ fontFamily: "var(--font-label)" }}>Today</p>
                   <div className="space-y-0.5">
                     {today.map((e) => (
                       <HistoryItem key={e.id} estimate={e} onClick={() => router.push(`/estimate/${e.id}`)} />
@@ -115,7 +115,7 @@ export default function DashboardPage() {
               )}
               {yesterday.length > 0 && (
                 <div>
-                  <p className="text-[10px] text-[#757684] uppercase tracking-[0.2em] px-2 mb-1.5 font-bold" style={{ fontFamily: "var(--font-label)" }}>Yesterday</p>
+                  <p className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-[0.2em] px-2 mb-1.5 font-bold" style={{ fontFamily: "var(--font-label)" }}>Yesterday</p>
                   <div className="space-y-0.5">
                     {yesterday.map((e) => (
                       <HistoryItem key={e.id} estimate={e} onClick={() => router.push(`/estimate/${e.id}`)} />
@@ -125,7 +125,7 @@ export default function DashboardPage() {
               )}
               {older.length > 0 && (
                 <div>
-                  <p className="text-[10px] text-[#757684] uppercase tracking-[0.2em] px-2 mb-1.5 font-bold" style={{ fontFamily: "var(--font-label)" }}>Earlier</p>
+                  <p className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-[0.2em] px-2 mb-1.5 font-bold" style={{ fontFamily: "var(--font-label)" }}>Earlier</p>
                   <div className="space-y-0.5">
                     {older.map((e) => (
                       <HistoryItem key={e.id} estimate={e} onClick={() => router.push(`/estimate/${e.id}`)} />
@@ -141,7 +141,7 @@ export default function DashboardPage() {
         <div className="px-3 pb-4 border-t border-black/5/15 pt-3">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] text-[#757684] hover:text-[#1a1b20] hover:bg-[#fafafa] transition-colors"
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)] transition-colors"
             style={{ fontFamily: "var(--font-body)" }}
           >
             <IconLogout />
@@ -154,10 +154,10 @@ export default function DashboardPage() {
       <main className="flex-1 flex items-center justify-center p-10 overflow-y-auto">
         <div className="w-full max-w-2xl">
 
-          <h1 className="text-[clamp(28px,4vw,42px)] text-[#1a1b20] tracking-tight text-center mb-2" style={{ fontFamily: "var(--font-headline)" }}>
+          <h1 className="text-[clamp(28px,4vw,42px)] text-[var(--color-text-primary)] tracking-tight text-center mb-2" style={{ fontFamily: "var(--font-headline)" }}>
             What are we doing today?
           </h1>
-          <p className="text-center text-[15px] text-[#515f74] mb-12" style={{ fontFamily: "var(--font-body)" }}>
+          <p className="text-center text-[15px] text-[var(--color-text-description)] mb-12" style={{ fontFamily: "var(--font-body)" }}>
             Upload a drawing to get a should-cost breakdown, or search your company&apos;s part history.
           </p>
 
@@ -168,18 +168,18 @@ export default function DashboardPage() {
               onClick={() => router.push("/estimate/new")}
               className="group bg-white ghost-border rounded-xl p-8 text-left hover:ambient-shadow transition-all duration-200"
             >
-              <div className="w-10 h-10 bg-[#1a1a1a] rounded-lg flex items-center justify-center mb-5">
+              <div className="w-10 h-10 bg-[var(--color-brand-dark)] rounded-lg flex items-center justify-center mb-5">
                 <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                 </svg>
               </div>
-              <h2 className="text-[16px] font-bold text-[#1a1b20] mb-2 group-hover:text-[#1a1a1a]" style={{ fontFamily: "var(--font-body)" }}>
+              <h2 className="text-[16px] font-bold text-[var(--color-text-primary)] mb-2 group-hover:text-[var(--color-brand-dark)]" style={{ fontFamily: "var(--font-body)" }}>
                 Get a should-cost
               </h2>
-              <p className="text-[14px] text-[#515f74] leading-relaxed mb-5" style={{ fontFamily: "var(--font-body)" }}>
+              <p className="text-[14px] text-[var(--color-text-description)] leading-relaxed mb-5" style={{ fontFamily: "var(--font-body)" }}>
                 Upload a drawing. Newton-Metre reads it, calculates every cost line — material, machining, finishing, margin.
               </p>
-              <span className="text-[12px] text-[#1a1a1a] font-bold uppercase tracking-widest group-hover:underline" style={{ fontFamily: "var(--font-label)" }}>
+              <span className="text-[12px] text-[var(--color-brand-dark)] font-bold uppercase tracking-widest group-hover:underline" style={{ fontFamily: "var(--font-label)" }}>
                 Upload a drawing →
               </span>
             </button>
@@ -189,18 +189,18 @@ export default function DashboardPage() {
               onClick={() => router.push("/similar")}
               className="group bg-white ghost-border rounded-xl p-8 text-left hover:ambient-shadow transition-all duration-200"
             >
-              <div className="w-10 h-10 bg-[#1a1a1a] rounded-lg flex items-center justify-center mb-5">
+              <div className="w-10 h-10 bg-[var(--color-brand-dark)] rounded-lg flex items-center justify-center mb-5">
                 <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
                 </svg>
               </div>
-              <h2 className="text-[16px] font-bold text-[#1a1b20] mb-2 group-hover:text-[#1a1a1a]" style={{ fontFamily: "var(--font-body)" }}>
+              <h2 className="text-[16px] font-bold text-[var(--color-text-primary)] mb-2 group-hover:text-[var(--color-brand-dark)]" style={{ fontFamily: "var(--font-body)" }}>
                 Find similar parts
               </h2>
-              <p className="text-[14px] text-[#515f74] leading-relaxed mb-5" style={{ fontFamily: "var(--font-body)" }}>
+              <p className="text-[14px] text-[var(--color-text-description)] leading-relaxed mb-5" style={{ fontFamily: "var(--font-body)" }}>
                 Upload drawings, POs, contracts, or QA docs. Newton-Metre searches your company&apos;s history for matches.
               </p>
-              <span className="text-[12px] text-[#1a1a1a] font-bold uppercase tracking-widest group-hover:underline" style={{ fontFamily: "var(--font-label)" }}>
+              <span className="text-[12px] text-[var(--color-brand-dark)] font-bold uppercase tracking-widest group-hover:underline" style={{ fontFamily: "var(--font-label)" }}>
                 Search drawings →
               </span>
             </button>
@@ -219,12 +219,12 @@ function HistoryItem({ estimate, onClick }: { estimate: Estimate; onClick: () =>
   return (
     <button
       onClick={onClick}
-      className="w-full text-left px-2 py-2 rounded-lg hover:bg-[#fafafa] transition-colors group"
+      className="w-full text-left px-2 py-2 rounded-lg hover:bg-[var(--color-surface-hover)] transition-colors group"
     >
-      <p className="text-[12px] text-[#444653] group-hover:text-[#1a1b20] truncate leading-snug" style={{ fontFamily: "var(--font-body)" }}>
+      <p className="text-[12px] text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] truncate leading-snug" style={{ fontFamily: "var(--font-body)" }}>
         {label}
       </p>
-      <p className="text-[10px] text-[#757684] tabular-nums mt-0.5" style={{ fontFamily: "var(--font-mono)" }}>
+      <p className="text-[10px] text-[var(--color-text-muted)] tabular-nums mt-0.5" style={{ fontFamily: "var(--font-mono)" }}>
         {cost}
       </p>
     </button>

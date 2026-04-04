@@ -23,28 +23,28 @@ function Hero() {
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-12">
             {/* Box 1: Should-Cost */}
             <div className="p-8 sm:p-10 rounded-2xl bg-white/60 backdrop-blur-sm border border-black/10 text-left">
-              <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/80 text-[#1a1a1a] text-xs font-bold uppercase tracking-widest mb-6 border border-black/10 shadow-sm">
+              <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/80 text-[var(--color-brand-dark)] text-xs font-bold uppercase tracking-widest mb-6 border border-black/10 shadow-sm">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 Should-Cost in Minutes
               </div>
-              <h1 className="text-3xl sm:text-4xl lg:text-[44px] font-medium text-[#1a1a1a] leading-[1.1] tracking-tight mb-4" style={{ fontFamily: "var(--font-headline)" }}>
+              <h1 className="text-3xl sm:text-4xl lg:text-[44px] font-medium text-[var(--color-brand-dark)] leading-[1.1] tracking-tight mb-4" style={{ fontFamily: "var(--font-headline)" }}>
                 Know what it <em className="text-orange-500">should</em> cost.
               </h1>
-              <p className="text-[#374151] text-base leading-relaxed">
+              <p className="text-[var(--color-neutral-gray)] text-base leading-relaxed">
                 Upload any manufacturing drawing. Get a line-by-line breakdown of material, machining, and finishing costs. Negotiate with the real number.
               </p>
             </div>
 
             {/* Box 2: Similarity Search */}
             <div className="p-8 sm:p-10 rounded-2xl bg-white/60 backdrop-blur-sm border border-black/10 text-left">
-              <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/80 text-[#1a1a1a] text-xs font-bold uppercase tracking-widest mb-6 border border-black/10 shadow-sm">
+              <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/80 text-[var(--color-brand-dark)] text-xs font-bold uppercase tracking-widest mb-6 border border-black/10 shadow-sm">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 Part History, Searchable
               </div>
-              <h1 className="text-3xl sm:text-4xl lg:text-[44px] font-medium text-[#1a1a1a] leading-[1.1] tracking-tight mb-4" style={{ fontFamily: "var(--font-headline)" }}>
+              <h1 className="text-3xl sm:text-4xl lg:text-[44px] font-medium text-[var(--color-brand-dark)] leading-[1.1] tracking-tight mb-4" style={{ fontFamily: "var(--font-headline)" }}>
                 Find where it <em className="text-orange-500">already</em> exists.
               </h1>
-              <p className="text-[#374151] text-base leading-relaxed">
+              <p className="text-[var(--color-neutral-gray)] text-base leading-relaxed">
                 Search your company&apos;s entire history — find similar parts, specs, and contracts in seconds. Stop reinventing the wheel.
               </p>
             </div>
@@ -53,7 +53,7 @@ function Hero() {
           {/* Prompt-style input bar (Base44 inspired) */}
           <div className="max-w-2xl mx-auto mb-8">
             <div className="bg-white rounded-full shadow-lg shadow-black/5 border border-black/5 p-2 flex items-center gap-3">
-              <span className="text-[#9ca3af] text-sm pl-5 flex-1 text-left truncate">Upload a drawing to get a should-cost breakdown...</span>
+              <span className="text-[var(--color-text-disabled)] text-sm pl-5 flex-1 text-left truncate">Upload a drawing to get a should-cost breakdown...</span>
               <Link
                 href="/estimate/new"
                 className="dark-pill px-6 py-3 text-xs font-bold uppercase tracking-widest flex items-center gap-2 shrink-0"
@@ -63,13 +63,13 @@ function Hero() {
             </div>
           </div>
 
-          <div className="text-sm text-[#374151] uppercase tracking-widest font-bold mb-4">Not sure where to start? Try one of these:</div>
+          <div className="text-sm text-[var(--color-neutral-gray)] uppercase tracking-widest font-bold mb-4">Not sure where to start? Try one of these:</div>
           <div className="flex flex-wrap justify-center gap-3">
             {["Should-Cost Estimate", "Similarity Search"].map((label) => (
               <Link
                 key={label}
                 href={label === "Similarity Search" ? "/similar" : "/estimate/new"}
-                className="px-5 py-2.5 rounded-full border border-black/10 bg-white/60 text-base text-[#374151] hover:bg-white hover:border-black/20 transition-all"
+                className="px-5 py-2.5 rounded-full border border-black/10 bg-white/60 text-base text-[var(--color-neutral-gray)] hover:bg-white hover:border-black/20 transition-all"
               >
                 {label}
               </Link>
@@ -87,11 +87,11 @@ function Problem() {
     <section className="py-28 warm-gradient-subtle">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-8">
         <div className="max-w-2xl mb-20">
-          <h2 className="text-4xl sm:text-5xl font-medium text-[#1a1a1a] mb-6 tracking-tight leading-tight" style={{ fontFamily: "var(--font-headline)" }}>
+          <h2 className="text-4xl sm:text-5xl font-medium text-[var(--color-brand-dark)] mb-6 tracking-tight leading-tight" style={{ fontFamily: "var(--font-headline)" }}>
             Engineering became precise.<br />
-            <em className="text-[#9ca3af]">Commercial negotiations never did.</em>
+            <em className="text-[var(--color-text-disabled)]">Commercial negotiations never did.</em>
           </h2>
-          <p className="text-[#374151] text-lg leading-relaxed">
+          <p className="text-[var(--color-neutral-gray)] text-lg leading-relaxed">
             Your engineers design to micron-level tolerances. But when procurement negotiates the price, they rely on PDFs from suppliers, old purchase orders, and gut feeling.
           </p>
         </div>
@@ -103,9 +103,9 @@ function Problem() {
             { stat: "1", label: "Bad Quote Kills a Bid", desc: "In defense and aerospace, a wrong cost estimate doesn\u2019t just blow the budget \u2014 it loses the contract." },
           ].map((item, i) => (
             <div key={i} className="p-8 rounded-2xl bg-white/80 border border-black/10 h-full flex flex-col">
-              <div className="text-4xl font-medium text-[#1a1a1a] mb-3" style={{ fontFamily: "var(--font-mono)" }}>{item.stat}</div>
-              <div className="text-sm font-bold text-[#1a1a1a] uppercase tracking-widest mb-3">{item.label}</div>
-              <p className="text-base text-[#374151] leading-relaxed flex-1">{item.desc}</p>
+              <div className="text-4xl font-medium text-[var(--color-brand-dark)] mb-3" style={{ fontFamily: "var(--font-mono)" }}>{item.stat}</div>
+              <div className="text-sm font-bold text-[var(--color-brand-dark)] uppercase tracking-widest mb-3">{item.label}</div>
+              <p className="text-base text-[var(--color-neutral-gray)] leading-relaxed flex-1">{item.desc}</p>
             </div>
           ))}
         </div>
@@ -121,12 +121,12 @@ function ShouldCost() {
       <div className="max-w-[1200px] mx-auto">
         <div className="grid lg:grid-cols-2 gap-20 items-center">
           <div>
-            <div className="text-sm text-[#1a1a1a]/50 uppercase tracking-widest font-bold mb-6" style={{ fontFamily: "var(--font-mono)" }}>01 / 02 &middot; Should-Cost Engine</div>
-            <h2 className="text-4xl sm:text-5xl font-medium text-[#1a1a1a] mb-8 tracking-tight leading-tight" style={{ fontFamily: "var(--font-headline)" }}>
+            <div className="text-sm text-[var(--color-brand-dark)]/50 uppercase tracking-widest font-bold mb-6" style={{ fontFamily: "var(--font-mono)" }}>01 / 02 &middot; Should-Cost Engine</div>
+            <h2 className="text-4xl sm:text-5xl font-medium text-[var(--color-brand-dark)] mb-8 tracking-tight leading-tight" style={{ fontFamily: "var(--font-headline)" }}>
               Upload a drawing.<br />
               <em>Get the real number.</em>
             </h2>
-            <p className="text-lg text-[#374151] leading-relaxed mb-10">
+            <p className="text-lg text-[var(--color-neutral-gray)] leading-relaxed mb-10">
               Your supplier already knows what it costs to make your part. Now you will too. Newton-Metre gives you a line-by-line should-cost — material, machining, finishing, overhead — so you walk into every negotiation with the real number. Companies save 8-12% on the first quote they challenge.
             </p>
             <Link href="/estimate/new" className="dark-pill inline-flex items-center gap-2 px-8 py-4 text-xs font-bold uppercase tracking-widest">
@@ -141,7 +141,7 @@ function ShouldCost() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <div className="bg-[#1a1a1a] rounded-2xl p-6 text-white shadow-2xl">
+            <div className="bg-[var(--color-brand-dark)] rounded-2xl p-6 text-white shadow-2xl">
               <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10">
                 <div>
                   <div className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">Analysis: NM-9283</div>
@@ -195,8 +195,8 @@ function ShouldCost() {
           ].map((item, i) => (
             <div key={i} className="p-8 rounded-2xl border border-black/10 bg-white/80 hover:bg-white hover:border-black/20 transition-all group h-full flex flex-col">
               <CheckCircle2 className="w-6 h-6 text-emerald-500 mb-5" />
-              <div className="text-sm font-bold text-[#1a1a1a] uppercase tracking-widest mb-3 group-hover:text-orange-600 transition-colors">{item.title}</div>
-              <p className="text-base text-[#374151] leading-relaxed flex-1">{item.desc}</p>
+              <div className="text-sm font-bold text-[var(--color-brand-dark)] uppercase tracking-widest mb-3 group-hover:text-orange-600 transition-colors">{item.title}</div>
+              <p className="text-base text-[var(--color-neutral-gray)] leading-relaxed flex-1">{item.desc}</p>
             </div>
           ))}
         </div>
@@ -208,7 +208,7 @@ function ShouldCost() {
 /* ── Similarity Search (warm dark section) ────────────── */
 function SimilaritySearch() {
   return (
-    <section className="py-28 bg-[#1a1a1a] text-white overflow-hidden relative">
+    <section className="py-28 bg-[var(--color-brand-dark)] text-white overflow-hidden relative">
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-orange-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
       <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-amber-500/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3" />
 
@@ -276,7 +276,7 @@ function SimilaritySearch() {
               <div className="mt-6 pt-6 border-t border-white/10">
                 <Link
                   href="/similar"
-                  className="w-full py-4 rounded-full bg-white text-[#1a1a1a] text-xs font-bold uppercase tracking-widest hover:bg-white/90 transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-4 rounded-full bg-white text-[var(--color-brand-dark)] text-xs font-bold uppercase tracking-widest hover:bg-white/90 transition-colors flex items-center justify-center gap-2"
                 >
                   Search Your Company History <ArrowRight className="w-4 h-4" />
                 </Link>
@@ -295,11 +295,11 @@ function SiloBreaker() {
     <section className="py-28 px-4 sm:px-8 warm-gradient-subtle">
       <div className="max-w-[1200px] mx-auto">
         <div className="text-center mb-8">
-          <h2 className="text-4xl sm:text-5xl font-medium text-[#1a1a1a] tracking-tight" style={{ fontFamily: "var(--font-headline)" }}>
+          <h2 className="text-4xl sm:text-5xl font-medium text-[var(--color-brand-dark)] tracking-tight" style={{ fontFamily: "var(--font-headline)" }}>
             One upload. <em>Five departments get answers.</em>
           </h2>
         </div>
-        <p className="text-center text-lg text-[#374151] leading-relaxed max-w-2xl mx-auto mb-20">
+        <p className="text-center text-lg text-[var(--color-neutral-gray)] leading-relaxed max-w-2xl mx-auto mb-20">
           Manufacturing companies lose 20-30% in revenue to disconnected data. Newton-Metre turns your scattered files into one searchable company brain.
         </p>
 
@@ -311,11 +311,11 @@ function SiloBreaker() {
             { Icon: Layers, dept: "Shop Floor", work: "Same geometry, same material — here\u2019s the proven setup, cycle time, and tooling config from last time." },
           ].map((item, i) => (
             <div key={i} className="p-8 rounded-2xl border border-black/10 bg-white/80 hover:border-black/20 hover:bg-white transition-all group h-full flex flex-col">
-              <div className="w-12 h-12 rounded-xl bg-[#fafafa] border border-black/5 flex items-center justify-center text-[#1a1a1a] mb-6 group-hover:bg-[#1a1a1a] group-hover:text-white transition-all">
+              <div className="w-12 h-12 rounded-xl bg-[var(--color-surface-hover)] border border-black/5 flex items-center justify-center text-[var(--color-brand-dark)] mb-6 group-hover:bg-[var(--color-brand-dark)] group-hover:text-white transition-all">
                 <item.Icon className="w-6 h-6" />
               </div>
-              <div className="text-sm font-bold text-[#1a1a1a] uppercase tracking-widest mb-3">{item.dept}</div>
-              <p className="text-base text-[#374151] leading-relaxed flex-1">{item.work}</p>
+              <div className="text-sm font-bold text-[var(--color-brand-dark)] uppercase tracking-widest mb-3">{item.dept}</div>
+              <p className="text-base text-[var(--color-neutral-gray)] leading-relaxed flex-1">{item.work}</p>
             </div>
           ))}
         </div>
@@ -330,7 +330,7 @@ function HowItWorks() {
     <section id="how-it-works" className="py-28 px-4 sm:px-8 warm-gradient-hero">
       <div className="max-w-[1200px] mx-auto">
         <div className="text-center mb-20">
-          <h2 className="text-4xl sm:text-5xl font-medium text-[#1a1a1a] tracking-tight" style={{ fontFamily: "var(--font-headline)" }}>
+          <h2 className="text-4xl sm:text-5xl font-medium text-[var(--color-brand-dark)] tracking-tight" style={{ fontFamily: "var(--font-headline)" }}>
             Five steps. <em>Drawing to negotiation.</em>
           </h2>
         </div>
@@ -344,9 +344,9 @@ function HowItWorks() {
             { step: "05", title: "Negotiate", desc: "Walk in with the number. Save 8-12% on the first quote." },
           ].map((item, i) => (
             <div key={i} className="relative group text-center">
-              <div className="text-6xl font-bold text-[#1a1a1a]/20 mb-4 group-hover:text-orange-500/40 transition-colors" style={{ fontFamily: "var(--font-mono)" }}>{item.step}</div>
-              <div className="text-sm font-bold text-[#1a1a1a] uppercase tracking-widest mb-3">{item.title}</div>
-              <p className="text-base text-[#374151] leading-relaxed">{item.desc}</p>
+              <div className="text-6xl font-bold text-[var(--color-brand-dark)]/20 mb-4 group-hover:text-orange-500/40 transition-colors" style={{ fontFamily: "var(--font-mono)" }}>{item.step}</div>
+              <div className="text-sm font-bold text-[var(--color-brand-dark)] uppercase tracking-widest mb-3">{item.title}</div>
+              <p className="text-base text-[var(--color-neutral-gray)] leading-relaxed">{item.desc}</p>
             </div>
           ))}
         </div>
@@ -362,11 +362,11 @@ function BuiltForIndia() {
       <div className="max-w-[1200px] mx-auto">
         <div className="grid lg:grid-cols-2 gap-20 items-center">
           <div>
-            <h2 className="text-4xl sm:text-5xl font-medium text-[#1a1a1a] mb-8 tracking-tight leading-tight" style={{ fontFamily: "var(--font-headline)" }}>
+            <h2 className="text-4xl sm:text-5xl font-medium text-[var(--color-brand-dark)] mb-8 tracking-tight leading-tight" style={{ fontFamily: "var(--font-headline)" }}>
               Built for the <br />
               <em>Indian Manufacturing Renaissance.</em>
             </h2>
-            <p className="text-lg text-[#374151] leading-relaxed mb-10">
+            <p className="text-lg text-[var(--color-neutral-gray)] leading-relaxed mb-10">
               Western tools use Western approximations. Newton-Metre is built on the ground truth of Indian economics — MSME labour rates, regional machine hour rates, BIS standards, and INR material pricing.
             </p>
             <div className="grid grid-cols-2 gap-8">
@@ -377,8 +377,8 @@ function BuiltForIndia() {
                 { label: "MSME Ready", desc: "Built for Indian workshop economics." },
               ].map((item, i) => (
                 <div key={i}>
-                  <div className="text-sm font-bold text-[#1a1a1a] uppercase tracking-widest mb-1.5">{item.label}</div>
-                  <p className="text-base text-[#374151]">{item.desc}</p>
+                  <div className="text-sm font-bold text-[var(--color-brand-dark)] uppercase tracking-widest mb-1.5">{item.label}</div>
+                  <p className="text-base text-[var(--color-neutral-gray)]">{item.desc}</p>
                 </div>
               ))}
             </div>
@@ -386,21 +386,21 @@ function BuiltForIndia() {
 
           <div className="bg-white/80 rounded-2xl p-10 border border-black/10">
             <div className="flex items-center gap-4 mb-8">
-              <div className="w-12 h-12 rounded-lg bg-[#1a1a1a] flex items-center justify-center text-white">
+              <div className="w-12 h-12 rounded-lg bg-[var(--color-brand-dark)] flex items-center justify-center text-white">
                 <Zap className="w-6 h-6" />
               </div>
-              <div className="text-sm font-bold text-[#1a1a1a] uppercase tracking-widest">Results from Real Users</div>
+              <div className="text-sm font-bold text-[var(--color-brand-dark)] uppercase tracking-widest">Results from Real Users</div>
             </div>
             <div className="space-y-5">
               <div className="p-6 rounded-xl bg-white border border-black/5">
-                <div className="text-sm font-bold text-[#1a1a1a]/50 uppercase tracking-widest mb-3">Market Insight</div>
-                <div className="text-base text-[#1a1a1a] leading-relaxed font-medium">
+                <div className="text-sm font-bold text-[var(--color-brand-dark)]/50 uppercase tracking-widest mb-3">Market Insight</div>
+                <div className="text-base text-[var(--color-brand-dark)] leading-relaxed font-medium">
                   &ldquo;Newton-Metre identified a 12% cost variance in our Pune-based suppliers vs. Bangalore for the same part family.&rdquo;
                 </div>
               </div>
               <div className="p-6 rounded-xl bg-white border border-black/5">
-                <div className="text-sm font-bold text-[#1a1a1a]/50 uppercase tracking-widest mb-3">Design Reuse</div>
-                <div className="text-base text-[#1a1a1a] leading-relaxed font-medium">
+                <div className="text-sm font-bold text-[var(--color-brand-dark)]/50 uppercase tracking-widest mb-3">Design Reuse</div>
+                <div className="text-base text-[var(--color-brand-dark)] leading-relaxed font-medium">
                   &ldquo;By indexing our 10-year drawing history, we reduced new part design time by 85% in the first quarter.&rdquo;
                 </div>
               </div>
@@ -420,21 +420,21 @@ function Pricing() {
         <div className="grid lg:grid-cols-3 gap-8 items-stretch">
           {/* Left: heading */}
           <div className="flex flex-col justify-center">
-            <h2 className="text-4xl sm:text-5xl font-medium text-[#1a1a1a] tracking-tight mb-4" style={{ fontFamily: "var(--font-headline)" }}>
+            <h2 className="text-4xl sm:text-5xl font-medium text-[var(--color-brand-dark)] tracking-tight mb-4" style={{ fontFamily: "var(--font-headline)" }}>
               Pricing plans<br />for every need
             </h2>
-            <p className="text-base text-[#374151] leading-relaxed">
+            <p className="text-base text-[var(--color-neutral-gray)] leading-relaxed">
               One corrected quote pays for a year. Everything after that is pure savings.
             </p>
           </div>
 
           {/* Free */}
           <div className="p-8 rounded-2xl bg-white/80 border border-black/10 h-full flex flex-col">
-            <div className="text-sm font-bold uppercase tracking-widest text-[#1a1a1a] mb-6">Start for free</div>
-            <p className="text-base text-[#374151] mb-6">Get access to:</p>
+            <div className="text-sm font-bold uppercase tracking-widest text-[var(--color-brand-dark)] mb-6">Start for free</div>
+            <p className="text-base text-[var(--color-neutral-gray)] mb-6">Get access to:</p>
             <ul className="space-y-3 mb-8">
               {["10 estimates / month", "Should-cost breakdown", "Similarity search", "PDF & image uploads"].map((f) => (
-                <li key={f} className="flex items-center gap-2.5 text-base text-[#374151]">
+                <li key={f} className="flex items-center gap-2.5 text-base text-[var(--color-neutral-gray)]">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
                   {f}
                 </li>
@@ -447,13 +447,13 @@ function Pricing() {
 
           {/* Pro */}
           <div className="p-8 rounded-2xl warm-gradient-accent border border-black/10 relative overflow-hidden h-full flex flex-col">
-            <div className="text-sm font-bold uppercase tracking-widest text-[#1a1a1a] mb-2">Paid plans from</div>
+            <div className="text-sm font-bold uppercase tracking-widest text-[var(--color-brand-dark)] mb-2">Paid plans from</div>
             <div className="flex items-baseline gap-1 mb-6">
-              <span className="text-4xl font-medium text-[#1a1a1a]" style={{ fontFamily: "var(--font-mono)" }}>₹4,999</span>
+              <span className="text-4xl font-medium text-[var(--color-brand-dark)]" style={{ fontFamily: "var(--font-mono)" }}>₹4,999</span>
               <span className="text-xs text-[#6b7280]">/mo</span>
             </div>
-            <p className="text-base text-[#374151] mb-6">Upgrade as you go for more credits, more features, and more support.</p>
-            <Link href="/login?waitlist=pro" className="block w-full py-3.5 rounded-full border border-black/10 text-xs font-bold uppercase tracking-widest text-center text-[#1a1a1a] hover:bg-white/60 transition-colors">
+            <p className="text-base text-[var(--color-neutral-gray)] mb-6">Upgrade as you go for more credits, more features, and more support.</p>
+            <Link href="/login?waitlist=pro" className="block w-full py-3.5 rounded-full border border-black/10 text-xs font-bold uppercase tracking-widest text-center text-[var(--color-brand-dark)] hover:bg-white/60 transition-colors">
               See all plans
             </Link>
           </div>
@@ -472,45 +472,45 @@ function Footer() {
           <div>
             <div className="flex items-center justify-center gap-3 mb-4">
               <div className="relative w-9 h-9 flex items-center justify-center">
-                <div className="absolute inset-0 bg-[#1a1a1a] rounded-xl" />
+                <div className="absolute inset-0 bg-[var(--color-brand-dark)] rounded-xl" />
                 <span className="relative text-white font-mono font-bold text-sm tracking-tighter">N·m</span>
               </div>
-              <span className="text-[#1a1a1a] text-lg font-semibold" style={{ fontFamily: "var(--font-headline)", fontStyle: "italic" }}>Newton-Metre</span>
+              <span className="text-[var(--color-brand-dark)] text-lg font-semibold" style={{ fontFamily: "var(--font-headline)", fontStyle: "italic" }}>Newton-Metre</span>
             </div>
-            <p className="text-base text-[#1a1a1a]/60 leading-relaxed text-center">
+            <p className="text-base text-[var(--color-brand-dark)]/60 leading-relaxed text-center">
               Know what it costs, before they quote.
             </p>
           </div>
 
           <div>
-            <div className="text-sm font-bold uppercase tracking-widest text-[#1a1a1a] mb-4">Company</div>
+            <div className="text-sm font-bold uppercase tracking-widest text-[var(--color-brand-dark)] mb-4">Company</div>
             <ul className="space-y-2.5">
-              <li><a href="mailto:chand@costimize.dev" className="text-base text-[#1a1a1a]/60 hover:text-[#1a1a1a] transition-colors">Contact Us</a></li>
+              <li><a href="mailto:chand@costimize.dev" className="text-base text-[var(--color-brand-dark)]/60 hover:text-[var(--color-brand-dark)] transition-colors">Contact Us</a></li>
             </ul>
           </div>
 
           <div>
-            <div className="text-sm font-bold uppercase tracking-widest text-[#1a1a1a] mb-4">Product</div>
+            <div className="text-sm font-bold uppercase tracking-widest text-[var(--color-brand-dark)] mb-4">Product</div>
             <ul className="space-y-2.5">
               {[
                 { label: "Should-Cost", href: "/estimate/new" },
                 { label: "Similarity Search", href: "/similar" },
               ].map((item) => (
-                <li key={item.label}><Link href={item.href} className="text-base text-[#1a1a1a]/60 hover:text-[#1a1a1a] transition-colors">{item.label}</Link></li>
+                <li key={item.label}><Link href={item.href} className="text-base text-[var(--color-brand-dark)]/60 hover:text-[var(--color-brand-dark)] transition-colors">{item.label}</Link></li>
               ))}
             </ul>
           </div>
 
           <div>
-            <div className="text-sm font-bold uppercase tracking-widest text-[#1a1a1a] mb-4">Legal</div>
+            <div className="text-sm font-bold uppercase tracking-widest text-[var(--color-brand-dark)] mb-4">Legal</div>
             <ul className="space-y-2.5">
-              <li><a href="mailto:chand@costimize.dev" className="text-base text-[#1a1a1a]/60 hover:text-[#1a1a1a] transition-colors">Contact</a></li>
+              <li><a href="mailto:chand@costimize.dev" className="text-base text-[var(--color-brand-dark)]/60 hover:text-[var(--color-brand-dark)] transition-colors">Contact</a></li>
             </ul>
           </div>
         </div>
 
         <div className="pt-6 border-t border-[#1a1a1a]/10 flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="text-sm text-[#1a1a1a]/40">&copy; 2026 Newton-Metre. Should-cost in minutes, not meetings.</div>
+          <div className="text-sm text-[var(--color-brand-dark)]/40">&copy; 2026 Newton-Metre. Should-cost in minutes, not meetings.</div>
         </div>
       </div>
     </footer>

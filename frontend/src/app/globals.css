@@ -31,6 +31,14 @@
   --color-text-muted:           #757684;
   --color-text-disabled:        #c4c5d5;
 
+  /* Brand dark — logo, primary buttons, dark UI elements */
+  --color-brand-dark:           #1a1a1a;
+  --color-brand-dark-hover:     #333333;
+
+  /* Neutral grays — subtle backgrounds, hover states */
+  --color-surface-hover:        #fafafa;
+  --color-neutral-gray:         #374151;
+
   /* Semantic */
   --color-nm-on-surface:        #1a1b20;
   --color-nm-on-surface-variant: #444653;

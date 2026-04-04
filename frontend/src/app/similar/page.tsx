@@ -45,31 +45,31 @@ export default function SimilarPartsPage() {
       <div className="min-h-screen warm-gradient-page">
         <AppNav />
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-12">
-          <h1 style={{ fontFamily: "var(--font-heading)" }} className="text-[32px] tracking-tight text-slate-900 mb-2">Similar Parts</h1>
-          <p className="text-slate-400 mb-8 text-[14px]" style={{ fontFamily: "var(--font-sans)" }}>Upload 2 or more drawings to find similar parts from your company&apos;s history.</p>
+          <h1 style={{ fontFamily: "var(--font-headline)" }} className="text-[32px] tracking-tight text-[var(--color-text-primary)] mb-2">Similar Parts</h1>
+          <p className="text-[var(--color-text-muted)] mb-8 text-[14px]" style={{ fontFamily: "var(--font-body)" }}>Upload 2 or more drawings to find similar parts from your company&apos;s history.</p>
 
-          <div className="bg-white rounded-2xl border border-slate-200/80 p-8">
+          <div className="bg-white rounded-2xl border border-black/10 p-8">
             <div
-              className="border-2 border-dashed border-slate-200 rounded-xl p-10 text-center mb-6 hover:border-cyan-300 hover:bg-cyan-50/50 transition-colors cursor-pointer"
+              className="border-2 border-dashed border-black/15 rounded-xl p-10 text-center mb-6 hover:border-[var(--color-nm-primary)]/30 hover:bg-[var(--color-nm-primary)]/5 transition-colors cursor-pointer"
               role="button"
               tabIndex={0}
               onClick={() => document.getElementById("multi-file-input")?.click()}
               onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); document.getElementById("multi-file-input")?.click(); } }}
-              onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-cyan-300", "bg-cyan-50/50"); }}
-              onDragLeave={(e) => { e.currentTarget.classList.remove("border-cyan-300", "bg-cyan-50/50"); }}
-              onDrop={(e) => { e.preventDefault(); e.currentTarget.classList.remove("border-cyan-300", "bg-cyan-50/50"); const newFiles = Array.from(e.dataTransfer.files); if (newFiles.length > 0) setFiles(newFiles); }}
+              onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-[var(--color-nm-primary)]/40"); }}
+              onDragLeave={(e) => { e.currentTarget.classList.remove("border-[var(--color-nm-primary)]/40"); }}
+              onDrop={(e) => { e.preventDefault(); e.currentTarget.classList.remove("border-[var(--color-nm-primary)]/40"); const newFiles = Array.from(e.dataTransfer.files); if (newFiles.length > 0) setFiles(newFiles); }}
             >
-              <div className="w-12 h-12 bg-cyan-50 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <svg className="w-6 h-6 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <div className="w-12 h-12 bg-[var(--color-nm-primary)]/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 h-6 text-[var(--color-nm-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
                 </svg>
               </div>
               {files.length > 0 ? (
-                <p className="text-sm font-medium text-slate-900" style={{ fontFamily: "var(--font-mono)" }}>{files.length} file(s) selected</p>
+                <p className="text-sm font-medium text-[var(--color-text-primary)]" style={{ fontFamily: "var(--font-mono)" }}>{files.length} file(s) selected</p>
               ) : (
                 <>
-                  <p className="text-sm font-medium text-slate-600 mb-1">Click to select multiple files</p>
-                  <p className="text-xs text-slate-400">PDF, PNG, or JPG — minimum 2 drawings</p>
+                  <p className="text-sm font-medium text-[var(--color-text-description)] mb-1">Click to select multiple files</p>
+                  <p className="text-xs text-[var(--color-text-muted)]">PDF, PNG, or JPG — minimum 2 drawings</p>
                 </>
               )}
               <input
@@ -83,9 +83,9 @@ export default function SimilarPartsPage() {
             </div>
 
             {files.length > 0 && (
-              <div className="bg-slate-50 rounded-lg px-4 py-3 mb-6">
-                <p className="text-xs text-slate-400 font-medium mb-1" style={{ fontFamily: "var(--font-mono)" }}>Selected files:</p>
-                <p className="text-sm text-slate-600">{files.map((f) => f.name).join(", ")}</p>
+              <div className="bg-[var(--color-surface-container-low)] rounded-lg px-4 py-3 mb-6">
+                <p className="text-xs text-[var(--color-text-muted)] font-medium mb-1" style={{ fontFamily: "var(--font-mono)" }}>Selected files:</p>
+                <p className="text-sm text-[var(--color-text-description)]">{files.map((f) => f.name).join(", ")}</p>
               </div>
             )}
 
@@ -98,8 +98,8 @@ export default function SimilarPartsPage() {
             <button
               onClick={handleSearch}
               disabled={loading || files.length < 2}
-              className="w-full bg-slate-900 text-white py-3.5 rounded-full font-medium hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 text-[14px]"
-            style={{ fontFamily: "var(--font-sans)" }}
+              className="w-full bg-[var(--color-brand-dark)] text-white py-3.5 rounded-full font-medium hover:bg-[var(--color-brand-dark-hover)] disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 text-[14px]"
+              style={{ fontFamily: "var(--font-body)" }}
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -120,49 +120,49 @@ export default function SimilarPartsPage() {
       <AppNav>
         <button
           onClick={() => { setStep("upload"); setMatches([]); setFiles([]); }}
-          className="text-slate-500 hover:text-slate-700 text-sm font-medium transition-colors py-2 px-3"
+          className="text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] text-sm font-medium transition-colors py-2 px-3"
         >
           New Search
         </button>
       </AppNav>
       <div className="max-w-3xl mx-auto px-4 sm:px-8 py-8">
-        <h1 style={{ fontFamily: "var(--font-heading)" }} className="text-[32px] tracking-tight text-slate-900 mb-1">Similar Parts</h1>
-        <p className="text-slate-400 text-[13px] mb-6" style={{ fontFamily: "var(--font-mono)" }}>{matches.length} match{matches.length !== 1 ? "es" : ""} found</p>
+        <h1 style={{ fontFamily: "var(--font-headline)" }} className="text-[32px] tracking-tight text-[var(--color-text-primary)] mb-1">Similar Parts</h1>
+        <p className="text-[var(--color-text-muted)] text-[13px] mb-6" style={{ fontFamily: "var(--font-mono)" }}>{matches.length} match{matches.length !== 1 ? "es" : ""} found</p>
 
         {matches.length === 0 ? (
-          <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
-            <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center mx-auto mb-4">
-              <svg className="w-6 h-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <div className="bg-white rounded-xl border border-black/10 p-12 text-center">
+            <div className="w-12 h-12 bg-[var(--color-surface-container-low)] rounded-xl flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-[var(--color-text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
               </svg>
             </div>
-            <p className="text-slate-700 font-medium mb-1">No similar parts found</p>
-            <p className="text-slate-400 text-sm">Upload more drawings to build your comparison library.</p>
+            <p className="text-[var(--color-text-primary)] font-medium mb-1">No similar parts found</p>
+            <p className="text-[var(--color-text-muted)] text-sm">Upload more drawings to build your comparison library.</p>
           </div>
         ) : (
-          <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+          <div className="bg-white rounded-xl border border-black/10 overflow-hidden">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-slate-100 bg-slate-50">
-                  <th className="text-left px-6 py-3.5 text-xs font-medium text-slate-500 uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Drawing</th>
-                  <th className="text-right px-6 py-3.5 text-xs font-medium text-slate-500 uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Similarity</th>
+                <tr className="border-b border-black/5 bg-[var(--color-surface-container-low)]">
+                  <th className="text-left px-6 py-3.5 text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Drawing</th>
+                  <th className="text-right px-6 py-3.5 text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>Similarity</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-black/5">
                 {matches.map((m) => {
                   const pct = m.score * 100;
-                  const barColor = pct >= 80 ? "bg-emerald-500" : pct >= 60 ? "bg-amber-500" : "bg-slate-300";
+                  const barColor = pct >= 80 ? "bg-emerald-500" : pct >= 60 ? "bg-amber-500" : "bg-[var(--color-text-disabled)]";
                   return (
-                    <tr key={m.drawing_id} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-6 py-4 text-sm font-medium text-slate-900">
+                    <tr key={m.drawing_id} className="hover:bg-[var(--color-surface-hover)] transition-colors">
+                      <td className="px-6 py-4 text-sm font-medium text-[var(--color-text-primary)]">
                         {(m.metadata.filename as string) || m.drawing_id}
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-3">
-                          <div className="w-20 h-2 bg-slate-200 rounded-full overflow-hidden">
+                          <div className="w-20 h-2 bg-[var(--color-surface-container)] rounded-full overflow-hidden">
                             <div className={`h-full ${barColor} rounded-full`} style={{ width: `${pct}%` }} />
                           </div>
-                          <span className="text-sm font-medium text-slate-900 w-14 text-right" style={{ fontFamily: "var(--font-mono)", fontVariantNumeric: "tabular-nums" }}>
+                          <span className="text-sm font-medium text-[var(--color-text-primary)] w-14 text-right" style={{ fontFamily: "var(--font-mono)", fontVariantNumeric: "tabular-nums" }}>
                             {pct.toFixed(1)}%
                           </span>
                         </div>

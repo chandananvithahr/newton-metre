@@ -36,11 +36,11 @@ export function LandingNav() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 group">
           <div className="relative w-11 h-11 flex items-center justify-center">
-            <div className="absolute inset-0 bg-[#1a1a1a] rounded-xl rotate-3 opacity-10 group-hover:rotate-6 transition-transform" />
-            <div className="absolute inset-0 bg-[#1a1a1a] rounded-xl" />
+            <div className="absolute inset-0 bg-[var(--color-brand-dark)] rounded-xl rotate-3 opacity-10 group-hover:rotate-6 transition-transform" />
+            <div className="absolute inset-0 bg-[var(--color-brand-dark)] rounded-xl" />
             <span className="relative text-white font-mono font-bold text-base tracking-tighter">N·m</span>
           </div>
-          <span className="text-[#1a1a1a] text-2xl font-bold tracking-tight" style={{ fontFamily: "var(--font-headline)", fontStyle: "italic" }}>Newton-Metre</span>
+          <span className="text-[var(--color-brand-dark)] text-2xl font-bold tracking-tight" style={{ fontFamily: "var(--font-headline)", fontStyle: "italic" }}>Newton-Metre</span>
         </Link>
 
         {/* Desktop nav links */}
@@ -49,7 +49,7 @@ export function LandingNav() {
             <a
               key={label}
               href={href}
-              className="text-base text-[#374151] hover:text-[#1a1a1a] transition-colors font-medium"
+              className="text-base text-[var(--color-neutral-gray)] hover:text-[var(--color-brand-dark)] transition-colors font-medium"
             >
               {label}
             </a>
@@ -57,14 +57,14 @@ export function LandingNav() {
           {loggedIn ? (
             <button
               onClick={handleLogout}
-              className="text-base text-[#374151] hover:text-[#1a1a1a] transition-colors font-medium"
+              className="text-base text-[var(--color-neutral-gray)] hover:text-[var(--color-brand-dark)] transition-colors font-medium"
             >
               Log out
             </button>
           ) : (
             <Link
               href="/login"
-              className="text-base text-[#374151] hover:text-[#1a1a1a] transition-colors font-medium"
+              className="text-base text-[var(--color-neutral-gray)] hover:text-[var(--color-brand-dark)] transition-colors font-medium"
             >
               Log in
             </Link>
@@ -78,9 +78,9 @@ export function LandingNav() {
             className="md:hidden flex flex-col justify-center items-center w-10 h-10 gap-1.5"
             aria-label="Toggle menu"
           >
-            <span className={`block w-5 h-0.5 bg-[#1a1a1a] transition-transform ${menuOpen ? "rotate-45 translate-y-1" : ""}`} />
-            <span className={`block w-5 h-0.5 bg-[#1a1a1a] transition-opacity ${menuOpen ? "opacity-0" : ""}`} />
-            <span className={`block w-5 h-0.5 bg-[#1a1a1a] transition-transform ${menuOpen ? "-rotate-45 -translate-y-1" : ""}`} />
+            <span className={`block w-5 h-0.5 bg-[var(--color-brand-dark)] transition-transform ${menuOpen ? "rotate-45 translate-y-1" : ""}`} />
+            <span className={`block w-5 h-0.5 bg-[var(--color-brand-dark)] transition-opacity ${menuOpen ? "opacity-0" : ""}`} />
+            <span className={`block w-5 h-0.5 bg-[var(--color-brand-dark)] transition-transform ${menuOpen ? "-rotate-45 -translate-y-1" : ""}`} />
           </button>
 
           {/* CTA */}
@@ -101,7 +101,7 @@ export function LandingNav() {
               key={label}
               href={href}
               onClick={() => setMenuOpen(false)}
-              className="text-base text-[#374151] hover:text-[#1a1a1a] transition-colors font-medium px-2"
+              className="text-base text-[var(--color-neutral-gray)] hover:text-[var(--color-brand-dark)] transition-colors font-medium px-2"
             >
               {label}
             </a>
@@ -109,7 +109,7 @@ export function LandingNav() {
           {loggedIn ? (
             <button
               onClick={() => { handleLogout(); setMenuOpen(false); }}
-              className="text-base text-[#374151] hover:text-[#1a1a1a] transition-colors font-medium px-2 text-left"
+              className="text-base text-[var(--color-neutral-gray)] hover:text-[var(--color-brand-dark)] transition-colors font-medium px-2 text-left"
             >
               Log out
             </button>
@@ -117,7 +117,7 @@ export function LandingNav() {
             <Link
               href="/login"
               onClick={() => setMenuOpen(false)}
-              className="text-base text-[#374151] hover:text-[#1a1a1a] transition-colors font-medium px-2"
+              className="text-base text-[var(--color-neutral-gray)] hover:text-[var(--color-brand-dark)] transition-colors font-medium px-2"
             >
               Log in
             </Link>
