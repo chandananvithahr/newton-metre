@@ -29,7 +29,14 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const protectedPaths = ["/dashboard", "/estimate", "/similar", "/chat", "/workflows", "/mpn"];
+  // Redirect /dashboard → /estimate/new (dashboard removed from nav)
+  if (request.nextUrl.pathname.startsWith("/dashboard")) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/estimate/new";
+    return NextResponse.redirect(url);
+  }
+
+  const protectedPaths = ["/estimate", "/similar", "/chat", "/workflows", "/mpn"];
   const isProtected = protectedPaths.some((p) =>
     request.nextUrl.pathname.startsWith(p),
   );
