@@ -1376,8 +1376,8 @@ export default function NewEstimatePage() {
           </div>
 
           <div className="flex gap-3">
-            <button onClick={() => router.push("/dashboard")} className="flex-1 border border-black/20 py-3.5 rounded-lg hover:bg-[var(--color-surface-hover)] text-sm font-medium text-[var(--color-text-description)] transition-colors">
-              Back to Dashboard
+            <button onClick={() => router.push("/similar")} className="flex-1 border border-black/20 py-3.5 rounded-lg hover:bg-[var(--color-surface-hover)] text-sm font-medium text-[var(--color-text-description)] transition-colors">
+              Find similar parts
             </button>
             <button
               onClick={() => { setStep("type"); setAssemblyResult(null); setAsmComponents([]); setResult(null); setFile(null); }}

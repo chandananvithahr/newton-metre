@@ -223,10 +223,10 @@ export default function ViewEstimatePage() {
         </div>
 
         <button
-          onClick={() => router.push("/dashboard")}
+          onClick={() => router.push("/estimate/new")}
           className="border border-black/10 px-6 py-3 rounded-lg hover:bg-[var(--color-surface-hover)] text-sm font-medium text-[var(--color-text-description)] transition-colors"
         >
-          Back to Dashboard
+          New Estimate
         </button>
       </div>
 
