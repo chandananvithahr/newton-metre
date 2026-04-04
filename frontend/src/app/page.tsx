@@ -100,12 +100,12 @@ function Problem() {
             {
               stat: "60%",
               label: "Parts already exist",
-              desc: "60% of part numbers in a typical manufacturing database are duplicates. Each redundant part costs $4,500–7,500/year in carrying costs.",
+              desc: "60% of part numbers in a typical manufacturing database are duplicates or variants. A single search across your drawing history would catch them. Each redundant part costs $4,500–7,500/year.",
             },
             {
               stat: "70%",
               label: "Spend is off-the-shelf",
-              desc: "70% of procurement spend is on bought-out MPN items. Your company\u2019s negotiation history for these is trapped in email threads and spreadsheets.",
+              desc: "70% of procurement spend is on bought-out MPN items. Alternate parts, better vendors, volume discounts \u2014 all discoverable if your past POs were searchable. They\u2019re not.",
             },
           ].map((item, i) => (
             <div
@@ -147,8 +147,9 @@ function ShouldCost() {
             <p className="text-lg text-[#525252] leading-relaxed mb-10">
               Your supplier already knows what it costs to make your part. Now
               you will too. Line-by-line should-cost — material, machining,
-              finishing, overhead — in 30 seconds. Not days. Companies save
-              8–12% on the first quote they challenge.
+              finishing, overhead — in 30 seconds. Not days. Plus, instantly
+              find similar parts from your history with what you paid before.
+              Companies save 8–12% on the first quote they challenge.
             </p>
             <Link
               href="/estimate/new"
@@ -224,15 +225,15 @@ function ShouldCost() {
           {[
             {
               title: "Sourcing & Procurement",
-              desc: "Your supplier quoted ₹48,000. The should-cost is ₹29,400. That\u2019s ₹18,600 back per part.",
+              desc: "Supplier quoted ₹48,000. Should-cost says ₹29,400. Search finds you paid ₹31,000 last year for the same part. Walk in with data.",
             },
             {
               title: "Cost Engineering",
-              desc: "Should-cost in minutes, not days. Every line item defensible in an audit.",
+              desc: "Should-cost in minutes, not days. Every line item defensible. Search your history for similar estimates to cross-check.",
             },
             {
               title: "Design Engineering",
-              desc: "See the cost impact of every design choice before it reaches procurement.",
+              desc: "See cost impact before it reaches procurement. Search 10 years of drawings — that bracket probably already exists.",
             },
             {
               title: "Leadership",
@@ -306,6 +307,24 @@ function SimilaritySearch() {
                 title:
                   "Customer called. You quoted in 10 minutes. Competitor took 3 days.",
                 desc: "Upload a sketch, find 5 similar parts from history, give a ballpark price — while the customer is still on the phone.",
+              },
+              {
+                dept: "Import / Export",
+                title:
+                  "11,000 HS codes. You classified it wrong. Again.",
+                desc: "Find the 5 most similar past imports, surface their HS codes and FTA routes. Indian manufacturers leave 70% of FTA benefits on the table.",
+              },
+              {
+                dept: "Finance",
+                title:
+                  "\u20B93.2 crore on turned parts last year. You had no idea.",
+                desc: "Spend analysis by part family, material, supplier. Budget vs. actual on every category. Visibility into where the money actually goes.",
+              },
+              {
+                dept: "Supply Planning",
+                title:
+                  "AI predicted demand 3 months out. You ordered before the rush.",
+                desc: "Your PO history feeds a forecasting engine that predicts demand by part family, spots seasonal patterns, and calculates reorder points.",
               },
             ].map((item, i) => (
               <div
@@ -470,8 +489,9 @@ function AIWorkerTrailer() {
         <div className="text-center">
           <p className="text-white/30 text-sm mb-8 max-w-lg mx-auto">
             Every interaction makes the system smarter. Alternate approvals,
-            negotiation outcomes, vendor performance, price trends &mdash; your
-            company&apos;s institutional memory, compounding with every deal.
+            negotiation outcomes, vendor performance, price trends &mdash; all
+            searchable, all compounding. Your company&apos;s institutional
+            memory grows with every deal, every search, every decision.
           </p>
           <Link
             href="/login?waitlist=enterprise"
