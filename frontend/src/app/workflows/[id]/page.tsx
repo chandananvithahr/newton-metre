@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -62,6 +62,353 @@ function JsonBlock({ data }: { data: Record<string, unknown> }) {
       {JSON.stringify(data, null, 2)}
     </pre>
   );
+}
+
+/* ── Structured output renderers per workflow type ── */
+
+function fmt(n: unknown): string {
+  const v = Number(n);
+  if (isNaN(v)) return "—";
+  return v.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function CostOutputCard({ data }: { data: Record<string, unknown> }) {
+  const costData = (data.cost_agent ?? data) as Record<string, unknown>;
+  const processLines = (costData.process_lines ?? []) as Record<string, unknown>[];
+  const hasLines = processLines.length > 0;
+
+  return (
+    <div className="space-y-4">
+      {/* Summary row */}
+      <div className="grid grid-cols-3 gap-3">
+        {([
+          { label: "Unit Cost", value: `₹${fmt(costData.unit_cost)}`, accent: true },
+          { label: "Order Cost", value: `₹${fmt(costData.order_cost)}`, accent: false },
+          { label: "Quantity", value: String(costData.quantity ?? "—"), accent: false },
+        ] as { label: string; value: string; accent: boolean }[]).map((item) => (
+          <div key={item.label} className="bg-[var(--color-surface-container-low)] rounded-lg p-3 text-center">
+            <p className="text-[10px] uppercase tracking-wider text-[var(--color-text-muted)]" style={{ fontFamily: "var(--font-label)" }}>{item.label}</p>
+            <p className={`text-lg font-semibold mt-0.5 ${item.accent ? "text-emerald-700" : "text-[var(--color-text-primary)]"}`} style={{ fontFamily: "var(--font-mono)" }}>{item.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Cost range band */}
+      {!!costData.unit_cost_low && (
+        <p className="text-[11px] text-[var(--color-text-muted)] text-center" style={{ fontFamily: "var(--font-body)" }}>
+          Range: ₹{fmt(costData.unit_cost_low)} – ₹{fmt(costData.unit_cost_high)} (±{String(costData.uncertainty_pct ?? 15)}%)
+        </p>
+      )}
+
+      {/* Cost breakdown table */}
+      <div className="overflow-x-auto">
+        <table className="w-full text-[12px]">
+          <tbody className="divide-y divide-black/5">
+            {([
+              { label: "Material", value: costData.material_cost, sub: `${fmt(costData.raw_weight_kg)} kg ${String(costData.material_name ?? "")}` },
+              ...(hasLines ? processLines.map((p) => ({
+                label: String(p.process_name ?? p.process_id ?? "Process"),
+                value: Number(p.machine_cost ?? 0) + Number(p.setup_cost_per_unit ?? 0) + Number(p.tooling_cost ?? 0) + Number(p.labour_cost ?? 0) + Number(p.power_cost ?? 0),
+                sub: `${fmt(p.time_min)} min`,
+              })) : []),
+              { label: "Machining", value: costData.total_machining_cost, sub: null },
+              { label: "Overhead (15%)", value: costData.overhead, sub: null },
+              { label: "Profit (20%)", value: costData.profit, sub: null },
+            ] as { label: string; value: unknown; sub: string | null }[]).filter(r => r.value !== undefined && r.value !== null).map((row) => (
+              <tr key={row.label}>
+                <td className="py-2 text-[var(--color-text-secondary)]" style={{ fontFamily: "var(--font-body)" }}>
+                  {row.label}
+                  {row.sub && <span className="text-[10px] text-[var(--color-text-muted)] ml-1.5">{row.sub}</span>}
+                </td>
+                <td className="py-2 text-right font-medium text-[var(--color-text-primary)]" style={{ fontFamily: "var(--font-mono)" }}>₹{fmt(row.value)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function RfqOutputCard({ data }: { data: Record<string, unknown> }) {
+  const rfqData = (data.rfq_agent ?? data) as Record<string, unknown>;
+  const drafts = (rfqData.email_drafts ?? []) as Record<string, unknown>[];
+  const doc = (rfqData.rfq_document ?? {}) as Record<string, unknown>;
+
+  return (
+    <div className="space-y-4">
+      {/* RFQ summary */}
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { label: "Suppliers", value: String(rfqData.draft_count ?? drafts.length) },
+          { label: "Material", value: String(doc.material ?? "—") },
+          { label: "Quantity", value: String(doc.quantity ?? "—") },
+        ].map((item) => (
+          <div key={item.label} className="bg-[var(--color-surface-container-low)] rounded-lg p-3 text-center">
+            <p className="text-[10px] uppercase tracking-wider text-[var(--color-text-muted)]" style={{ fontFamily: "var(--font-label)" }}>{item.label}</p>
+            <p className="text-sm font-medium mt-0.5 text-[var(--color-text-primary)]" style={{ fontFamily: "var(--font-body)" }}>{item.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Email drafts */}
+      {drafts.map((draft, i) => {
+        const supplier = (draft.supplier ?? {}) as Record<string, unknown>;
+        const hasWarning = !!draft._warnings;
+        return (
+          <div key={i} className={`border rounded-lg overflow-hidden ${hasWarning ? "border-amber-200" : "border-black/5"}`}>
+            <div className="bg-[var(--color-surface-container-low)] px-4 py-2 flex items-center justify-between">
+              <p className="text-[12px] font-semibold text-[var(--color-text-primary)]" style={{ fontFamily: "var(--font-body)" }}>
+                {String(supplier.name ?? `Supplier ${i + 1}`)}
+              </p>
+              {!!supplier.email && (
+                <p className="text-[10px] text-[var(--color-text-muted)]" style={{ fontFamily: "var(--font-mono)" }}>{String(supplier.email)}</p>
+              )}
+            </div>
+            <div className="px-4 py-3">
+              <p className="text-[11px] font-semibold text-[var(--color-text-muted)] mb-1" style={{ fontFamily: "var(--font-label)" }}>
+                {String(draft.subject ?? "RFQ Email")}
+              </p>
+              <p className="text-[12px] text-[var(--color-text-secondary)] whitespace-pre-line leading-relaxed" style={{ fontFamily: "var(--font-body)" }}>
+                {String(draft.body ?? draft.error ?? "No email body")}
+              </p>
+              {hasWarning && (
+                <p className="text-[10px] text-amber-600 mt-2" style={{ fontFamily: "var(--font-body)" }}>⚠ {String(draft._warnings)}</p>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function QuoteComparisonCard({ data }: { data: Record<string, unknown> }) {
+  const compData = (data.quote_comparison_agent ?? data) as Record<string, unknown>;
+  const rows = (compData.comparison_table ?? []) as Record<string, unknown>[];
+  const anomalies = (compData.anomalies ?? []) as Record<string, unknown>[];
+  const recommendation = String(compData.recommendation ?? "");
+
+  return (
+    <div className="space-y-4">
+      {/* Recommendation */}
+      {recommendation && (
+        <div className="bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-3">
+          <p className="text-[12px] text-emerald-800 font-medium" style={{ fontFamily: "var(--font-body)" }}>{recommendation}</p>
+        </div>
+      )}
+
+      {/* Comparison table */}
+      {rows.length > 0 && (
+        <div className="overflow-x-auto">
+          <table className="w-full text-[12px]">
+            <thead>
+              <tr className="border-b border-black/10">
+                {["#", "Supplier", "Unit Price", "Delivery", "vs Should-Cost", "Total"].map((h) => (
+                  <th key={h} className="py-2 px-2 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]" style={{ fontFamily: "var(--font-label)" }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-black/5">
+              {rows.map((row) => {
+                const deltaPct = Number(row.delta_pct ?? 0);
+                const deltaColor = deltaPct > 10 ? "text-red-600" : deltaPct < -5 ? "text-emerald-600" : "text-[var(--color-text-secondary)]";
+                return (
+                  <tr key={String(row.supplier)} className={Number(row.rank) === 1 ? "bg-emerald-50/50" : ""}>
+                    <td className="py-2 px-2 font-bold text-[var(--color-text-muted)]" style={{ fontFamily: "var(--font-mono)" }}>{String(row.rank)}</td>
+                    <td className="py-2 px-2 font-medium text-[var(--color-text-primary)]" style={{ fontFamily: "var(--font-body)" }}>{String(row.supplier)}</td>
+                    <td className="py-2 px-2" style={{ fontFamily: "var(--font-mono)" }}>₹{fmt(row.unit_price)}</td>
+                    <td className="py-2 px-2 text-[var(--color-text-muted)]">{String(row.delivery_weeks ?? "—")} wk</td>
+                    <td className={`py-2 px-2 font-medium ${deltaColor}`} style={{ fontFamily: "var(--font-mono)" }}>
+                      {deltaPct > 0 ? "+" : ""}{deltaPct.toFixed(1)}%
+                    </td>
+                    <td className="py-2 px-2 font-medium" style={{ fontFamily: "var(--font-mono)" }}>₹{fmt(row.total_cost)}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Anomalies */}
+      {anomalies.length > 0 && (
+        <div className="space-y-1.5">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]" style={{ fontFamily: "var(--font-label)" }}>Anomalies</p>
+          {anomalies.map((a, i) => (
+            <div key={i} className={`rounded-lg px-3 py-2 text-[11px] ${String(a.type) === "suspicious" ? "bg-amber-50 text-amber-700" : "bg-red-50 text-red-700"}`} style={{ fontFamily: "var(--font-body)" }}>
+              <span className="font-semibold">{String(a.supplier)}</span>: {String(a.detail)}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function NegotiationOutputCard({ data }: { data: Record<string, unknown> }) {
+  const neg = (data.negotiation_agent ?? data) as Record<string, unknown>;
+
+  return (
+    <div className="space-y-4">
+      {/* Key numbers */}
+      <div className="grid grid-cols-4 gap-3">
+        {([
+          { label: "Vendor Quote", value: `₹${fmt(neg.vendor_quote)}`, accent: false },
+          { label: "Should-Cost", value: `₹${fmt(neg.should_cost)}`, accent: false },
+          { label: "Target Price", value: `₹${fmt(neg.target_price)}`, accent: true },
+          { label: "Mode", value: String(neg.execution_mode ?? "—"), accent: false },
+        ] as { label: string; value: string; accent: boolean }[]).map((item) => (
+          <div key={item.label} className="bg-[var(--color-surface-container-low)] rounded-lg p-3 text-center">
+            <p className="text-[10px] uppercase tracking-wider text-[var(--color-text-muted)]" style={{ fontFamily: "var(--font-label)" }}>{item.label}</p>
+            <p className={`text-sm font-semibold mt-0.5 ${item.accent ? "text-emerald-700" : "text-[var(--color-text-primary)]"}`} style={{ fontFamily: "var(--font-mono)" }}>{item.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Counter offer / analysis */}
+      {!!neg.counter_offer && (
+        <div className="border border-black/5 rounded-lg p-4">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] mb-2" style={{ fontFamily: "var(--font-label)" }}>Counter Offer</p>
+          <p className="text-[12px] text-[var(--color-text-secondary)] whitespace-pre-line leading-relaxed" style={{ fontFamily: "var(--font-body)" }}>
+            {typeof neg.counter_offer === "string" ? neg.counter_offer : JSON.stringify(neg.counter_offer, null, 2)}
+          </p>
+        </div>
+      )}
+      {!!neg.analysis && (
+        <div className="border border-black/5 rounded-lg p-4">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] mb-2" style={{ fontFamily: "var(--font-label)" }}>Analysis</p>
+          <p className="text-[12px] text-[var(--color-text-secondary)] whitespace-pre-line leading-relaxed" style={{ fontFamily: "var(--font-body)" }}>
+            {typeof neg.analysis === "string" ? neg.analysis : JSON.stringify(neg.analysis, null, 2)}
+          </p>
+        </div>
+      )}
+      {!!neg.talking_points && (
+        <div className="border border-black/5 rounded-lg p-4">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] mb-2" style={{ fontFamily: "var(--font-label)" }}>Talking Points</p>
+          <p className="text-[12px] text-[var(--color-text-secondary)] whitespace-pre-line leading-relaxed" style={{ fontFamily: "var(--font-body)" }}>
+            {typeof neg.talking_points === "string" ? neg.talking_points : JSON.stringify(neg.talking_points, null, 2)}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ProposalOutputCard({ data }: { data: Record<string, unknown> }) {
+  const proposal = (data.proposal_agent ?? data) as Record<string, unknown>;
+
+  return (
+    <div className="space-y-3">
+      {!!proposal.title && (
+        <h3 className="text-base font-semibold text-[var(--color-text-primary)]" style={{ fontFamily: "var(--font-headline)" }}>
+          {String(proposal.title)}
+        </h3>
+      )}
+      {!!proposal.summary && (
+        <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed" style={{ fontFamily: "var(--font-body)" }}>
+          {String(proposal.summary)}
+        </p>
+      )}
+      {!!proposal.recommendation && (
+        <div className="bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-3">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 mb-1" style={{ fontFamily: "var(--font-label)" }}>Recommendation</p>
+          <p className="text-[12px] text-emerald-800" style={{ fontFamily: "var(--font-body)" }}>{String(proposal.recommendation)}</p>
+        </div>
+      )}
+      {!!proposal.risks && (
+        <div className="border border-black/5 rounded-lg p-4">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] mb-2" style={{ fontFamily: "var(--font-label)" }}>Risks</p>
+          <p className="text-[12px] text-[var(--color-text-secondary)] whitespace-pre-line" style={{ fontFamily: "var(--font-body)" }}>
+            {typeof proposal.risks === "string" ? proposal.risks : JSON.stringify(proposal.risks, null, 2)}
+          </p>
+        </div>
+      )}
+      {/* Fallback for any extra fields */}
+      {!proposal.title && !proposal.summary && !proposal.recommendation && (
+        <JsonBlock data={data} />
+      )}
+    </div>
+  );
+}
+
+function MeetingOutputCard({ data }: { data: Record<string, unknown> }) {
+  const meeting = (data.meeting_agent ?? data) as Record<string, unknown>;
+
+  return (
+    <div className="space-y-3">
+      {!!meeting.brief && (
+        <div className="border border-black/5 rounded-lg p-4">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] mb-2" style={{ fontFamily: "var(--font-label)" }}>Meeting Brief</p>
+          <p className="text-[13px] text-[var(--color-text-secondary)] whitespace-pre-line leading-relaxed" style={{ fontFamily: "var(--font-body)" }}>
+            {typeof meeting.brief === "string" ? meeting.brief : JSON.stringify(meeting.brief, null, 2)}
+          </p>
+        </div>
+      )}
+      {!!meeting.agenda && (
+        <div className="border border-black/5 rounded-lg p-4">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] mb-2" style={{ fontFamily: "var(--font-label)" }}>Agenda</p>
+          <p className="text-[13px] text-[var(--color-text-secondary)] whitespace-pre-line leading-relaxed" style={{ fontFamily: "var(--font-body)" }}>
+            {typeof meeting.agenda === "string" ? meeting.agenda : JSON.stringify(meeting.agenda, null, 2)}
+          </p>
+        </div>
+      )}
+      {!!meeting.key_points && (
+        <div className="border border-black/5 rounded-lg p-4">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] mb-2" style={{ fontFamily: "var(--font-label)" }}>Key Points</p>
+          <p className="text-[13px] text-[var(--color-text-secondary)] whitespace-pre-line leading-relaxed" style={{ fontFamily: "var(--font-body)" }}>
+            {typeof meeting.key_points === "string" ? meeting.key_points : JSON.stringify(meeting.key_points, null, 2)}
+          </p>
+        </div>
+      )}
+      {!meeting.brief && !meeting.agenda && !meeting.key_points && (
+        <JsonBlock data={data} />
+      )}
+    </div>
+  );
+}
+
+/** Route outputs to the right structured renderer, fall back to JSON */
+function StructuredOutput({ workflowType, data }: { workflowType: string; data: Record<string, unknown> }) {
+  if (!data || Object.keys(data).length === 0) {
+    return <p className="text-sm text-[var(--color-text-muted)] italic" style={{ fontFamily: "var(--font-body)" }}>No outputs yet</p>;
+  }
+
+  switch (workflowType) {
+    case "estimate":
+      return <CostOutputCard data={data} />;
+    case "rfq":
+      return <RfqOutputCard data={data} />;
+    case "compare_quotes":
+      return <QuoteComparisonCard data={data} />;
+    case "negotiate":
+      return <NegotiationOutputCard data={data} />;
+    case "full_procurement":
+      // Full procurement has multiple stages — show cost if present, then RFQ
+      return (
+        <div className="space-y-6">
+          {!!data.cost_agent && (
+            <>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]" style={{ fontFamily: "var(--font-label)" }}>Cost Estimate</p>
+              <CostOutputCard data={data} />
+            </>
+          )}
+          {!!data.rfq_agent && (
+            <>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]" style={{ fontFamily: "var(--font-label)" }}>RFQ Drafts</p>
+              <RfqOutputCard data={data} />
+            </>
+          )}
+          {!data.cost_agent && !data.rfq_agent && <JsonBlock data={data} />}
+        </div>
+      );
+    case "proposal":
+      return <ProposalOutputCard data={data} />;
+    case "meeting_brief":
+      return <MeetingOutputCard data={data} />;
+    default:
+      return <JsonBlock data={data} />;
+  }
 }
 
 const PIPELINE_STEPS: Record<string, string[]> = {
@@ -150,24 +497,50 @@ export default function WorkflowDetailPage() {
   const [error, setError] = useState("");
   const [rejectReason, setRejectReason] = useState("");
   const [showRejectInput, setShowRejectInput] = useState(false);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const data = await getWorkflow(id as string);
-        setWorkflow(data);
-      } catch (e) {
-        const msg = e instanceof Error ? e.message : "Failed to load workflow";
-        if (msg === "Not authenticated") {
-          router.push("/login");
-          return;
-        }
-        setError(msg);
+  const ACTIVE_STATES = new Set<WorkflowState>(["created", "planning", "executing"]);
+  const isPolling = workflow ? ACTIVE_STATES.has(workflow.state) : false;
+
+  const fetchWorkflow = useCallback(async () => {
+    try {
+      const data = await getWorkflow(id as string);
+      setWorkflow(data);
+      return data;
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Failed to load workflow";
+      if (msg === "Not authenticated") {
+        router.push("/login");
+        return null;
       }
-      setLoading(false);
+      setError(msg);
+      return null;
     }
-    load();
   }, [id, router]);
+
+  // Initial load
+  useEffect(() => {
+    fetchWorkflow().then(() => setLoading(false));
+  }, [fetchWorkflow]);
+
+  // Auto-refresh every 3s for active workflows
+  useEffect(() => {
+    if (pollRef.current) clearInterval(pollRef.current);
+    if (!workflow || !ACTIVE_STATES.has(workflow.state)) return;
+
+    pollRef.current = setInterval(async () => {
+      const updated = await fetchWorkflow();
+      if (updated && !ACTIVE_STATES.has(updated.state)) {
+        if (pollRef.current) clearInterval(pollRef.current);
+        pollRef.current = null;
+      }
+    }, 3000);
+
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [workflow?.state, fetchWorkflow]);
 
   async function handleApprove() {
     if (!workflow) return;
@@ -321,15 +694,23 @@ export default function WorkflowDetailPage() {
           <JsonBlock data={workflow.inputs} />
         </div>
 
-        {/* Outputs */}
+        {/* Outputs — structured per workflow type */}
         <div className="bg-white ghost-border rounded-xl p-5 mb-6">
-          <h2
-            className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-muted)] mb-3"
-            style={{ fontFamily: "var(--font-label)" }}
-          >
-            Outputs
-          </h2>
-          <JsonBlock data={workflow.outputs} />
+          <div className="flex items-center justify-between mb-3">
+            <h2
+              className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-muted)]"
+              style={{ fontFamily: "var(--font-label)" }}
+            >
+              Outputs
+            </h2>
+            {isPolling && (
+              <span className="flex items-center gap-1.5 text-[10px] text-[var(--color-text-muted)]" style={{ fontFamily: "var(--font-body)" }}>
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+                Live
+              </span>
+            )}
+          </div>
+          <StructuredOutput workflowType={workflow.workflow_type} data={workflow.outputs} />
         </div>
 
         {/* Error message */}
