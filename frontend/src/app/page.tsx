@@ -62,7 +62,7 @@ function Hero() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
               </svg>
             </div>
-            <div className="text-[17px] font-bold text-[#1a1a1a] mb-1.5">Cost Estimator</div>
+            <div className="text-[17px] font-bold text-[#1a1a1a] mb-1.5">Should-Cost</div>
             <p className="text-[13px] font-medium text-[#525252] mb-5">Know the real cost before the supplier quotes</p>
             <ul className="space-y-3 mb-6 flex-1">
               {[
@@ -98,10 +98,12 @@ function Hero() {
             <p className="text-[13px] font-medium text-[#525252] mb-5">20 years of company knowledge. Searchable in seconds.</p>
             <ul className="space-y-3 mb-6 flex-1">
               {[
-                "Design: 159 hrs/yr on BOM admin. Gone.",
-                "QA: every NCR, FAI, failure — found instantly",
-                "Procurement: 75% of quotes are wrong. Check yours.",
-                "Sales: quote in the call, not 3 days later",
+                "Design: 90% match found before you start. Already built. Already tested. Reuse it.",
+                "QA: Repeat failure on line 3. Root cause was documented in 2019. Found in 8 seconds.",
+                "Procurement: Suppliers know their true costs. You've been guessing. Average overspend: 14%.",
+                "Sales: First quote wins. Competitors reply in hours. You're still building the spreadsheet.",
+                "Marketing: Every cost saving is a case study. Pull the numbers before the week ends.",
+                "Finance: Overspend discovered at quarter close. After the money was already gone.",
               ].map((point) => (
                 <li key={point} className="flex items-start gap-2.5 text-[14px] text-[#525252]">
                   <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#1a1a1a]/25 shrink-0" />
@@ -133,7 +135,8 @@ function Hero() {
                 "Supplier matrix — rank all vendors by price, delivery & risk in one view",
                 "Negotiation brief in 30 sec — last 3 deals, your opening number, the lever to pull",
                 "Supplier gave 14% last time. AI says push for 18%. Here's how.",
-                "MPN lookup — live market price before you open their email",
+                "Sits in on every vendor call — listens, flags the lever, drafts your counteroffer.",
+                "Trains on your data. Runs on your servers. Stays on your premises.",
               ].map((point) => (
                 <li key={point} className="flex items-start gap-2.5 text-[14px] text-[#525252]">
                   <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#1a1a1a]/25 shrink-0" />
@@ -146,6 +149,76 @@ function Hero() {
             </span>
           </Link>
         </HeroCard>
+      </div>
+    </section>
+  );
+}
+
+/* ── Proof ────────────────────────────────────────────── */
+function Proof() {
+  return (
+    <section className="py-20 px-4 sm:px-8 bg-white border-t border-black/5">
+      <div className="max-w-[1100px] mx-auto">
+        <motion.div
+          className="grid lg:grid-cols-2 gap-12 items-center"
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.6 }}
+        >
+          {/* Story */}
+          <div>
+            <div className="text-[11px] font-bold uppercase tracking-widest text-orange-500 mb-6 font-mono">
+              Real result · Defense sub-assembly
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#1a1a1a] tracking-tight leading-tight mb-6">
+              Management called it a win.
+              <br />
+              <span className="text-[#A3A3A3]">₹6L saved per unit.</span>
+            </h2>
+            <p className="text-[16px] text-[#525252] leading-relaxed mb-6">
+              Vendor quoted ₹43 lakhs. Negotiations brought it to ₹37L — team celebrated. Newton-Metre ran the numbers: mechanical cost ₹8L, purchased components ₹12L, with margin: should-cost ₹25L.
+            </p>
+            <p className="text-[16px] text-[#525252] leading-relaxed mb-8">
+              Armed with a line-by-line breakdown, the team pushed again. Vendor settled at ₹28L.
+            </p>
+            <div className="text-[15px] font-medium text-[#1a1a1a] italic border-l-4 border-orange-500 pl-5">
+              "The win they were celebrating was leaving ₹6 crore on the table."
+            </div>
+          </div>
+
+          {/* Numbers */}
+          <div className="grid grid-cols-2 gap-4">
+            {[
+              { stat: "₹43L", label: "Vendor's opening quote", muted: true },
+              { stat: "₹37L", label: "What management celebrated", muted: true },
+              { stat: "₹25L", label: "Should-cost (Newton-Metre)", highlight: true },
+              { stat: "₹28L", label: "Final negotiated price", highlight: true },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                className={`p-6 rounded-2xl border ${item.highlight ? "bg-[#1a1a1a] border-[#1a1a1a]" : "bg-white border-black/8"}`}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.08 }}
+              >
+                <div className={`text-3xl font-bold font-mono mb-2 ${item.highlight ? "text-white" : "text-[#1a1a1a]"}`}>
+                  {item.stat}
+                </div>
+                <div className={`text-[11px] uppercase tracking-widest font-bold ${item.highlight ? "text-white/50" : "text-[#A3A3A3]"}`}>
+                  {item.label}
+                </div>
+              </motion.div>
+            ))}
+            <div className="col-span-2 p-6 rounded-2xl bg-orange-50 border border-orange-200">
+              <div className="text-4xl font-bold font-mono text-orange-600 mb-1">₹10.05 Cr</div>
+              <div className="text-[11px] uppercase tracking-widest font-bold text-orange-500">
+                Total saved · 67 units × ₹15L per unit
+              </div>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
@@ -164,14 +237,12 @@ function Problem() {
           transition={{ duration: 0.6 }}
         >
           <h2 className="text-4xl sm:text-5xl font-bold text-[#1a1a1a] mb-6 tracking-tight leading-tight">
-            You engineer to microns.
+            Your engineering is precise.
             <br />
-            <span className="text-[#A3A3A3]">You negotiate blind.</span>
+            <span className="text-[#A3A3A3]">Your procurement is not.</span>
           </h2>
           <p className="text-lg text-[#525252] leading-relaxed">
-            Your engineers design to micron-level tolerances. But when
-            procurement negotiates price, they rely on supplier PDFs, stale POs,
-            and gut feeling. That gap costs you 8–14% on every part.
+            Your team specifies every component, tolerance, and process to exact standards. But when procurement negotiates price, they rely on supplier PDFs, stale POs, and gut feeling. That gap costs you 8–14% on every order.
           </p>
         </motion.div>
 
@@ -230,7 +301,7 @@ function ShouldCost() {
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.6 }}
           >
-            <div className="text-[11px] text-[#A3A3A3] uppercase tracking-widest font-bold mb-6 font-mono">
+            <div className="text-[13px] text-orange-500 uppercase tracking-widest font-bold mb-6 font-mono">
               01 / 03 · Should-Cost Estimation
             </div>
             <h2 className="text-4xl sm:text-5xl font-bold text-[#1a1a1a] mb-8 tracking-tight leading-tight">
@@ -327,7 +398,7 @@ function ShouldCost() {
             },
             {
               title: "Design Engineering",
-              desc: "See cost impact before it reaches procurement. Search 10 years of drawings — that bracket probably already exists.",
+              desc: "See cost impact before it reaches procurement. Search your full history — that part probably already exists.",
             },
             {
               title: "Leadership",
@@ -390,8 +461,8 @@ function SimilaritySearch() {
             {[
               {
                 dept: "Design Engineering",
-                title: "She spent 3 days designing a bracket. It already existed.",
-                desc: "70–80% of new designs are variants of existing parts. Find the match in seconds, tweak 10%, ship in hours. Each avoided new part saves $15,000.",
+                title: "She spent 3 days designing something that already existed.",
+                desc: "70–80% of new designs are variants of existing parts. Find the match in seconds, tweak 10%, ship in hours. Each avoided redesign saves $15,000.",
               },
               {
                 dept: "Procurement",
@@ -950,6 +1021,7 @@ export default function LandingPage() {
       <LandingNav />
       <main>
         <Hero />
+        <Proof />
         <Problem />
         <ShouldCost />
         <SimilaritySearch />
