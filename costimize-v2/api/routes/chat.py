@@ -32,13 +32,14 @@ You help users understand cost breakdowns, compare materials, optimize manufactu
 processes, and make data-driven sourcing decisions for Indian manufacturing.
 
 Rules:
-- Be concise and specific. Use numbers, not vague statements.
+- ALWAYS answer using the CURRENT ESTIMATE CONTEXT first. When the user asks "why is X cost so high?", compute the math from the estimate data: show the material price/kg, part weight, volume, and how the number was derived. Never give generic textbook answers when estimate data is available.
+- Be concise and specific. Use ₹ numbers from the estimate, not vague statements.
 - All costs in ₹ (INR) unless user asks otherwise.
-- When discussing estimates, reference specific line items from the estimate context.
+- For "why" questions about cost: break down the calculation step-by-step using actual dimensions and material properties from the estimate. Example: "Your part is 150mm OD × 200mm long in Al 6061 (₹315/kg, density 2700 kg/m³). Volume = π/4 × 0.15² × 0.2 = 0.00353 m³. Weight = 9.54 kg. Material cost = 9.54 × ₹315 = ₹3,005. This is 51% of your unit cost because aluminum is 4-5× pricier than mild steel."
+- Focus on actionable advice: "Switch to Al 5052 (₹285/kg vs ��315/kg) to save ₹X" or "Reduce OD by 10mm to save ₹X in material"
 - If you don't know something, say so. Don't make up costs.
-- Focus on actionable advice: "Switch from EN24 to EN8 to save ₹X on material"
 - You understand turning, milling, sheet metal, PCB, and cable assembly processes.
-- When a KNOWLEDGE BASE section is provided, use it to give informed, specific answers. Cite facts from it."""
+- When a KNOWLEDGE BASE section is provided, use it to give informed, specific answers grounded in the estimate data. Cite facts from it."""
 
 
 class ChatRequest(BaseModel):
@@ -82,20 +83,64 @@ def _get_estimate_context(estimate_id: str) -> str:
         extracted = est.get("extracted_data") or {}
         dims = extracted.get("dimensions", {})
 
+        material_name = bd.get('material_name', est.get('material_name', 'Unknown'))
+
         lines = [
             "=== CURRENT ESTIMATE CONTEXT ===",
             f"Part Type: {est.get('part_type', 'mechanical')}",
-            f"Material: {bd.get('material_name', est.get('material_name', 'Unknown'))}",
+            f"Material: {material_name}",
             f"Quantity: {est.get('quantity', 1)}",
             f"Total Unit Cost: ₹{est.get('total_cost', 0):,.2f}",
             f"Confidence: {est.get('confidence_tier', 'unknown')}",
         ]
 
-        # Dimensions
+        # Dimensions — include all for calculation context
         if dims:
             dim_parts = [f"{k}: {v}mm" for k, v in dims.items() if v]
             if dim_parts:
                 lines.append(f"Dimensions: {', '.join(dim_parts)}")
+
+        # Material properties — critical for "why is material cost high?" questions
+        try:
+            from engines.mechanical.material_db import get_material, load_materials
+            # Fuzzy match: try exact first, then substring match
+            try:
+                mat = get_material(material_name)
+            except ValueError:
+                mat = None
+                for k in load_materials():
+                    if k.lower() in material_name.lower() or material_name.lower() in k.lower():
+                        mat = get_material(k)
+                        break
+            if mat:
+                lines.append(f"\nMaterial Properties ({mat.name}):")
+                lines.append(f"  Price: ₹{mat.price_per_kg_inr}/kg")
+                lines.append(f"  Density: {mat.density_kg_per_m3} kg/m³")
+                if mat.uts_mpa:
+                    lines.append(f"  UTS: {mat.uts_mpa} MPa")
+                # Compute weight from dimensions if available
+                od = dims.get("outer_diameter_mm", 0) or 0
+                length = dims.get("length_mm", 0) or 0
+                id_mm = dims.get("inner_diameter_mm", 0) or 0
+                width = dims.get("width_mm", 0) or 0
+                height = dims.get("height_mm", 0) or 0
+                import math
+                if od > 0 and length > 0:
+                    vol_m3 = math.pi / 4 * ((od / 1000) ** 2 - (id_mm / 1000) ** 2) * (length / 1000)
+                    weight = vol_m3 * mat.density_kg_per_m3
+                    calc_mat_cost = weight * mat.price_per_kg_inr
+                    lines.append(f"  Estimated raw weight: {weight:.3f} kg")
+                    lines.append(f"  Weight × price = {weight:.3f} × ₹{mat.price_per_kg_inr} = ₹{calc_mat_cost:,.0f}")
+                    lines.append(f"  (Material cost includes 15% wastage allowance)")
+                elif width > 0 and height > 0 and length > 0:
+                    vol_m3 = (width / 1000) * (height / 1000) * (length / 1000)
+                    weight = vol_m3 * mat.density_kg_per_m3
+                    calc_mat_cost = weight * mat.price_per_kg_inr
+                    lines.append(f"  Estimated raw weight: {weight:.3f} kg")
+                    lines.append(f"  Weight × price = {weight:.3f} × ₹{mat.price_per_kg_inr} = ₹{calc_mat_cost:,.0f}")
+                    lines.append(f"  (Material cost includes 15% wastage allowance)")
+        except Exception:
+            pass  # non-critical
 
         # Cost breakdown line items
         lines.append("")
@@ -231,7 +276,7 @@ def _call_gemini(messages: list[dict]) -> str:
         # Prepend system to first user message
         contents[0]["parts"][0] = f"{system_msg}\n\n{contents[0]['parts'][0]}"
 
-    response = model.generate_content(contents)
+    response = model.generate_content(contents, generation_config={"temperature": 0.0})
     return response.text.strip()
 
 
