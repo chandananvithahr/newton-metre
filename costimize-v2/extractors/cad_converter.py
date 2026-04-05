@@ -519,6 +519,80 @@ def _group_entities_by_layer(msp) -> dict[str, list[str]]:
     return layer_groups
 
 
+_RE_RAW_DXF_SKIP = re.compile(
+    r'^(AC\d+|ANSI_|ACDB|ACAD_|ObjectDBX|DICTION|TABLE|VISUAL|SCALE|MLE'
+    r'|BLOCK_|LTYPE|LAYER|STYLE|VIEW|UCS|APPID|DIMSTYLE|VPORT)',
+    re.IGNORECASE,
+)
+
+
+def _dxf_raw_text_fallback(raw_dxf: str) -> str:
+    """Last-resort DXF parser: scan raw DXF ENTITIES section for dimensions/annotations.
+
+    Used when ezdxf can't parse a DXF (e.g. corrupt DWG-converted DXF with bad handles).
+    Only scans the ENTITIES section to avoid DXF header noise.
+    """
+    sections: list[str] = ["=== DXF/DWG FILE CONTENTS (raw text fallback) ===", ""]
+
+    # Find the ENTITIES section — everything before it is header/tables noise
+    entities_start = raw_dxf.find("\nENTITIES\n")
+    if entities_start < 0:
+        entities_start = 0
+    entities_end = raw_dxf.find("\nEOF\n", entities_start)
+    if entities_end < 0:
+        entities_end = len(raw_dxf)
+    body = raw_dxf[entities_start:entities_end]
+
+    lines = body.splitlines()
+    dims: list[str] = []
+    texts: list[str] = []
+    dim_overrides: list[str] = []
+
+    i = 0
+    while i < len(lines) - 1:
+        code = lines[i].strip()
+        val = lines[i + 1].strip()
+        # Group 42 = actual dimension measurement (only positive, >0.001 to skip near-zero)
+        if code == "42":
+            try:
+                num = float(val)
+                if num > 0.001:
+                    dims.append(f"  linear: {num:.4f}")
+            except ValueError:
+                pass
+        # Group 1 = primary text (TEXT entity content or dimension override)
+        elif code == "1" and val and val not in ("<>", ""):
+            if len(val) < 100 and not _RE_RAW_DXF_SKIP.match(val):
+                texts.append(val)
+        # Group 3 = extra text (MTEXT continuation)
+        elif code == "3" and val and len(val) < 100 and not _RE_RAW_DXF_SKIP.match(val):
+            texts.append(val)
+        i += 2
+
+    # Deduplicate texts
+    seen_texts: set[str] = set()
+    unique_texts = []
+    for t in texts:
+        clean = t.strip()
+        if clean and clean not in seen_texts:
+            seen_texts.add(clean)
+            unique_texts.append(clean)
+
+    if dims:
+        sections.append(f"DIMENSIONS ({len(dims)} found):")
+        sections.extend(dims[:50])
+        sections.append("")
+
+    if unique_texts:
+        sections.append("ANNOTATIONS:")
+        for t in unique_texts[:60]:
+            sections.append(f"  {t}")
+        sections.append("")
+
+    sections.append("NOTE: Parsed via raw text fallback — ezdxf could not open this file.")
+    return "\n".join(sections)
+
+
 def dxf_to_text(file_bytes: bytes, filename: str = "drawing.dxf") -> str:
     """Extract engineering data directly from DXF/DWG using ezdxf entity traversal.
 
@@ -560,6 +634,22 @@ def dxf_to_text(file_bytes: bytes, filename: str = "drawing.dxf") -> str:
 
     try:
         doc = ezdxf.readfile(tmp_path)
+    except Exception as exc:
+        # DWG-converted DXFs often have corrupt/invalid handles — use recovery mode
+        try:
+            from ezdxf import recover as ezdxf_recover
+            doc, _ = ezdxf_recover.readfile(tmp_path)
+            logger.warning("DXF read with recovery mode (tolerant parsing): %s", exc)
+        except Exception as exc2:
+            # Final fallback: raw text parsing for DXF files ezdxf can't handle at all
+            logger.warning("ezdxf recovery failed, using raw text fallback: %s", exc2)
+            try:
+                raw_text = Path(tmp_path).read_bytes().decode("latin-1", errors="replace")
+                return _dxf_raw_text_fallback(raw_text)
+            except Exception:
+                pass
+            Path(tmp_path).unlink(missing_ok=True)
+            raise RuntimeError(f"ezdxf failed to read file even in recovery mode: {exc2}") from exc2
     finally:
         Path(tmp_path).unlink(missing_ok=True)
 
@@ -609,12 +699,24 @@ def dxf_to_text(file_bytes: bytes, filename: str = "drawing.dxf") -> str:
     leaders: list[str] = []
     hatch_count = 0
 
-    for entity in msp:
-        dtype = entity.dxftype()
+    try:
+        entity_list = list(msp)  # materialize — catches "Invalid handle 0" on corrupt DWG-converted DXFs
+    except Exception as exc:
+        logger.warning("Failed to iterate modelspace entities (likely corrupt DXF from DWG): %s", exc)
+        entity_list = []
+
+    for entity in entity_list:
+        try:
+            dtype = entity.dxftype()
+        except Exception:
+            continue
 
         if dtype == "DIMENSION":
             try:
                 val = entity.dxf.get("actual_measurement", None)
+                # -1 is DWG/DXF sentinel for "measurement not pre-computed" — discard
+                if val is not None and val < 0:
+                    val = None
                 dim_type = entity.dimtype & 7
                 type_label = {0: "linear", 2: "angular", 3: "diameter", 4: "radius"}.get(dim_type, "dim")
                 override = entity.dxf.get("text", "")

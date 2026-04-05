@@ -20,21 +20,33 @@ _MATERIAL_SET = set(ALLOWED_MATERIALS)
 
 # Keyword aliases → canonical name. AI often returns variations like "AL6061", "SS 304", "MS".
 _MATERIAL_ALIASES: list[tuple[list[str], str]] = [
-    (["al6061", "al 6061", "al-6061", "6061", "aluminum alloy", "aluminium alloy", "aluminum", "aluminium", "alloy al"], "Aluminum 6061"),
-    (["mild steel", "ms ", " ms", "is2062", "is 2062", "low carbon steel", "carbon steel"], "Mild Steel IS2062"),
-    (["en8", "en 8", "carbon steel en8", "080m40"], "EN8 Steel"),
-    (["en24", "en 24", "817m40", "alloy steel en24"], "EN24 Steel"),
-    (["stainless steel", "ss304", "ss 304", "304", "aisi 304", "aisi304", "inox"], "Stainless Steel 304"),
-    (["brass", "is319", "is 319", "cu zn", "cuzn"], "Brass IS319"),
-    (["cast iron", "grey iron", "gray iron", "ci "], "Cast Iron"),
-    (["copper", "cu ", " cu", "electrolytic copper"], "Copper"),
-    (["titanium", "ti ", " ti", "grade 5", "gr5", "gr.5", "ti-6al-4v", "ti6al4v"], "Titanium Grade 5"),
-    (["en19", "en 19", "4140", "aisi 4140", "aisi4140", "40cr1mo28", "alloy steel en19"], "EN19 Steel"),
-    (["ss316", "ss 316", "316", "aisi 316", "aisi316", "stainless 316"], "Stainless Steel 316"),
-    (["al7075", "al 7075", "7075", "al-7075", "aluminum 7075", "aluminium 7075", "7075-t6"], "Aluminum 7075-T6"),
+    # Specific/exotic materials first — prevents short keywords from shadowing them
+    (["inconel", "inconel 718", "in718", "alloy 718", "uns n07718", "nickel alloy"], "Inconel 718"),
+    (["titanium", "grade 5", "gr5", "gr.5", "ti-6al-4v", "ti6al4v"], "Titanium Grade 5"),
+    # "ti " and " ti" removed — match inside "stainless", "ductile" etc.
     (["sg iron", "sgi", "fcd500", "fcd 500", "ductile iron", "nodular iron", "spheroidal graphite"], "SG Iron FCD500"),
     (["20mncr5", "20 mncr5", "5120", "aisi 5120", "case hardening steel"], "20MnCr5 Steel"),
-    (["inconel", "inconel 718", "in718", "alloy 718", "uns n07718", "nickel alloy"], "Inconel 718"),
+    # Aluminium alloys
+    (["al6061", "al 6061", "al-6061", "6061", "aluminum alloy", "aluminium alloy", "aluminum", "aluminium", "alloy al"], "Aluminum 6061"),
+    (["al7075", "al 7075", "al-7075", "aluminum 7075", "aluminium 7075", "7075-t6"], "Aluminum 7075-T6"),
+    # "7075" alone removed — false-matches part numbers containing those digits
+    # Stainless steels
+    (["stainless steel", "ss304", "ss 304", "aisi 304", "aisi304", "inox"], "Stainless Steel 304"),
+    # "304" alone removed — matches PCD values, part numbers etc.
+    (["ss316", "ss 316", "aisi 316", "aisi316", "stainless 316"], "Stainless Steel 316"),
+    # "316" alone removed for same reason
+    # Carbon and alloy steels
+    (["en8", "en 8", "carbon steel en8", "080m40"], "EN8 Steel"),
+    (["en24", "en 24", "817m40", "alloy steel en24"], "EN24 Steel"),
+    (["en19", "en 19", "4140", "aisi 4140", "aisi4140", "40cr1mo28", "alloy steel en19"], "EN19 Steel"),
+    (["mild steel", "is2062", "is 2062", "low carbon steel", "carbon steel"], "Mild Steel IS2062"),
+    # "ms ", " ms" removed — "ms" matches inside "AMS", "dims", "cms" etc.
+    # Other metals
+    (["brass", "is319", "is 319", "cu zn", "cuzn"], "Brass IS319"),
+    (["cast iron", "grey iron", "gray iron"], "Cast Iron"),
+    # "ci " removed — matches "ci" inside "critical", "circuit", etc.
+    (["copper", "electrolytic copper"], "Copper"),
+    # "cu ", " cu" removed — matches inside "acute", "accumulate", "vacuum" etc.
 ]
 
 

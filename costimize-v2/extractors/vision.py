@@ -77,22 +77,31 @@ class _ExtractionResult(BaseModel):
 # Material alias table — maps raw AI strings to canonical names.
 # Mirrors the aliases in api/routes/estimate.py so extractor output is consistent.
 _MATERIAL_ALIASES: list[tuple[list[str], str]] = [
+    # Specific/exotic materials first — prevents short keywords from shadowing them
+    (["inconel 718","in718","alloy 718","nickel alloy"], "Inconel 718"),
+    (["titanium","ti-6al-4v","ti6al4v","grade 5","gr5"], "Titanium Grade 5"),
+    (["sg iron","ductile iron","nodular iron","fcd500"], "SG Iron FCD500"),
+    (["20mncr5","5120","aisi 5120","case hardening steel"], "20MnCr5 Steel"),
+    # Aluminium alloys
     (["al6061","al 6061","al-6061","6061-t6","6061 t6","aluminum 6061","aluminium 6061",
       "al 6061-t6","al6061-t6","aluminum alloy","aluminium alloy","alloy al"], "Aluminum 6061"),
-    (["al7075","al 7075","7075","7075-t6","aluminum 7075","aluminium 7075"], "Aluminum 7075-T6"),
-    (["mild steel","ms","is2062","is 2062","low carbon steel"], "Mild Steel IS2062"),
+    (["al7075","al 7075","7075-t6","aluminum 7075","aluminium 7075"], "Aluminum 7075-T6"),
+    # Note: bare "7075" removed — too likely to match part numbers containing "7075"
+    # Stainless steels
+    (["ss304","ss 304","aisi 304","stainless steel 304","stainless 304","inox"], "Stainless Steel 304"),
+    # "304" alone removed — false-matches drawing numbers, PCD values, etc.
+    (["ss316","ss 316","aisi 316","stainless steel 316","stainless 316"], "Stainless Steel 316"),
+    # "316" alone removed for same reason
+    # Carbon and alloy steels
     (["en8","en 8","080m40"], "EN8 Steel"),
     (["en24","en 24","817m40"], "EN24 Steel"),
     (["en19","en 19","4140","aisi 4140","40cr1mo28"], "EN19 Steel"),
-    (["ss304","ss 304","304","aisi 304","stainless steel 304","stainless 304","inox"], "Stainless Steel 304"),
-    (["ss316","ss 316","316","aisi 316","stainless steel 316","stainless 316"], "Stainless Steel 316"),
+    (["mild steel","is2062","is 2062","low carbon steel"], "Mild Steel IS2062"),
+    # "ms" removed — matches inside "AMS", "dims", "cms" etc. Use "mild steel" instead.
+    # Other metals
     (["brass","is319","is 319"], "Brass IS319"),
     (["cast iron","grey iron","gray iron"], "Cast Iron"),
     (["copper","electrolytic copper"], "Copper"),
-    (["titanium","ti-6al-4v","ti6al4v","grade 5","gr5"], "Titanium Grade 5"),
-    (["sg iron","ductile iron","nodular iron","fcd500"], "SG Iron FCD500"),
-    (["inconel 718","in718","alloy 718","nickel alloy"], "Inconel 718"),
-    (["20mncr5","5120","aisi 5120","case hardening steel"], "20MnCr5 Steel"),
 ]
 
 
