@@ -29,13 +29,6 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Redirect /dashboard → /estimate/new (dashboard removed from nav)
-  if (request.nextUrl.pathname.startsWith("/dashboard")) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/estimate/new";
-    return NextResponse.redirect(url);
-  }
-
   const protectedPaths = ["/estimate", "/similar", "/chat", "/workflows", "/mpn", "/library"];
   const isProtected = protectedPaths.some((p) =>
     request.nextUrl.pathname.startsWith(p),
