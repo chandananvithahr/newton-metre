@@ -267,7 +267,7 @@ export default function NewEstimatePage() {
       : extractedData;
     const parsedQuote = supplierQuoteStr ? parseFloat(supplierQuoteStr) : undefined;
     try {
-      const est = await createEstimate(dataToSend, quantity, parsedQuote);
+      const est = await createEstimate(dataToSend, quantity, parsedQuote, file?.name);
       setResult(est);
       setSupplierQuoteSaved(!!parsedQuote);
       setStep("result");
@@ -861,7 +861,7 @@ export default function NewEstimatePage() {
                     const q = parseFloat(supplierQuoteStr);
                     if (!q || !result) return;
                     try {
-                      await createEstimate(extractedData!, quantity, q);
+                      await createEstimate(extractedData!, quantity, q, file?.name);
                       setSupplierQuoteSaved(true);
                     } catch { /* non-critical */ }
                   }}

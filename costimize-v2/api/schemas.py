@@ -27,6 +27,7 @@ class EstimateRequest(BaseModel):
     surface_treatment_id: str | None = None  # specific treatment from surface_treatment_db (e.g. "zinc_clear")
     heat_treatment_id: str | None = None     # specific treatment from heat_treatment_db (e.g. "through_hardening")
     machine_tier: str = "cnc_3axis"  # conventional, cnc_2axis, cnc_3axis, cnc_5axis, hmc
+    filename: str | None = None  # original drawing filename — used to link cost to similarity drawing
 
 
 class ProcessLine(BaseModel):

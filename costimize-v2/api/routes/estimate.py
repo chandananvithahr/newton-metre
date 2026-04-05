@@ -172,6 +172,34 @@ async def create_estimate(
         }
     ).execute()
 
+    # Link cost summary to the matching drawing in similarity index (non-blocking)
+    if body.filename:
+        try:
+            drawing_row = (
+                sb.table("drawings")
+                .select("id, metadata")
+                .eq("user_id", user_id)
+                .eq("file_url", body.filename)
+                .order("created_at", desc=True)
+                .limit(1)
+                .execute()
+            )
+            if drawing_row.data:
+                d = drawing_row.data[0]
+                meta = d.get("metadata") or {}
+                meta["cost_summary"] = {
+                    "unit_cost": round(breakdown.unit_cost, 2),
+                    "unit_cost_low": round(breakdown.unit_cost_low, 2),
+                    "unit_cost_high": round(breakdown.unit_cost_high, 2),
+                    "material_cost": round(breakdown.material_cost, 2),
+                    "total_machining_cost": round(breakdown.total_machining_cost, 2),
+                    "confidence_tier": confidence,
+                    "quantity": body.quantity,
+                }
+                sb.table("drawings").update({"metadata": meta}).eq("id", d["id"]).execute()
+        except Exception as e:
+            logger.warning("Failed to link cost to drawing '%s': %s", body.filename, e)
+
     log_usage(
         user_id, "estimate", 0.01, {"material": material, "processes": processes}
     )

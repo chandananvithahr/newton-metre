@@ -100,7 +100,8 @@ Original monolithic CNC turning-only estimator. Kept for reference.
 | **Inference Server** | Cloud APIs (now) → vLLM on RunPod/on-prem (target) | OpenAI-compatible API, model-agnostic |
 | **Analytics** | Vercel Analytics + usage_log table | Page views + API usage tracking |
 | **AI Procurement** | Raw Python agents (no frameworks) | 8 agents, state machine, 3-layer memory, checkpoint/resume |
-| **Testing** | pytest | 347 tests across 20 test files |
+| **Chat Knowledge** | Karpathy-style wiki (15 articles, ~25K tokens) | Keyword-routed CAG injection — no vector DB, no RAG |
+| **Testing** | pytest | 466 tests across 20 test files |
 | **Language** | Python 3.11+ (backend), TypeScript (frontend) | |
 
 ### Commands
@@ -155,7 +156,7 @@ cd costimize-v2 && python -m pytest tests/test_agent_*.py # Run 183 agent tests 
 
 **Frontend** (`frontend/`): Next.js pages in `src/app/` (page, login, dashboard, estimate/new, estimate/[id], chat, similar, library, mpn, workflows/new, workflows/[id], workflows, waitlist). Components in `src/components/` (app-shell, chat-widget, app-nav, landing-nav, Toast). Lib: `src/lib/api.ts` + `supabase.ts`. Auth middleware in `src/middleware.ts`.
 
-**Backend** (`costimize-v2/`): `agents/` (8 procurement agents + engine + memory + checkpoint), `engines/` (mechanical, sheet_metal, pcb, cable, validation, similarity), `extractors/` (vision, process_detector, bom, gemini_estimator, pdf_classifier, rfq), `scrapers/` (component, material), `history/` (po_parser/store/matcher), `ui/` (Streamlit tabs), `tests/` (466 tests, 20 files), `docs/research/` (24 docs — see `MASTER-RESEARCH-REPORT.md`), `supabase/migrations/` (005-010).
+**Backend** (`costimize-v2/`): `agents/` (8 procurement agents + engine + memory + checkpoint), `engines/` (mechanical, sheet_metal, pcb, cable, validation, similarity), `extractors/` (vision, process_detector, bom, gemini_estimator, pdf_classifier, rfq), `scrapers/` (component, material), `history/` (po_parser/store/matcher), `ui/` (Streamlit tabs), `api/wiki_loader.py` (Karpathy-style knowledge base), `docs/wiki/` (15 compiled articles), `tests/` (466 tests, 20 files), `docs/research/` (24 docs — see `MASTER-RESEARCH-REPORT.md`), `supabase/migrations/` (005-010).
 
 ### Data Flow
 
@@ -168,6 +169,7 @@ cd costimize-v2 && python -m pytest tests/test_agent_*.py # Run 183 agent tests 
 6. **All tabs:** Historical PO records loaded from sidebar → matched against current estimate → comparison displayed
 7. **Training data:** Every validated mechanical estimate auto-saved to data/validation/ for future ML
 8. **Agent workflows:** API triggers pipeline → agents execute sequentially/parallel → checkpoint at approval gates → human approves → resume → complete
+9. **Chat agent:** User message → `wiki_loader.route_topics()` keyword-matches → injects top 1-3 wiki articles (≤8K tokens) into context → LLM responds with domain knowledge + estimate data
 
 ### Multi-Agent Procurement Architecture (agents/)
 
@@ -295,6 +297,16 @@ PIPELINES = {
 - **Feedback loop** — users confirm/reject matches → builds similarity graph over time
 
 **Upgrade phases:** ~~(1) Real embeddings + BM25~~ DONE → ~~(2) 6-signal ranker + role presets~~ DONE → (3) DINOv2 visual embeddings + cross-encoder re-ranker → (4) Fine-tune + on-prem (ColFlor) → (5) KG + LightRAG → (6) STEP via GC-CAD GNN
+
+#### Chat Knowledge Base (api/wiki_loader.py + docs/wiki/)
+
+**Karpathy-style LLM Knowledge Base** — 15 structured wiki articles (~25K tokens) compiled from 30 research docs. Injected into chat context via keyword routing (CAG, not RAG). Zero new dependencies, zero retrieval API cost.
+
+- **Articles:** should-cost, materials, turning/milling, sheet metal, surface treatments, Indian regional costs, Indian manufacturing, similarity search, procurement agents, physics engine, drawing extraction, embeddings, competitors, business model, bibliography
+- **Routing:** `route_topics(msg)` — keyword matching (exact word = 2pts, substring = 1pt) → top 1-3 articles
+- **Budget:** 8K token cap per chat turn, articles truncated if over budget
+- **Integration:** `get_wiki_context(msg)` called in `chat.py` before `_build_messages()`, injected between system prompt and estimate context
+- **Why not RAG:** Knowledge base is small (~25K tokens), curated, and static. Keyword routing is deterministic, fast, and free. No vector DB overhead for 15 articles.
 
 ### Key Design Decisions
 

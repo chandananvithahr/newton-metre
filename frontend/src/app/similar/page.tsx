@@ -312,6 +312,15 @@ export default function SimilarPartsPage() {
                   (m.metadata.filename as string) || m.drawing_id;
                 const breakdown = (m.metadata.score_breakdown || {}) as Record<string, number>;
                 const material = (m.metadata.material as string) || "";
+                const costSummary = (m.metadata.cost_summary || null) as {
+                  unit_cost: number;
+                  unit_cost_low: number;
+                  unit_cost_high: number;
+                  material_cost: number;
+                  total_machining_cost: number;
+                  confidence_tier: string | null;
+                  quantity: number;
+                } | null;
 
                 return (
                   <div
@@ -340,6 +349,42 @@ export default function SimilarPartsPage() {
                             </span>
                           )}
                         </div>
+
+                        {/* Cost intelligence — historical should-cost */}
+                        {costSummary && (
+                          <div className="flex items-center gap-3 mb-2.5 px-3 py-2 rounded-lg bg-emerald-50/60 border border-emerald-100">
+                            <div className="flex items-center gap-1.5">
+                              <svg className="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              <span className="text-[13px] font-bold text-emerald-700" style={{ fontFamily: "var(--font-mono)" }}>
+                                <span style={{ fontFamily: "var(--font-body)", fontSize: "0.95em" }}>{"\u20B9"}</span>
+                                {costSummary.unit_cost.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+                              </span>
+                              <span className="text-[11px] text-emerald-600/70" style={{ fontFamily: "var(--font-mono)" }}>/unit</span>
+                            </div>
+                            <span className="text-[10px] text-emerald-600/50">|</span>
+                            <span className="text-[11px] text-emerald-600/80" style={{ fontFamily: "var(--font-mono)" }}>
+                              Material <span style={{ fontFamily: "var(--font-body)", fontSize: "0.95em" }}>{"\u20B9"}</span>{costSummary.material_cost.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+                            </span>
+                            <span className="text-[10px] text-emerald-600/50">|</span>
+                            <span className="text-[11px] text-emerald-600/80" style={{ fontFamily: "var(--font-mono)" }}>
+                              Machining <span style={{ fontFamily: "var(--font-body)", fontSize: "0.95em" }}>{"\u20B9"}</span>{costSummary.total_machining_cost.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+                            </span>
+                            {costSummary.confidence_tier && (
+                              <>
+                                <span className="text-[10px] text-emerald-600/50">|</span>
+                                <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${
+                                  costSummary.confidence_tier === "HIGH" ? "bg-emerald-100 text-emerald-700"
+                                    : costSummary.confidence_tier === "MEDIUM" ? "bg-amber-100 text-amber-700"
+                                    : "bg-gray-100 text-gray-600"
+                                }`} style={{ fontFamily: "var(--font-label)" }}>
+                                  {costSummary.confidence_tier}
+                                </span>
+                              </>
+                            )}
+                          </div>
+                        )}
 
                         {description && (
                           <p

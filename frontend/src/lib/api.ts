@@ -77,6 +77,7 @@ export async function createEstimate(
   extractedData: Record<string, unknown>,
   quantity = 1,
   supplierQuote?: number,
+  filename?: string,
 ) {
   const headers = await getAuthHeaders();
 
@@ -87,6 +88,7 @@ export async function createEstimate(
       extracted_data: extractedData,
       quantity,
       supplier_quote: supplierQuote ?? null,
+      filename: filename ?? null,
     }),
   });
 
