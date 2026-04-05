@@ -76,7 +76,7 @@ Library page shows indexed drawings with file type badges, AI descriptions, stat
 
 ### `costimize-v2/` — Python Engines + FastAPI Backend (Railway)
 
-4 part types (mechanical, sheet metal, PCB, cable), physics-based engines, 8 procurement agents, 347 passing tests. FastAPI API serves the frontend.
+4 part types (mechanical, sheet metal, PCB, cable), physics-based engines, 8 procurement agents, 466 passing tests. FastAPI API serves the frontend.
 
 ### Root files (`app.py`, `vision.py`, `cost_engine.py`) — Legacy v1
 
@@ -121,7 +121,7 @@ pip install -r api/requirements.txt
 uvicorn api.main:app --reload                 # http://localhost:8000
 
 # Tests
-cd costimize-v2 && python -m pytest tests/ -v            # Run all 347 tests
+cd costimize-v2 && python -m pytest tests/ -v            # Run all 466 tests
 cd costimize-v2 && python -m pytest tests/test_agent_*.py # Run 183 agent tests only
 ```
 
@@ -155,12 +155,13 @@ cd costimize-v2 && python -m pytest tests/test_agent_*.py # Run 183 agent tests 
 
 **Frontend** (`frontend/`): Next.js pages in `src/app/` (page, login, dashboard, estimate/new, estimate/[id], chat, similar, library, mpn, workflows/new, workflows/[id], workflows, waitlist). Components in `src/components/` (app-shell, chat-widget, app-nav, landing-nav, Toast). Lib: `src/lib/api.ts` + `supabase.ts`. Auth middleware in `src/middleware.ts`.
 
-**Backend** (`costimize-v2/`): `agents/` (8 procurement agents + engine + memory + checkpoint), `engines/` (mechanical, sheet_metal, pcb, cable, validation, similarity), `extractors/` (vision, process_detector, bom, gemini_estimator, pdf_classifier, rfq), `scrapers/` (component, material), `history/` (po_parser/store/matcher), `ui/` (Streamlit tabs), `tests/` (347 tests, 20 files), `docs/research/` (24 docs — see `MASTER-RESEARCH-REPORT.md`), `supabase/migrations/` (005-010).
+**Backend** (`costimize-v2/`): `agents/` (8 procurement agents + engine + memory + checkpoint), `engines/` (mechanical, sheet_metal, pcb, cable, validation, similarity), `extractors/` (vision, process_detector, bom, gemini_estimator, pdf_classifier, rfq), `scrapers/` (component, material), `history/` (po_parser/store/matcher), `ui/` (Streamlit tabs), `tests/` (466 tests, 20 files), `docs/research/` (24 docs — see `MASTER-RESEARCH-REPORT.md`), `supabase/migrations/` (005-010).
 
 ### Data Flow
 
 1. **Mechanical:** Upload drawing → AI extracts → physics engine + Gemini estimate in parallel → orchestrator compares → confidence tier → line-by-line breakdown
-2. **Sheet Metal:** Upload drawing → AI extracts dimensions/cutting perimeter/bends → cost engine (laser + bend + weld + finish) → breakdown
+2. **Sheet Metal:** Upload drawing → AI extracts dimensions/cutting perimeter/bends → cost engine (laser + bend + weld + hardware inserts + finish) → breakdown
+2b. **Assembly ZIP:** Upload ZIP with multiple drawings → extract each file → return per-component ExtractionResponse array → frontend assembles into AssemblyEstimateRequest
 3. **PCB:** Upload BOM (CSV/Excel/PDF) → parse components → scrape prices → calculate fab + assembly + test → breakdown
 4. **Cable:** Upload BOM → parse components → count wires/connectors → calculate labour → breakdown
 5. **Similarity:** Upload 2+ drawings → embed (Gemini Embedding 2 / DINOv2 / image hash) → hybrid search (vector + BM25) → re-rank (FlashRank) → multi-signal rank (visual+material+dimension+process+tolerance+finish) → show matches
@@ -236,23 +237,28 @@ PIPELINES = {
 
 #### Mechanical Engine (engines/mechanical/)
 - **Physics-based MRR calculations** — turning, milling, drilling time from real cutting parameters
-- **Sandvik kc1 data** — specific cutting force for 9 materials, power formula: Pc = (vc×ap×fn×kc)/(60×10³)
+- **Sandvik kc1 data** — specific cutting force for 15 materials, power formula: Pc = (vc×ap×fn×kc)/(60×10³)
 - **Taylor tool life** — V×T^n = C, tooling cost = edge_cost / tool_life × cutting_time
-- **18 machining processes** with material-specific cutting speeds from Machinery's Handbook + Sandvik
-- **40+ surface treatments** — area-based ₹/sq.dm costing with mil-spec references
-- **15 heat treatments** — weight-based ₹/kg costing with AMS 2759 references
+- **25 machining processes** with material-specific cutting speeds from Machinery's Handbook + Sandvik (includes EDM wire/sinker, chamfering, deburring, honing, lapping, polishing)
+- **Machine tier model** — conventional, cnc_2axis, cnc_3axis (default), cnc_5axis, HMC with rate/speed/setup multipliers
+- **40+ surface treatments** — area-based ₹/sq.dm costing with mil-spec references, wired into cost pipeline
+- **15 heat treatments** — weight-based ₹/kg costing with AMS 2759 references, wired into cost pipeline
+- **10 joining methods** — MIG, TIG, spot, adhesive, mechanical fastening, press_fit + brazing (torch/furnace), laser welding, resistance seam
 
 #### Sheet Metal Engine (engines/sheet_metal/)
 - **Laser cutting speeds** — 6 material groups × 9 thicknesses at 3kW fiber laser, with interpolation
 - **Pierce time estimation** — material-specific multipliers (SS 1.5×, Al 1.2×)
 - **Bending tonnage** — F = UTS×T²×L / (V×1000), press brake size selection
+- **Minimum bend radius validation** — per-material factors (MS 0.8×T, SS 1.0×T, Al 0.5×T, Brass 0.3×T), 20% surcharge if below minimum
+- **Springback correction** — per-material angle correction (MS 2°, SS 3°, Al 1°, Copper 0.5°)
 - **Nesting utilization** — rectangular part packing on standard Indian sheet sizes
-- **Welding** — MIG/TIG/spot rates per meter/spot
+- **Welding** — MIG/TIG/spot/laser/brazing/resistance seam rates per meter/spot
+- **Hardware inserts** — pem_nut (₹8), pem_stud (₹10), rivnut (₹6), standoff (₹12) + press install time
 - **Surface finishing** — powder coating, plating, anodizing per sq.m
 
 ### Cost Model Constants (config.py)
 
-- 18 machine processes with rates ₹600-1500/hr
+- 25 machine processes with rates ₹400-1500/hr (including EDM, honing, lapping, polishing)
 - Setup times: 15-60 min per process (amortized over quantity)
 - Power consumption per process (kW) + power rate ₹8/kWh
 - Tooling cost per unit (₹ per process)
