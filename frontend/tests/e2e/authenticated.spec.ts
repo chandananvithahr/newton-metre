@@ -29,7 +29,7 @@ test.describe("Flow 3: Dashboard", () => {
   test("dashboard renders 5 product cards", async ({ page }) => {
     const cardTexts = [
       "Should-cost",
-      "Find similar",
+      "Find similar parts",
       "AI Procurement",
       "Part Number",
       "Ask anything",
