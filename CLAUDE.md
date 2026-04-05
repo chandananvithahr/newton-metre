@@ -278,22 +278,23 @@ PIPELINES = {
 
 #### Similarity Search → Company Brain (engines/similarity/)
 
-**Current (MVP):** Gemini text-hash → 256-dim → pgvector. Works but quality-limited.
-
-**Target architecture (researched 2026-04-02, see `docs/research/SIMILARITY-SEARCH-DEEP-DIVE.md`):**
-- **Embeddings:** Gemini Embedding 2 (768-dim, embeds PDFs directly) + DINOv2-ViT-B/14 (visual) + ColFlor (174M, on-prem)
-- **EMBEDDING_DIM=768** — Matryoshka (truncatable), 99.5% quality retention from 3072
-- **Hybrid search** — pgvector HNSW (vectors) + PostgreSQL tsvector (BM25) combined via Reciprocal Rank Fusion
-- **Re-ranking** — FlashRank or BGE-reranker-v2-m3 (open-source cross-encoder) on top 100 → top 10
-- **6-signal ranking** — visual + material + dimension + process + tolerance + surface finish
-- **Knowledge graph** — PostgreSQL relational: part → material → process → feature → cost → supplier
-- **Portfolio intelligence** — LightRAG (open-source, 70% cheaper than GraphRAG) for "what's our avg cost for turned aluminum?"
-- **Feedback loop** — users confirm/reject matches → builds similarity graph over time
-- **Role presets** — designer (visual-heavy), procurement (material-heavy), QA (process-heavy)
+**Current (LIVE as of 2026-04-05):**
+- **Embeddings:** Gemini Embedding API → 768-dim vectors stored in pgvector (Supabase)
+- **Hybrid search:** pgvector HNSW (cosine, weight 0.7) + PostgreSQL tsvector BM25 (weight 0.3) via `match_drawings_hybrid` RPC
+- **6-signal re-ranking (LIVE):** Over-fetch 20 from Supabase → `ranker.rank_candidates()` scores visual (40%) + material (15%) + dimension (20%) + process (10%) + tolerance (10%) + finish (5%) → return top 10
+- **Role presets (LIVE):** `?role=designer` (visual-heavy), `procurement` (material-heavy), `qa` (process-heavy), `default` (balanced)
+- **Metadata extraction on embed:** Vision extractor runs on upload → populates material, dimensions, processes, tolerances in JSONB metadata for ranker
+- **Text description:** Gemini Flash Lite generates 50-100 word technical description per drawing for BM25 leg
+- **Score breakdown in UI:** Frontend shows 6 color-coded mini bars per match (green ≥80%, amber ≥50%, gray <50%) + material badge
 - **Product rules** — separate from cost estimation, session-scoped for regular users, enterprise gets persistent index
 - **On-prem path** — ColFlor (174M params, fits 8GB RAM) for defense clients who won't use cloud APIs
 
-**Upgrade phases:** (1) Real embeddings + BM25 → (2) DINOv2 + re-ranker → (3) Fine-tune + on-prem → (4) KG + LightRAG → (5) STEP via GC-CAD GNN
+**Research target (see `docs/research/SIMILARITY-SEARCH-DEEP-DIVE.md`):**
+- **Knowledge graph** — PostgreSQL relational: part → material → process → feature → cost → supplier
+- **Portfolio intelligence** — LightRAG (open-source, 70% cheaper than GraphRAG) for "what's our avg cost for turned aluminum?"
+- **Feedback loop** — users confirm/reject matches → builds similarity graph over time
+
+**Upgrade phases:** ~~(1) Real embeddings + BM25~~ DONE → ~~(2) 6-signal ranker + role presets~~ DONE → (3) DINOv2 visual embeddings + cross-encoder re-ranker → (4) Fine-tune + on-prem (ColFlor) → (5) KG + LightRAG → (6) STEP via GC-CAD GNN
 
 ### Key Design Decisions
 
