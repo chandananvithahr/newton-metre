@@ -64,16 +64,66 @@ class _Entity(NamedTuple):
 
 # ── DWG → DXF conversion ────────────────────────────────────────────────────
 
+def _find_oda_exe() -> str | None:
+    """Find ODAFileConverter.exe on the system.
+
+    ODA installs under versioned directories like 'ODAFileConverter 27.1.0' which are
+    not added to PATH. Searches PATH first, then common Windows install locations.
+    """
+    # 1. In PATH (Linux/CI installs)
+    cmd = shutil.which("ODAFileConverter") or shutil.which("ODAFileConverter.exe")
+    if cmd:
+        return cmd
+
+    # 2. Windows versioned install dirs under Program Files
+    import os
+    pf_roots = [
+        os.environ.get("PROGRAMFILES", r"C:\Program Files"),
+        os.environ.get("PROGRAMFILES(X86)", r"C:\Program Files (x86)"),
+    ]
+    for root in pf_roots:
+        if not root:
+            continue
+        oda_root = Path(root) / "ODA"
+        if not oda_root.exists():
+            continue
+        # Enumerate versioned sub-dirs, newest first
+        candidates = sorted(oda_root.iterdir(), reverse=True)
+        for d in candidates:
+            exe = d / "ODAFileConverter.exe"
+            if exe.exists():
+                return str(exe)
+    return None
+
+
 def _dwg_to_dxf_bytes(file_bytes: bytes) -> bytes:
     """Convert DWG binary to DXF bytes using available system converters.
 
     Tries in order:
-    1. ezdxf odafc addon (wraps ODA File Converter)
-    2. LibreDWG dwg2dxf CLI
-    3. ODAFileConverter CLI directly
+    1. ODAFileConverter CLI (best quality — handles all DWG versions including 2018+)
+    2. ezdxf odafc addon (wraps ODA via Python API)
+    3. LibreDWG dwg2dxf CLI (open-source fallback — may fail on newer DWG formats)
     Raises RuntimeError if no converter is available.
     """
-    # Strategy 1: ezdxf odafc addon (cleanest)
+    # Strategy 1: ODAFileConverter CLI (in/out directories, any DWG version)
+    oda_cmd = _find_oda_exe()
+    if oda_cmd:
+        with tempfile.TemporaryDirectory() as indir, tempfile.TemporaryDirectory() as outdir:
+            dwg_path = Path(indir) / "input.dwg"
+            dwg_path.write_bytes(file_bytes)
+            try:
+                subprocess.run(
+                    [oda_cmd, indir, outdir, "ACAD2018", "DXF", "0", "1"],
+                    capture_output=True, timeout=60,
+                )
+                dxf_files = list(Path(outdir).glob("*.dxf"))
+                if dxf_files:
+                    logger.info("DWG→DXF via ODAFileConverter")
+                    return dxf_files[0].read_bytes()
+            except (subprocess.TimeoutExpired, Exception) as exc:
+                logger.warning("ODAFileConverter failed: %s", exc)
+
+    # Strategy 2: ezdxf odafc addon (wraps ODA via Python API)
     try:
         from ezdxf.addons import odafc
         if odafc.is_installed():
@@ -86,14 +136,14 @@ def _dwg_to_dxf_bytes(file_bytes: bytes) -> bytes:
                 doc.saveas(dxf_path)
                 dxf_bytes = Path(dxf_path).read_bytes()
                 Path(dxf_path).unlink(missing_ok=True)
-                logger.info("DWG→DXF via ODA File Converter (ezdxf odafc)")
+                logger.info("DWG→DXF via ezdxf odafc")
                 return dxf_bytes
             finally:
                 Path(dwg_path).unlink(missing_ok=True)
     except Exception as exc:
-        logger.debug("odafc not available: %s", exc)
+        logger.debug("ezdxf odafc not available: %s", exc)
 
-    # Strategy 2: LibreDWG dwg2dxf CLI (also checks dwg2dxf.exe on Windows)
+    # Strategy 3: LibreDWG dwg2dxf CLI (open-source, may fail on newer formats)
     dwg2dxf_cmd = shutil.which("dwg2dxf") or shutil.which("dwg2dxf.exe")
     if dwg2dxf_cmd:
         with tempfile.NamedTemporaryFile(suffix=".dwg", delete=False) as tmp:
@@ -114,30 +164,38 @@ def _dwg_to_dxf_bytes(file_bytes: bytes) -> bytes:
             Path(dwg_path).unlink(missing_ok=True)
             Path(dxf_path).unlink(missing_ok=True)
 
-    # Strategy 3: ODAFileConverter CLI directly
-    oda_cmd = shutil.which("ODAFileConverter")
-    if oda_cmd:
-        with tempfile.TemporaryDirectory() as indir, tempfile.TemporaryDirectory() as outdir:
-            dwg_path = Path(indir) / "input.dwg"
-            dwg_path.write_bytes(file_bytes)
-            try:
-                subprocess.run(
-                    [oda_cmd, indir, outdir, "ACAD2018", "DXF", "0", "1"],
-                    check=True, capture_output=True, timeout=30,
-                )
-                dxf_files = list(Path(outdir).glob("*.dxf"))
-                if dxf_files:
-                    logger.info("DWG→DXF via ODAFileConverter CLI")
-                    return dxf_files[0].read_bytes()
-            except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
-                logger.warning("ODAFileConverter failed: %s", exc)
-
     raise RuntimeError(
         "No DWG converter available. Install ODA File Converter "
         "(https://www.opendesign.com/guestfiles/oda_file_converter) "
         "or LibreDWG (apt install libredwg-tools). "
         "Alternatively, export as DXF from AutoCAD."
     )
+
+
+def dxf_to_dwg_bytes(dxf_bytes: bytes) -> bytes:
+    """Convert DXF bytes to DWG binary using ODAFileConverter.
+
+    ODA writes ACAD2018-format DWG — compatible with AutoCAD 2018+ and most
+    CAD viewers. Raises RuntimeError if ODA is not available.
+    """
+    oda_cmd = _find_oda_exe()
+    if not oda_cmd:
+        raise RuntimeError(
+            "ODA File Converter not found. Install from "
+            "https://www.opendesign.com/guestfiles/oda_file_converter"
+        )
+    with tempfile.TemporaryDirectory() as indir, tempfile.TemporaryDirectory() as outdir:
+        dxf_path = Path(indir) / "input.dxf"
+        dxf_path.write_bytes(dxf_bytes)
+        subprocess.run(
+            [oda_cmd, indir, outdir, "ACAD2018", "DWG", "0", "1"],
+            capture_output=True, timeout=60,
+        )
+        dwg_files = list(Path(outdir).glob("*.dwg"))
+        if not dwg_files:
+            raise RuntimeError("ODA conversion produced no DWG output")
+        logger.info("DXF→DWG via ODAFileConverter")
+        return dwg_files[0].read_bytes()
 
 
 # ── DXF / DWG direct extraction ───────────────────────────────────────────────
