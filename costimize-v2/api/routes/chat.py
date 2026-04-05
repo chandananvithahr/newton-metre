@@ -288,6 +288,7 @@ def _call_openai(messages: list[dict]) -> str:
         model="gpt-4o-mini",
         messages=messages,
         max_tokens=1000,
+        temperature=0.0,
     )
     return response.choices[0].message.content.strip()
 

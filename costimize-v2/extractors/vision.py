@@ -390,7 +390,7 @@ def analyze_cad_file(file_bytes: bytes, filename: str) -> dict:
         cad_text = step_to_text(file_bytes)
         return analyze_step_text(cad_text)
 
-    if is_dxf_dwg(file_bytes, filename):
+    if is_dxf_dwg(None, filename):
         try:
             cad_text = dxf_to_text(file_bytes, filename)
             return analyze_step_text(cad_text)
@@ -400,6 +400,10 @@ def analyze_cad_file(file_bytes: bytes, filename: str) -> dict:
             return analyze_drawing(rf.png_bytes, filename + ".png")
         except Exception as e:
             raise RuntimeError(f"CAD extraction failed for {filename}: {e}") from e
+
+    if is_step(None, filename):
+        cad_text = step_to_text(file_bytes)
+        return analyze_step_text(cad_text)
 
     # Images (PNG, JPG, PDF scan)
     return analyze_drawing(file_bytes, filename)

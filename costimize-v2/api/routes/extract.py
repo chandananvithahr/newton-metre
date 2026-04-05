@@ -80,21 +80,8 @@ def _extract_single_file(raw_bytes: bytes, filename: str, content_type: str | No
     Returns the raw result dict from the AI extractor.
     Raises ValueError for bad input, RuntimeError for AI failures.
     """
-    from extractors.vision import analyze_drawing, analyze_step_text
-    from extractors.cad_converter import dxf_to_text, step_to_text, is_dxf_dwg, is_step
-
-    if is_dxf_dwg(content_type, filename):
-        try:
-            cad_text = dxf_to_text(raw_bytes, filename)
-            return analyze_step_text(cad_text)
-        except (RuntimeError, Exception) as dwg_err:
-            logger.warning("DXF/DWG native extraction failed (%s), falling back to AI vision", dwg_err)
-            return analyze_drawing(raw_bytes, filename)
-    elif is_step(content_type, filename):
-        cad_text = step_to_text(raw_bytes)
-        return analyze_step_text(cad_text)
-    else:
-        return analyze_drawing(raw_bytes, filename)
+    from extractors.vision import analyze_cad_file
+    return analyze_cad_file(raw_bytes, filename)
 
 
 def _result_to_response(result: dict) -> ExtractionResponse:

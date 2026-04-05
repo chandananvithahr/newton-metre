@@ -90,8 +90,8 @@ async def embed_drawing(
         metadata["description"] = text_description[:200]
 
     try:
-        from extractors.vision import analyze_drawing
-        extracted = analyze_drawing(image_bytes, file.filename or "drawing.png")
+        from extractors.vision import analyze_cad_file
+        extracted = analyze_cad_file(image_bytes, file.filename or "drawing.png")
         dims = extracted.get("dimensions", {})
         # Store only non-null dimension values
         metadata["dimensions"] = {k: v for k, v in dims.items() if v}
@@ -160,8 +160,8 @@ async def search_similar(
     query_processes: list[str] = []
     query_tolerances: dict = {}
     try:
-        from extractors.vision import analyze_drawing
-        extracted = analyze_drawing(image_bytes, file.filename or "drawing.png")
+        from extractors.vision import analyze_cad_file
+        extracted = analyze_cad_file(image_bytes, file.filename or "drawing.png")
         query_material = extracted.get("material") or ""
         query_dimensions = {k: v for k, v in extracted.get("dimensions", {}).items() if v}
         query_processes = extracted.get("suggested_processes", [])
