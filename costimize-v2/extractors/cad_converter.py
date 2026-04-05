@@ -39,6 +39,21 @@ _RE_TEXT_THREAD = re.compile(
 # Bare integer / decimal → likely linear dimension e.g. "40", "120.5"
 _RE_TEXT_LINEAR = re.compile(r"^(\d+(?:\.\d+)?)$")
 
+# Compound annotation patterns — "Thickness 15mm", "Height 20mm", "Depth 8mm"
+# Used to pull named dimensions out of multi-value annotation strings
+_RE_NAMED_DIM = re.compile(
+    r"\b(?P<kind>thickness|height|depth|width|length|dia(?:meter)?|bore|od|id|thk)\s*[=:]*\s*"
+    r"(?P<value>\d+(?:\.\d+)?)\s*(?:mm)?",
+    re.IGNORECASE,
+)
+_NAMED_DIM_KIND_MAP = {
+    "thickness": "thickness", "thk": "thickness",
+    "height": "height", "depth": "depth",
+    "width": "width", "length": "length",
+    "dia": "diameter", "diameter": "diameter",
+    "bore": "bore", "od": "outer_diameter", "id": "inner_diameter",
+}
+
 
 class _Entity(NamedTuple):
     etype: str
@@ -785,6 +800,20 @@ def dxf_to_text(file_bytes: bytes, filename: str = "drawing.dxf") -> str:
         sections.append("  Profile lines represent HALF the cross-section, mirrored about the axis.")
         sections.append("")
 
+    # Extract named dimensions from annotation text (e.g. "Thickness 15mm", "OD 150mm, Bore 50mm")
+    named_dims: list[str] = []
+    for ann in annotation_texts:
+        for m in _RE_NAMED_DIM.finditer(ann):
+            kind_raw = m.group("kind").lower()
+            kind = _NAMED_DIM_KIND_MAP.get(kind_raw, kind_raw)
+            val = float(m.group("value"))
+            named_dims.append(f"  {kind}: {val:.4f} {unit_label}  [from annotation \"{ann[:60]}\"]")
+    if named_dims:
+        sections.append(f"NAMED DIMENSIONS (extracted from annotation text, {len(named_dims)} found):")
+        for d in named_dims:
+            sections.append(d)
+        sections.append("")
+
     if annotation_texts:
         sections.append(f"TEXT ANNOTATIONS ({len(annotation_texts)} found):")
         for t in annotation_texts[:60]:
@@ -1024,12 +1053,37 @@ def _step_to_text_fallback(file_bytes: bytes) -> str:
 
     sections = ["=== STEP FILE (text parsing — OCC not available) ===", ""]
 
+    # Product name → process hints mapping
+    _PRODUCT_PROCESS_HINTS: list[tuple[re.Pattern, list[str]]] = [
+        (re.compile(r"\b(shaft|rod|pin|axle|spindle|bush|bushing|sleeve|tube|cylinder)\b", re.I),
+         ["turning"]),
+        (re.compile(r"\b(bracket|plate|flange|cover|housing|block|body|frame|lid)\b", re.I),
+         ["milling_face", "drilling"]),
+        (re.compile(r"\b(bolt|screw|stud|fastener)\b", re.I),
+         ["turning", "threading"]),
+        (re.compile(r"\b(nut|washer)\b", re.I),
+         ["turning", "drilling"]),
+        (re.compile(r"\b(gear|sprocket|pulley)\b", re.I),
+         ["turning", "milling_slot"]),
+    ]
+
     products = _RE_PRODUCT.findall(raw)
+    inferred_processes: set[str] = set()
     if products:
         sections.append("PRODUCTS:")
         for pid, pname in products[:10]:
             if pid.strip() or pname.strip():
                 sections.append(f"  - {pid.strip()} | {pname.strip()}")
+                combined = f"{pid} {pname}".lower()
+                for pattern, procs in _PRODUCT_PROCESS_HINTS:
+                    if pattern.search(combined):
+                        inferred_processes.update(procs)
+        sections.append("")
+
+    if inferred_processes:
+        sections.append("PROCESS HINTS (inferred from product names):")
+        for p in sorted(inferred_processes):
+            sections.append(f"  {p}")
         sections.append("")
 
     materials = _RE_MATERIAL.findall(raw)

@@ -74,6 +74,40 @@ class _ExtractionResult(BaseModel):
         return valid
 
 
+# Material alias table — maps raw AI strings to canonical names.
+# Mirrors the aliases in api/routes/estimate.py so extractor output is consistent.
+_MATERIAL_ALIASES: list[tuple[list[str], str]] = [
+    (["al6061","al 6061","al-6061","6061-t6","6061 t6","aluminum 6061","aluminium 6061",
+      "al 6061-t6","al6061-t6","aluminum alloy","aluminium alloy","alloy al"], "Aluminum 6061"),
+    (["al7075","al 7075","7075","7075-t6","aluminum 7075","aluminium 7075"], "Aluminum 7075-T6"),
+    (["mild steel","ms","is2062","is 2062","low carbon steel"], "Mild Steel IS2062"),
+    (["en8","en 8","080m40"], "EN8 Steel"),
+    (["en24","en 24","817m40"], "EN24 Steel"),
+    (["en19","en 19","4140","aisi 4140","40cr1mo28"], "EN19 Steel"),
+    (["ss304","ss 304","304","aisi 304","stainless steel 304","stainless 304","inox"], "Stainless Steel 304"),
+    (["ss316","ss 316","316","aisi 316","stainless steel 316","stainless 316"], "Stainless Steel 316"),
+    (["brass","is319","is 319"], "Brass IS319"),
+    (["cast iron","grey iron","gray iron"], "Cast Iron"),
+    (["copper","electrolytic copper"], "Copper"),
+    (["titanium","ti-6al-4v","ti6al4v","grade 5","gr5"], "Titanium Grade 5"),
+    (["sg iron","ductile iron","nodular iron","fcd500"], "SG Iron FCD500"),
+    (["inconel 718","in718","alloy 718","nickel alloy"], "Inconel 718"),
+    (["20mncr5","5120","aisi 5120","case hardening steel"], "20MnCr5 Steel"),
+]
+
+
+def _normalize_material(name: str | None) -> str | None:
+    """Normalize raw AI material strings to canonical names (best-effort)."""
+    if not name:
+        return name
+    lower = name.lower().strip()
+    for keywords, canonical in _MATERIAL_ALIASES:
+        for kw in keywords:
+            if kw in lower:
+                return canonical
+    return name  # return as-is if no match
+
+
 def _parse_and_validate(text: str) -> dict:
     """Strip markdown fences, parse JSON, validate schema. Returns plain dict."""
     if text.startswith("```"):
@@ -87,6 +121,9 @@ def _parse_and_validate(text: str) -> dict:
         # Try fixing single quotes
         text = text.replace("'", '"')
         raw = json.loads(text)
+    # Normalize material to canonical name before schema validation
+    if "material" in raw and raw["material"]:
+        raw["material"] = _normalize_material(raw["material"])
     validated = _ExtractionResult.model_validate(raw)
     return validated.model_dump()
 
@@ -100,7 +137,7 @@ Return a JSON object with these fields:
   "dimensions": {
     "outer_diameter_mm": <number or null>,
     "inner_diameter_mm": <number or null>,
-    "length_mm": <number or null>,
+    "length_mm": <axial length for turned parts; thickness/depth for plates and flanges; null if unknown>,
     "width_mm": <number or null>,
     "height_mm": <number or null>,
     "hole_diameter_mm": <number or null>,
