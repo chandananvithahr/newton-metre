@@ -51,7 +51,22 @@ See `docs/POSITIONING.md` for full multi-audience messaging and one-liners.
 
 ### `frontend/` — Next.js Web App (Vercel)
 
-13 pages: landing, login/signup, dashboard (3-card: should-cost, similarity, chat), new estimate (single + assembly with ZIP upload), estimate detail, similarity search, library (indexed drawings with stats), MPN part search, workflows (new/list/detail), full-page chat, and waitlist. **Split-screen layout:** all authenticated pages have a fixed 380px ChatPanel on the right (ChatGPT-style AI assistant, Gemini-powered). AppShell in root layout handles the split; landing, login, waitlist get full width. Color scheme standardized to CSS design tokens. Tailwind CSS v4 with "Tactical Elegance" design system (Newsreader + Space Grotesk fonts, deep blue #00288e, tonal surface layering #faf8ff). Landing page has: dedicated should-cost section (4 audience cards), similarity search section (CADDi-style knowledge-as-asset), ROI calculator (dark section with two sliders: procurement spend ₹1-100Cr + negotiation improvement 2-20% → live savings + ROI multiplier), recent estimates (last 5). Library page shows indexed drawings with file type badges, AI descriptions, stats (total, first indexed, last added). Login supports `?waitlist=procurement-brain` param for targeted signup copy. Favicon: N·m dark wordmark. See `DESIGN.md` for full spec. Vercel Analytics enabled.
+13 pages: landing, login/signup, dashboard (3-card: should-cost, similarity, chat), new estimate (single + assembly with ZIP upload), estimate detail, similarity search, library (indexed drawings with stats), MPN part search, workflows (new/list/detail), full-page chat, and waitlist. **Split-screen layout:** all authenticated pages have a fixed 380px ChatPanel on the right (ChatGPT-style AI assistant, Gemini-powered). AppShell in root layout handles the split; landing, login, waitlist get full width. Tailwind CSS v4 with **"Warm Editorial"** design system — warm gradient backgrounds (teal→peach→amber), Newsreader serif headlines, Space Grotesk body, DM Mono for data. Brand colors: `#1a1a1a` (primary dark), `orange-500` (accent), `emerald-500` (success). See `DESIGN.md` for full spec.
+
+**Landing page sections (in order):**
+1. **Hero** (`warm-gradient-hero`) — headline + 3 product cards (Should-Cost, Company Brain, Procurement Intel)
+2. **Proof** (`warm-gradient-subtle`) — real customer story: ₹43L vendor quote → ₹28L final → ₹10.05 Cr saved across 67 units
+3. **Problem** (`warm-gradient-hero`) — "Your engineering is precise. Your procurement is not." + 3 stat cards (14%, 60%, 70%)
+4. **Should-Cost** (`warm-gradient-subtle`) — section 01/03, dark preview card with cost breakdown, 4 audience cards
+5. **Similarity Search** (`bg-[#1a1a1a]` dark with orange glow orbs) — section 02/03, 7 department use cases, dark search results card
+6. **AI Worker Trailer** (`warm-gradient-hero`) — section 03/03, 70% MPN spend + negotiation intel, 6 department scenario cards
+7. **ROI Calculator** (`warm-gradient-subtle`) — two sliders (spend ₹1-100Cr + improvement 2-20%), dark result card with live ROI multiplier
+8. **Pricing** (`warm-gradient-hero`) — Free (₹0) + Pro (₹4,999/mo) cards
+9. **Footer** (`warm-gradient-footer`)
+
+**Background pattern:** alternating `warm-gradient-hero` ↔ `warm-gradient-subtle`, with one dark `bg-[#1a1a1a]` section for Similarity Search. All dark accents use `#1a1a1a` (never `#09090B` or `#0F1117` except RFQ page).
+
+Library page shows indexed drawings with file type badges, AI descriptions, stats (total, first indexed, last added). Login supports `?waitlist=procurement-brain` param for targeted signup copy. Favicon: N·m dark wordmark. Vercel Analytics enabled.
 
 ### `costimize-v2/` — Python Engines + FastAPI Backend (Railway)
 

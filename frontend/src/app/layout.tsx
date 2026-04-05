@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, DM_Mono } from "next/font/google";
+import { Space_Grotesk, DM_Mono, Newsreader } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { ToastProvider } from "@/components/Toast";
 import { AppShell } from "@/components/app-shell";
@@ -20,6 +20,14 @@ const dmMono = DM_Mono({
   display: "swap",
 });
 
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  weight: ["400", "600"],
+  style: ["normal", "italic"],
+  variable: "--font-serif",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Newton-Metre | Precision Sourcing Intelligence",
   description: "Know what it costs. Before they quote. Upload a manufacturing drawing, get a line-by-line should-cost in 30 seconds. Enterprise manufacturing intelligence.",
@@ -33,7 +41,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn(spaceGrotesk.variable, dmMono.variable)}
+      className={cn(spaceGrotesk.variable, dmMono.variable, newsreader.variable)}
     >
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />

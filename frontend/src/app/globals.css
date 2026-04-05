@@ -46,10 +46,11 @@
   --color-nm-outline-variant:   #c4c5d5;
 
   /* Typography — Space Grotesk (headline + body/UI) */
-  --font-headline: "Space Grotesk", sans-serif;
+  --font-headline: var(--font-serif, "Newsreader"), "Georgia", serif;
   --font-body:     "Space Grotesk", sans-serif;
   --font-sans:     "Space Grotesk", sans-serif;
   --font-label:    "Space Grotesk", sans-serif;
+  --font-serif:    "Newsreader", "Georgia", serif;
   --font-mono:     "DM Mono", ui-monospace, SFMono-Regular, monospace;
   --font-code:     "DM Mono", ui-monospace, SFMono-Regular, monospace;
 }

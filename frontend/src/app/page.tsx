@@ -3,231 +3,340 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
-import { ArrowRight, CheckCircle2, Search } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  Search,
+  Upload,
+  Zap,
+  ShieldCheck,
+  BarChart3,
+  Package,
+  AlertTriangle,
+  TrendingDown,
+} from "lucide-react";
 import { LandingNav } from "@/components/landing-nav";
 
 /* ─────────────────────────────────────────────────────────────
-   NEWTON-METRE — Landing page
-   Clean sections, white/gray/dark palette, Space Grotesk only
+   NEWTON-METRE — Landing Page
+   Narrative: Problem → Vision → Products (Door Opener → Platform → Engine)
+   "The Price Integrity Layer for Global Manufacturing"
    ───────────────────────────────────────────────────────────── */
 
-/* ── Hero ─────────────────────────────────────────────── */
-function HeroCard({
-  children,
-  delay,
-}: {
-  children: React.ReactNode;
-  delay: number;
-}) {
+/* ── ₹ Currency — same height as adjacent number ─────── */
+function R({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay, ease: "easeOut" }}
-      whileHover={{ y: -6, transition: { duration: 0.25 } }}
-    >
+    <span className={`font-mono inline-flex items-baseline whitespace-nowrap ${className}`}>
+      <span className="font-sans text-[0.95em] leading-none mr-[0.04em]" style={{ verticalAlign: "baseline" }}>₹</span>
       {children}
-    </motion.div>
+    </span>
   );
 }
 
+/* ── Page ──────────────────────────────────────────────── */
+export default function LandingPage() {
+  return (
+    <div className="min-h-screen bg-white">
+      <LandingNav />
+      <main>
+        <Hero />
+        <Proof />
+        <Vision />
+        <ShouldCost />
+        <SimilaritySearch />
+        <AIEngine />
+        <SeventyPercentGuardrail />
+        <ROICalculator />
+        <Pricing />
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════
+   SECTION 1: HERO — THE PROBLEM
+   "You're sitting on 20 years of procurement data.
+    It's in PDFs, spreadsheets, and people's heads."
+   ══════════════════════════════════════════════════════════ */
 function Hero() {
   return (
-    <section className="pt-36 pb-28 px-4 sm:px-8 warm-gradient-hero">
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        <div className="max-w-[720px] mx-auto text-center mb-14">
-          <h1 className="text-5xl lg:text-[64px] font-bold text-[#1a1a1a] leading-[1.08] tracking-tight">
-            Know what it costs.
+    <section className="pt-36 pb-20 px-4 sm:px-8 warm-gradient-hero overflow-hidden">
+      <div className="max-w-[1000px] mx-auto text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-600 text-[14px] font-bold uppercase tracking-widest mb-8">
+            <Zap className="w-3 h-3" /> Built for Defense, Aerospace &amp; Automotive
+          </div>
+
+          {/* Headline — the problem */}
+          <h1
+            className="text-5xl sm:text-6xl lg:text-[80px] font-semibold leading-[1] tracking-tight mb-8"
+            style={{ fontFamily: "var(--font-headline)" }}
+          >
+            <em>20 years of data.</em>
             <br />
-            Before they quote.
+            <span className="text-[#A3A3A3] not-italic">Zero intelligence.</span>
           </h1>
+
+          <div className="max-w-2xl mx-auto mb-12 space-y-4">
+            <p className="text-xl text-[#525252] leading-relaxed text-justify">
+              Your company has 20 years of data — stuck in PDFs,
+              messy spreadsheets, and an ERP that&apos;s really just an accounting tool.
+              Great at storing data. Terrible at making sense of it.
+            </p>
+            <p className="text-xl text-[#525252] leading-relaxed text-justify">
+              When your senior people leave, 20 years of design knowledge,
+              machining experience, assembly process know-how, vendor relationships,
+              and negotiation intuition walks out the door.
+            </p>
+          </div>
+
+          {/* Drop Zone */}
+          <Link href="/estimate/new" className="block max-w-xl mx-auto group">
+            <div className="border-2 border-dashed border-black/15 rounded-2xl bg-white/60 backdrop-blur-sm p-10 hover:border-[#1a1a1a]/30 hover:bg-white/80 hover:shadow-xl hover:shadow-black/5 transition-all duration-300 cursor-pointer">
+              <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-[#1a1a1a]/5 flex items-center justify-center group-hover:bg-[#1a1a1a]/10 transition-colors">
+                <Upload className="w-6 h-6 text-[#525252]" />
+              </div>
+              <div className="text-[17px] font-bold text-[#1a1a1a] mb-1.5">
+                Drop a 2D drawing or supplier quote
+              </div>
+              <div className="text-[15px] text-[#A3A3A3]">
+                DWG, STEP, DXF, PDF — or click to browse
+              </div>
+            </div>
+          </Link>
+
+          {/* On-prem badge */}
+          <div className="flex items-center justify-center gap-2 mt-6 text-[14px] font-bold uppercase tracking-widest text-[#A3A3A3]">
+            <ShieldCheck className="w-3.5 h-3.5" /> 100% On-Premise for Defense
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Product Preview Card */}
+      <motion.div
+        className="max-w-[1000px] mx-auto mt-16 px-4"
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+      >
+        <div className="bg-white rounded-3xl border border-black/8 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] p-6 sm:p-10 overflow-hidden">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between border-b border-black/5 pb-6 mb-6 gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
+                <BarChart3 className="w-6 h-6 text-emerald-600" />
+              </div>
+              <div>
+                <div className="text-[12px] uppercase tracking-widest font-bold text-[#A3A3A3]">
+                  Analysis: BRKT-928-AL
+                </div>
+                <div className="text-lg font-bold text-[#1a1a1a]">
+                  Should-Cost Breakdown
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-8">
+              <div className="text-right">
+                <div className="text-[12px] uppercase tracking-widest font-bold text-[#A3A3A3]">
+                  Supplier Quote
+                </div>
+                <div className="text-xl font-bold text-[#A3A3A3] line-through font-mono">
+                  <R>48,200</R>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-[12px] uppercase tracking-widest font-bold text-orange-500">
+                  True Cost
+                </div>
+                <div className="text-3xl font-bold text-[#1a1a1a] font-mono tracking-tighter">
+                  <R>32,450</R>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="col-span-2 space-y-4">
+              {[
+                { label: "Material: Aluminum 6061-T6 (2.4 kg)", cost: "4,820", pct: 15 },
+                { label: "CNC Machining (3-Axis Milling)", cost: "18,400", pct: 56 },
+                { label: "Surface: Clear Anodize", cost: "3,200", pct: 10 },
+                { label: "Overhead & Standard Margin", cost: "6,030", pct: 19 },
+              ].map((row, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between p-4 rounded-xl bg-[#fafafa] border border-black/[0.03]"
+                >
+                  <span className="text-sm font-medium text-[#525252]">{row.label}</span>
+                  <div className="flex items-center gap-4">
+                    <div className="w-24 h-1.5 bg-black/5 rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${row.pct}%` }}
+                        transition={{ duration: 1, delay: 0.5 + i * 0.1 }}
+                        className="h-full bg-orange-500/70 rounded-full"
+                      />
+                    </div>
+                    <span className="text-sm font-bold font-mono text-[#1a1a1a] w-16 text-right">
+                      <R>{row.cost}</R>
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="bg-orange-50 rounded-2xl p-6 border border-orange-100 flex flex-col justify-center">
+              <div className="text-orange-600 font-bold text-sm mb-3">Hidden Margin</div>
+              <div className="text-4xl font-bold tracking-tight text-[#1a1a1a] font-mono mb-2">
+                <R>15,750</R>
+              </div>
+              <div className="text-sm text-orange-700/70 leading-snug">
+                That&apos;s how much extra you&apos;re paying. Per unit. Now go back to the table with proof.
+              </div>
+            </div>
+          </div>
         </div>
       </motion.div>
-
-      {/* Three product cards — staggered entrance */}
-      <div className="grid sm:grid-cols-3 gap-6 max-w-[1100px] mx-auto text-left">
-
-        {/* Should-Cost */}
-        <HeroCard delay={0.3}>
-          <Link
-            href="/estimate/new"
-            className="group flex flex-col h-full bg-white/80 backdrop-blur-sm border border-black/6 rounded-2xl p-8 sm:p-10 hover:bg-white hover:shadow-xl hover:shadow-black/5 hover:border-black/10 transition-all duration-300"
-          >
-            <div className="w-12 h-12 logo-gradient rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-              </svg>
-            </div>
-            <div className="text-[17px] font-bold text-[#1a1a1a] mb-1.5">Should-Cost</div>
-            <p className="text-[13px] font-medium text-[#525252] mb-5">Know the real cost before the supplier quotes</p>
-            <ul className="space-y-3 mb-6 flex-1">
-              {[
-                "Upload DWG, DXF, STEP, or PDF",
-                "Material + machining + finishing — line by line",
-                "Supplier quoted ₹48K. It should cost ₹32K.",
-                "Walk into every negotiation with a number",
-              ].map((point) => (
-                <li key={point} className="flex items-start gap-2.5 text-[14px] text-[#525252]">
-                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#1a1a1a]/25 shrink-0" />
-                  {point}
-                </li>
-              ))}
-            </ul>
-            <span className="text-[11px] text-[#1a1a1a] font-bold uppercase tracking-widest group-hover:underline inline-flex items-center gap-1.5 group-hover:gap-2.5 transition-all">
-              Upload a drawing <ArrowRight className="w-3.5 h-3.5" />
-            </span>
-          </Link>
-        </HeroCard>
-
-        {/* Similarity Search */}
-        <HeroCard delay={0.45}>
-          <Link
-            href="/similar"
-            className="group flex flex-col h-full bg-white/80 backdrop-blur-sm border border-black/6 rounded-2xl p-8 sm:p-10 hover:bg-white hover:shadow-xl hover:shadow-black/5 hover:border-black/10 transition-all duration-300"
-          >
-            <div className="w-12 h-12 logo-gradient rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
-              </svg>
-            </div>
-            <div className="text-[17px] font-bold text-[#1a1a1a] mb-1.5">Company Brain</div>
-            <p className="text-[13px] font-medium text-[#525252] mb-5">20 years of company knowledge. Searchable in seconds.</p>
-            <ul className="space-y-3 mb-6 flex-1">
-              {[
-                "Design: 90% match found before you start. Already built. Already tested. Reuse it.",
-                "QA: Repeat failure on line 3. Root cause was documented in 2019. Found in 8 seconds.",
-                "Procurement: Suppliers know their true costs. You've been guessing. Average overspend: 14%.",
-                "Sales: First quote wins. Competitors reply in hours. You're still building the spreadsheet.",
-                "Marketing: Every cost saving is a case study. Pull the numbers before the week ends.",
-                "Finance: Overspend discovered at quarter close. After the money was already gone.",
-              ].map((point) => (
-                <li key={point} className="flex items-start gap-2.5 text-[14px] text-[#525252]">
-                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#1a1a1a]/25 shrink-0" />
-                  {point}
-                </li>
-              ))}
-            </ul>
-            <span className="text-[11px] text-[#1a1a1a] font-bold uppercase tracking-widest group-hover:underline inline-flex items-center gap-1.5 group-hover:gap-2.5 transition-all">
-              Search your history <ArrowRight className="w-3.5 h-3.5" />
-            </span>
-          </Link>
-        </HeroCard>
-
-        {/* AI Procurement */}
-        <HeroCard delay={0.6}>
-          <Link
-            href="/waitlist"
-            className="group flex flex-col h-full bg-white/80 backdrop-blur-sm border border-black/6 rounded-2xl p-8 sm:p-10 relative overflow-hidden hover:bg-white hover:shadow-xl hover:shadow-black/5 hover:border-black/10 transition-all duration-300"
-          >
-            <div className="w-12 h-12 logo-gradient rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-              </svg>
-            </div>
-            <div className="text-[17px] font-bold text-[#1a1a1a] mb-1.5">Procurement Intel</div>
-            <p className="text-[13px] font-medium text-[#525252] mb-5">Walk into every negotiation knowing what to ask for — and why</p>
-            <ul className="space-y-3 mb-6 flex-1">
-              {[
-                "Supplier matrix — rank all vendors by price, delivery & risk in one view",
-                "Negotiation brief in 30 sec — last 3 deals, your opening number, the lever to pull",
-                "Supplier gave 14% last time. AI says push for 18%. Here's how.",
-                "Sits in on every vendor call — listens, flags the lever, drafts your counteroffer.",
-                "Trains on your data. Runs on your servers. Stays on your premises.",
-              ].map((point) => (
-                <li key={point} className="flex items-start gap-2.5 text-[14px] text-[#525252]">
-                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#1a1a1a]/25 shrink-0" />
-                  {point}
-                </li>
-              ))}
-            </ul>
-            <span className="text-[11px] text-[#1a1a1a] font-bold uppercase tracking-widest group-hover:underline inline-flex items-center gap-1.5 group-hover:gap-2.5 transition-all">
-              Join the waitlist <ArrowRight className="w-3.5 h-3.5" />
-            </span>
-          </Link>
-        </HeroCard>
-      </div>
     </section>
   );
 }
 
-/* ── Proof ────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════
+   SECTION 2: PROOF — REAL RESULT
+   ══════════════════════════════════════════════════════════ */
 function Proof() {
   return (
-    <section className="py-20 px-4 sm:px-8 bg-white border-t border-black/5">
+    <section className="py-28 px-4 sm:px-8 warm-gradient-subtle">
       <div className="max-w-[1100px] mx-auto">
+        {/* Big quote */}
         <motion.div
-          className="grid lg:grid-cols-2 gap-12 items-center"
+          className="text-center mb-16"
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.6 }}
         >
-          {/* Story */}
-          <div>
-            <div className="text-[11px] font-bold uppercase tracking-widest text-orange-500 mb-6 font-mono">
-              Real result · Defense sub-assembly
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#1a1a1a] tracking-tight leading-tight mb-6">
-              Management called it a win.
-              <br />
-              <span className="text-[#A3A3A3]">₹6L saved per unit.</span>
-            </h2>
-            <p className="text-[16px] text-[#525252] leading-relaxed mb-6">
-              Vendor quoted ₹43 lakhs. Negotiations brought it to ₹37L — team celebrated. Newton-Metre ran the numbers: mechanical cost ₹8L, purchased components ₹12L, with margin: should-cost ₹25L.
-            </p>
-            <p className="text-[16px] text-[#525252] leading-relaxed mb-8">
-              Armed with a line-by-line breakdown, the team pushed again. Vendor settled at ₹28L.
-            </p>
-            <div className="text-[15px] font-medium text-[#1a1a1a] italic border-l-4 border-orange-500 pl-5">
-              "The win they were celebrating was leaving ₹6 crore on the table."
-            </div>
+          <div className="text-[14px] font-bold uppercase tracking-widest text-orange-500 mb-6 font-mono">
+            Real result &middot; Defense sub-assembly
           </div>
+          <h2
+            className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-[#1a1a1a] tracking-tight leading-tight mb-8"
+            style={{ fontFamily: "var(--font-headline)" }}
+          >
+            <em>&ldquo;The deal they were celebrating?</em>
+            <br />
+            <span className="text-orange-500">They&apos;d left ₹6 crore on the table.&rdquo;</span>
+          </h2>
+        </motion.div>
+
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          {/* Story */}
+          <motion.div
+            initial={{ opacity: 0, x: -40 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.6 }}
+          >
+            <p className="text-[17px] text-[#525252] leading-relaxed mb-6 text-justify">
+              Vendor quoted <R className="font-bold text-[#1a1a1a]">43L</R>. After negotiations, it came down to{" "}
+              <R className="font-bold text-[#1a1a1a]">37L</R> — team celebrated.
+              Newton-Metre ran the numbers: mechanical cost{" "}
+              <R className="font-bold text-[#1a1a1a]">8L</R>, purchased components{" "}
+              <R className="font-bold text-[#1a1a1a]">12L</R>, with margin: should-cost{" "}
+              <R className="font-bold text-[#1a1a1a]">25L</R>.
+            </p>
+            <p className="text-[17px] text-[#525252] leading-relaxed mb-8 text-justify">
+              Armed with a line-by-line breakdown, the team pushed again. Vendor settled at{" "}
+              <R className="font-bold text-[#1a1a1a]">28L</R>.
+            </p>
+            {/* Evidence bullets — bigger */}
+            <div className="space-y-4">
+              <motion.div
+                className="flex items-center gap-4 p-4 rounded-xl bg-white border border-black/5"
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: 0.2 }}
+              >
+                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+                <span className="text-[16px] text-[#1a1a1a] font-medium">Line-by-line breakdown revealed 14% margin padding</span>
+              </motion.div>
+              <motion.div
+                className="flex items-center gap-4 p-4 rounded-xl bg-white border border-black/5"
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: 0.3 }}
+              >
+                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+                <span className="text-[16px] text-[#1a1a1a] font-medium">Same part bought at <R>31K</R> last year — now quoted at <R>48K</R></span>
+              </motion.div>
+            </div>
+          </motion.div>
 
           {/* Numbers */}
-          <div className="grid grid-cols-2 gap-4">
+          <motion.div
+            className="grid grid-cols-2 gap-4"
+            initial={{ opacity: 0, x: 40 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
             {[
-              { stat: "₹43L", label: "Vendor's opening quote", muted: true },
-              { stat: "₹37L", label: "What management celebrated", muted: true },
-              { stat: "₹25L", label: "Should-cost (Newton-Metre)", highlight: true },
-              { stat: "₹28L", label: "Final negotiated price", highlight: true },
+              { stat: "43L", label: "Vendor's opening quote", muted: true },
+              { stat: "37L", label: "What management celebrated", muted: true },
+              { stat: "25L", label: "Should-cost (Newton-Metre)", highlight: true },
+              { stat: "28L", label: "Final negotiated price", highlight: true },
             ].map((item, i) => (
               <motion.div
                 key={i}
                 className={`p-6 rounded-2xl border ${item.highlight ? "bg-[#1a1a1a] border-[#1a1a1a]" : "bg-white border-black/8"}`}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                whileHover={{ scale: 1.03 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.08 }}
+                transition={{ duration: 0.4, delay: 0.2 + i * 0.1 }}
               >
-                <div className={`text-3xl font-bold font-mono mb-2 ${item.highlight ? "text-white" : "text-[#1a1a1a]"}`}>
-                  {item.stat}
+                <div className={`text-4xl font-bold font-mono mb-2 ${item.highlight ? "text-white" : "text-[#1a1a1a]"}`}>
+                  <R className={item.highlight ? "text-white" : "text-[#1a1a1a]"}>{item.stat}</R>
                 </div>
-                <div className={`text-[11px] uppercase tracking-widest font-bold ${item.highlight ? "text-white/50" : "text-[#A3A3A3]"}`}>
+                <div className={`text-[12px] uppercase tracking-widest font-bold ${item.highlight ? "text-white/60" : "text-[#A3A3A3]"}`}>
                   {item.label}
                 </div>
               </motion.div>
             ))}
-            <div className="col-span-2 p-6 rounded-2xl bg-orange-50 border border-orange-200">
-              <div className="text-4xl font-bold font-mono text-orange-600 mb-1">₹10.05 Cr</div>
-              <div className="text-[11px] uppercase tracking-widest font-bold text-orange-500">
-                Total saved · 67 units × ₹15L per unit
+            <motion.div
+              className="col-span-2 p-8 rounded-2xl bg-orange-50 border border-orange-200"
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+            >
+              <div className="text-5xl font-bold font-mono text-orange-600 mb-2">
+                <R>10.05 Cr</R>
               </div>
-            </div>
-          </div>
-        </motion.div>
+              <div className="text-[14px] uppercase tracking-widest font-bold text-orange-500">
+                Total saved &middot; 67 units &times; ₹15L per unit
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
       </div>
     </section>
   );
 }
 
-/* ── Problem ──────────────────────────────────────────── */
-function Problem() {
+/* ══════════════════════════════════════════════════════════
+   SECTION 3: THE VISION — PRICE INTELLIGENCE
+   "We turn your history into your company's price intelligence."
+   ══════════════════════════════════════════════════════════ */
+function Vision() {
   return (
-    <section className="py-28 bg-white">
+    <section className="py-28 warm-gradient-hero">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-8">
         <motion.div
           className="text-center max-w-3xl mx-auto mb-20"
@@ -236,13 +345,21 @@ function Problem() {
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-4xl sm:text-5xl font-bold text-[#1a1a1a] mb-6 tracking-tight leading-tight">
-            Your engineering is precise.
+          <div className="text-orange-500 text-[14px] font-bold uppercase tracking-widest mb-6 font-mono">
+            The Vision
+          </div>
+          <h2
+            className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-[#1a1a1a] mb-6 tracking-tight leading-tight"
+            style={{ fontFamily: "var(--font-headline)" }}
+          >
+            <em>We turn your history into</em>
             <br />
-            <span className="text-[#A3A3A3]">Your procurement is not.</span>
+            <span className="text-[#A3A3A3] not-italic">price intelligence.</span>
           </h2>
-          <p className="text-lg text-[#525252] leading-relaxed">
-            Your team specifies every component, tolerance, and process to exact standards. But when procurement negotiates price, they rely on supplier PDFs, stale POs, and gut feeling. That gap costs you 8–14% on every order.
+          <p className="text-lg text-[#525252] leading-relaxed text-justify">
+            Drawing archive, PO records, vendor negotiations, tribal knowledge —
+            all of it in one searchable system. Every past deal makes the next one sharper.
+            That&apos;s not a tool. That&apos;s your company&apos;s memory. And it only gets smarter.
           </p>
         </motion.div>
 
@@ -250,35 +367,36 @@ function Problem() {
           {[
             {
               stat: "14%",
-              label: "Average overpayment",
-              desc: "Procurement teams accept supplier quotes with no independent baseline. On precision parts, the average overspend is 14%.",
+              label: "Information Asymmetry",
+              desc: "Your supplier knows exactly what it costs to make your part. Your buyer doesn't. On precision parts, the average overspend is 14%. Every year. Every order.",
             },
             {
               stat: "60%",
               label: "Parts already exist",
-              desc: "60% of part numbers in a typical manufacturing database are duplicates or variants. A single search across your drawing history would catch them. Each redundant part costs $4,500–7,500/year.",
+              desc: "60% of the parts in your system are duplicates or variants of something you already made. One search catches them. Every redundant part is costing you ₹3.5–6 lakh a year to maintain.",
             },
             {
               stat: "70%",
               label: "Spend is off-the-shelf",
-              desc: "70% of procurement spend is on bought-out MPN items. Alternate parts, better vendors, volume discounts \u2014 all discoverable if your past POs were searchable. They\u2019re not.",
+              desc: "70% of what you buy is catalog items — bearings, connectors, motors. Better prices, alternate vendors, volume deals — all sitting in your own purchase history. If only it was searchable.",
             },
           ].map((item, i) => (
             <motion.div
               key={i}
-              className="p-8 rounded-2xl bg-white border border-black/5 h-full flex flex-col hover:shadow-lg hover:shadow-black/5 hover:-translate-y-1 transition-all duration-300"
+              className="p-8 rounded-2xl bg-white border border-black/5 h-full flex flex-col hover:shadow-lg hover:shadow-black/5 transition-all duration-300 cursor-default"
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
+              whileHover={{ y: -4, scale: 1.02 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.5, delay: i * 0.15 }}
             >
               <div className="text-4xl font-bold text-[#1a1a1a] mb-3 font-mono">
                 {item.stat}
               </div>
-              <div className="text-[11px] font-bold text-[#1a1a1a] uppercase tracking-widest mb-3">
+              <div className="text-[14px] font-bold text-[#1a1a1a] uppercase tracking-widest mb-3">
                 {item.label}
               </div>
-              <p className="text-[15px] text-[#525252] leading-relaxed flex-1">
+              <p className="text-[16px] text-[#525252] leading-relaxed flex-1 text-justify">
                 {item.desc}
               </p>
             </motion.div>
@@ -289,38 +407,62 @@ function Problem() {
   );
 }
 
-/* ── Should-Cost ──────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════
+   SECTION 4: SHOULD-COST — THE DOOR OPENER
+   "Upload a drawing. See the real number. Negotiate with data."
+   ══════════════════════════════════════════════════════════ */
 function ShouldCost() {
   return (
-    <section id="capabilities" className="py-28 px-4 sm:px-8 warm-gradient-subtle">
+    <section id="capabilities" className="py-32 px-4 sm:px-8 warm-gradient-subtle">
       <div className="max-w-[1200px] mx-auto">
-        <div className="grid lg:grid-cols-2 gap-20 items-center">
+        <motion.div
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="text-orange-500 text-[15px] sm:text-[18px] uppercase tracking-widest font-bold mb-6 font-mono">
+            01 / 03 &middot; The Door Opener
+          </div>
+          <h2
+            className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-[#1a1a1a] tracking-tight leading-tight"
+            style={{ fontFamily: "var(--font-headline)" }}
+          >
+            <em>Upload a drawing.</em>
+            <br />
+            <span className="text-[#A3A3A3] not-italic">Get the real number.</span>
+          </h2>
+        </motion.div>
+
+        <div className="grid lg:grid-cols-2 gap-16 items-start">
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.6 }}
           >
-            <div className="text-[13px] text-orange-500 uppercase tracking-widest font-bold mb-6 font-mono">
-              01 / 03 · Should-Cost Estimation
+            <div className="bg-white rounded-2xl border border-black/8 p-8 sm:p-10 shadow-sm mb-8">
+              <p className="text-[17px] text-[#525252] leading-[1.8] mb-6 text-justify">
+                Your supplier knows what it costs to make your part.
+                You don&apos;t. That ends now.
+              </p>
+              <p className="text-[17px] text-[#525252] leading-[1.8] mb-6 text-justify">
+                Upload a drawing. Get the full breakdown — material, machining, finishing,
+                overhead — in <span className="font-bold text-[#1a1a1a]">30 seconds</span>.
+                Not days. Every line item you can defend. Every number you can trace.
+              </p>
+              <p className="text-[17px] text-[#525252] leading-[1.8] text-justify">
+                Companies save{" "}
+                <span className="font-bold text-[#1a1a1a]">8–12%</span> on the
+                very first quote they challenge. First quote. First day.
+              </p>
             </div>
-            <h2 className="text-4xl sm:text-5xl font-bold text-[#1a1a1a] mb-8 tracking-tight leading-tight">
-              Upload a drawing.
-              <br />
-              <span className="text-[#A3A3A3]">Get the real number.</span>
-            </h2>
-            <p className="text-lg text-[#525252] leading-relaxed mb-10">
-              Your supplier already knows what it costs to make your part. Now
-              you will too. Line-by-line should-cost — material, machining,
-              finishing, overhead — in 30 seconds. Not days. Plus, instantly
-              find similar parts from your history with what you paid before.
-              Companies save 8–12% on the first quote they challenge.
-            </p>
             <Link
               href="/estimate/new"
-              className="dark-pill inline-flex items-center gap-2 px-8 py-4 text-xs font-bold uppercase tracking-widest"
+              className="dark-pill inline-flex items-center gap-2 px-10 py-5 text-xs font-bold uppercase tracking-widest"
             >
-              Upload a Drawing <ArrowRight className="w-4 h-4" />
+              Start a 30-second audit <ArrowRight className="w-4 h-4" />
             </Link>
           </motion.div>
 
@@ -331,25 +473,25 @@ function ShouldCost() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <div className="bg-[#09090B] rounded-2xl p-6 text-white shadow-2xl">
+            <div className="bg-[#1a1a1a] rounded-2xl p-6 text-white shadow-2xl">
               <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10">
                 <div>
-                  <div className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">
+                  <div className="text-[12px] font-bold text-white/40 uppercase tracking-widest mb-1">
                     Analysis: NM-9283
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-widest">
+                    <span className="text-[14px] font-bold text-emerald-400 uppercase tracking-widest">
                       HIGH confidence
                     </span>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">
+                  <div className="text-[12px] font-bold text-white/40 uppercase tracking-widest mb-1">
                     Should-Cost
                   </div>
                   <div className="text-2xl font-bold tracking-tighter font-mono">
-                    ₹ 14,820
+                    <R className="text-white">14,820</R>
                   </div>
                 </div>
               </div>
@@ -375,7 +517,7 @@ function ShouldCost() {
                         />
                       </div>
                       <span className="text-sm text-white/80 w-16 text-right font-mono">
-                        ₹ {item.value}
+                        <R className="text-white/80">{item.value}</R>
                       </span>
                     </div>
                   </div>
@@ -390,34 +532,34 @@ function ShouldCost() {
           {[
             {
               title: "Sourcing & Procurement",
-              desc: "Supplier quoted ₹48,000. Should-cost says ₹29,400. Search finds you paid ₹31,000 last year for the same part. Walk in with data.",
+              desc: "Supplier says ₹48,000. Should-cost says ₹29,400. You paid ₹31,000 last year for the same part. Now walk in and ask them why.",
             },
             {
               title: "Cost Engineering",
-              desc: "Should-cost in minutes, not days. Every line item defensible. Search your history for similar estimates to cross-check.",
+              desc: "Get should-cost in minutes, not days. Every line item holds up. Cross-check against your own past estimates instantly.",
             },
             {
               title: "Design Engineering",
-              desc: "See cost impact before it reaches procurement. Search your full history — that part probably already exists.",
+              desc: "Know the cost impact before it reaches procurement. That part? It probably already exists in your history. Search first, design second.",
             },
             {
               title: "Leadership",
-              desc: "See total overpayment across your supply base. Know which suppliers are competitive.",
+              desc: "How much are you overpaying across the entire supply base? Which vendors are sharp, which are milking you — visible in one click.",
             },
           ].map((item, i) => (
             <motion.div
               key={i}
-              className="p-8 rounded-2xl border border-black/5 bg-[#f9fafb] hover:bg-white hover:border-black/15 hover:shadow-md hover:-translate-y-1 transition-all duration-300 h-full flex flex-col"
+              className="p-8 rounded-2xl border border-black/5 bg-white/80 hover:bg-white hover:border-black/15 hover:shadow-md hover:-translate-y-1 transition-all duration-300 h-full flex flex-col"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.4, delay: i * 0.1 }}
             >
               <CheckCircle2 className="w-5 h-5 text-orange-500 mb-5" />
-              <div className="text-[11px] font-bold text-[#1a1a1a] uppercase tracking-widest mb-3">
+              <div className="text-[14px] font-bold text-[#1a1a1a] uppercase tracking-widest mb-3">
                 {item.title}
               </div>
-              <p className="text-[15px] text-[#525252] leading-relaxed flex-1">
+              <p className="text-[16px] text-[#525252] leading-relaxed flex-1 text-justify">
                 {item.desc}
               </p>
             </motion.div>
@@ -428,11 +570,25 @@ function ShouldCost() {
   );
 }
 
-/* ── Similarity Search ────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════
+   SECTION 5: INSTITUTIONAL MEMORY — THE PLATFORM
+   "Once 100,000 drawings are indexed, they never leave."
+   ══════════════════════════════════════════════════════════ */
 function SimilaritySearch() {
   return (
-    <section className="py-28 bg-white overflow-hidden border-t border-black/5">
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-8">
+    <section className="py-32 bg-[#1a1a1a] overflow-hidden relative">
+      {/* Glow orbs — animated */}
+      <motion.div
+        className="absolute top-20 left-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl pointer-events-none"
+        animate={{ x: [0, 30, 0], y: [0, -20, 0] }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="absolute bottom-20 right-1/4 w-80 h-80 bg-amber-500/5 rounded-full blur-3xl pointer-events-none"
+        animate={{ x: [0, -20, 0], y: [0, 30, 0] }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-8 relative z-10">
         <motion.div
           className="text-center max-w-3xl mx-auto mb-20"
           initial={{ opacity: 0, y: 24 }}
@@ -440,19 +596,22 @@ function SimilaritySearch() {
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.6 }}
         >
-          <div className="text-[#A3A3A3] text-[11px] font-bold uppercase tracking-widest mb-6 font-mono">
-            02 / 03 · Company Knowledge Engine
+          <div className="text-orange-500 text-[15px] sm:text-[18px] font-bold uppercase tracking-widest mb-6 font-mono">
+            02 / 03 &middot; The Platform
           </div>
-          <h2 className="text-4xl sm:text-5xl font-bold mb-8 tracking-tight leading-tight text-[#1a1a1a]">
-            Your company already knows.
+          <h2
+            className="text-4xl sm:text-5xl lg:text-6xl font-semibold mb-8 tracking-tight leading-tight text-white"
+            style={{ fontFamily: "var(--font-headline)" }}
+          >
+            <em>Your company already knows.</em>
             <br />
-            <span className="text-[#A3A3A3]">It just can&apos;t remember.</span>
+            <span className="text-white/40 not-italic">It just can&apos;t remember.</span>
           </h2>
-          <p className="text-lg text-[#525252] leading-relaxed">
-            10,000+ drawings in shared drives. Cost data in spreadsheets. 20
-            years of tribal knowledge in your senior engineer&apos;s head. When
-            they retire, it walks out the door. Newton-Metre turns scattered
-            files into one searchable company brain.
+          <p className="text-lg text-white/75 leading-relaxed text-justify">
+            10,000+ drawings sitting in shared drives. Cost data buried in
+            spreadsheets. 20 years of knowledge locked in one person&apos;s head.
+            Index it once in Newton-Metre — now it&apos;s permanent, searchable, and gets
+            sharper with every decision. Once 100,000 drawings are in, nobody leaves.
           </p>
         </motion.div>
 
@@ -461,53 +620,43 @@ function SimilaritySearch() {
             {[
               {
                 dept: "Design Engineering",
-                title: "She spent 3 days designing something that already existed.",
-                desc: "70–80% of new designs are variants of existing parts. Find the match in seconds, tweak 10%, ship in hours. Each avoided redesign saves $15,000.",
+                title: "3 days designing a part that already existed.",
+                desc: "70–80% of new designs are variants of something you already made. Find the match in seconds, tweak 10%, ship in hours. Every avoided redesign saves ₹12–15 lakh.",
               },
               {
                 dept: "Procurement",
-                title: "You paid ₹32,000 last year. They're quoting ₹48,000.",
-                desc: "Every past PO, negotiation outcome, and discount pattern — searchable. Know what you paid, when, and from whom.",
+                title: "Paid ₹32,000 last year. Now they want ₹48,000.",
+                desc: "Every past PO, every negotiation outcome, every discount pattern — searchable. What you paid, when, to whom. One click.",
               },
               {
                 dept: "Quality",
-                title: "25% of your quality issues are repeat failures. Preventable.",
-                desc: "When a defect appears, instantly find every past NCR for similar parts. Inspection reports, FAI docs, failure histories — indexed forever.",
+                title: "Same defect. Third time this year. All preventable.",
+                desc: "Defect shows up? Pull every past NCR for similar parts instantly. Inspection reports, FAI docs, failure patterns — all indexed. Forever.",
               },
               {
                 dept: "Sales",
-                title: "Customer called. You quoted in 10 minutes. Competitor took 3 days.",
-                desc: "Upload a sketch, find 5 similar parts from history, give a ballpark price — while the customer is still on the phone.",
-              },
-              {
-                dept: "Import / Export",
-                title: "11,000 HS codes. You classified it wrong. Again.",
-                desc: "Find the 5 most similar past imports, surface their HS codes and FTA routes. Indian manufacturers leave 70% of FTA benefits on the table.",
+                title: "Customer on the phone. Quote sent in 10 minutes. Competitor took 3 days.",
+                desc: "Upload the sketch, find 5 similar parts from history, give a price — while they&apos;re still on the call. Speed wins orders.",
               },
               {
                 dept: "Finance",
-                title: "₹3.2 crore on turned parts last year. You had no idea.",
-                desc: "Spend analysis by part family, material, supplier. Budget vs. actual on every category. Visibility into where the money actually goes.",
-              },
-              {
-                dept: "Supply Planning",
-                title: "AI predicted demand 3 months out. You ordered before the rush.",
-                desc: "Your PO history feeds a forecasting engine that predicts demand by part family, spots seasonal patterns, and calculates reorder points.",
+                title: "₹3.2 crore on turned parts last year. Nobody even knew.",
+                desc: "Spend by part family, material, supplier. Budget vs actual on every category. Where the money actually goes — finally visible.",
               },
             ].map((item, i) => (
               <motion.div
                 key={i}
-                className="relative pl-8 border-l-2 border-black/8 hover:border-orange-500/60 transition-colors"
+                className="relative pl-8 border-l-2 border-white/10 hover:border-orange-500/60 transition-colors"
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: "-40px" }}
                 transition={{ duration: 0.4, delay: i * 0.08 }}
               >
-                <div className="text-[11px] font-bold text-orange-500 uppercase tracking-widest mb-2">
+                <div className="text-[14px] font-bold text-orange-500 uppercase tracking-widest mb-2">
                   {item.dept}
                 </div>
-                <div className="text-xl font-bold mb-3 text-[#1a1a1a]">{item.title}</div>
-                <p className="text-[#525252] text-[15px] leading-relaxed">
+                <div className="text-xl font-bold mb-3 text-white">{item.title}</div>
+                <p className="text-white/70 text-[16px] leading-relaxed text-justify">
                   {item.desc}
                 </p>
               </motion.div>
@@ -520,12 +669,12 @@ function SimilaritySearch() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <div className="bg-[#f9fafb] rounded-2xl p-8 border border-black/6">
+            <div className="bg-white/5 rounded-2xl p-8 border border-white/10">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-8 h-8 rounded-lg bg-[#1a1a1a]/8 flex items-center justify-center">
-                  <Search className="w-4 h-4 text-[#525252]" />
+                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+                  <Search className="w-4 h-4 text-white/60" />
                 </div>
-                <span className="text-[11px] font-bold uppercase tracking-widest text-[#A3A3A3]">
+                <span className="text-[14px] font-bold uppercase tracking-widest text-white/40">
                   Search Results
                 </span>
               </div>
@@ -539,13 +688,13 @@ function SimilaritySearch() {
                 ].map((item, i) => (
                   <div
                     key={i}
-                    className="p-4 rounded-xl bg-white border border-black/5 hover:border-black/10 hover:shadow-sm transition-all cursor-pointer flex items-center justify-between"
+                    className="p-4 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/8 transition-all cursor-pointer flex items-center justify-between"
                   >
                     <div>
-                      <div className="text-sm font-medium mb-0.5 font-mono text-[#1a1a1a]">
+                      <div className="text-sm font-medium mb-0.5 font-mono text-white">
                         {item.name}
                       </div>
-                      <div className="text-[10px] text-[#A3A3A3] uppercase tracking-widest">
+                      <div className="text-[12px] text-white/40 uppercase tracking-widest">
                         {item.type}
                       </div>
                     </div>
@@ -556,10 +705,10 @@ function SimilaritySearch() {
                 ))}
               </div>
 
-              <div className="mt-6 pt-6 border-t border-black/5">
+              <div className="mt-6 pt-6 border-t border-white/10">
                 <Link
                   href="/similar"
-                  className="w-full py-4 rounded-full bg-[#1a1a1a] text-white text-xs font-bold uppercase tracking-widest hover:bg-[#333] transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-4 rounded-full bg-white text-[#1a1a1a] text-xs font-bold uppercase tracking-widest hover:bg-white/90 transition-colors flex items-center justify-center gap-2"
                 >
                   Search Your Company History <ArrowRight className="w-4 h-4" />
                 </Link>
@@ -572,10 +721,13 @@ function SimilaritySearch() {
   );
 }
 
-/* ── AI Worker Trailer ────────────────────────────────── */
-function AIWorkerTrailer() {
+/* ══════════════════════════════════════════════════════════
+   SECTION 6: AI PROCUREMENT ENGINE — THE REVENUE
+   "From tactical buying to strategic sourcing."
+   ══════════════════════════════════════════════════════════ */
+function AIEngine() {
   return (
-    <section className="py-32 px-4 sm:px-8 warm-gradient-subtle border-t border-black/5">
+    <section className="py-32 px-4 sm:px-8 warm-gradient-hero">
       <div className="max-w-[900px] mx-auto">
         <motion.div
           className="text-center mb-16"
@@ -584,22 +736,27 @@ function AIWorkerTrailer() {
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.6 }}
         >
-          <div className="text-[11px] tracking-widest text-[#A3A3A3] uppercase font-bold mb-4 font-mono">
-            03 / 03 · AI Procurement Worker
+          <div className="text-orange-500 text-[15px] sm:text-[18px] tracking-widest uppercase font-bold mb-6 font-mono">
+            03 / 03 &middot; The Revenue Engine
           </div>
 
-          <h2 className="text-4xl sm:text-5xl font-bold text-[#1a1a1a] tracking-tight leading-tight mb-6">
-            Better decisions. Faster.
+          <h2
+            className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-[#1a1a1a] tracking-tight leading-tight mb-6"
+            style={{ fontFamily: "var(--font-headline)" }}
+          >
+            <em>From tactical buying</em>
+            <br />
+            <span className="text-[#A3A3A3] not-italic">to strategic sourcing.</span>
           </h2>
 
-          <p className="text-lg text-[#525252] leading-relaxed max-w-[640px] mx-auto">
-            Your company&apos;s PO history, vendor master, negotiation
-            transcripts, and approval templates &mdash; turned into live
-            intelligence. AI reads your data. You make the call.
+          <p className="text-lg text-[#525252] leading-relaxed max-w-[640px] mx-auto text-justify">
+            PO history, vendor master, negotiation transcripts, approval
+            templates — all turned into live intelligence. AI reads your data, audits every quote,
+            gets sharper with every deal. You make the call.
           </p>
         </motion.div>
 
-        {/* Two-column breakdown: 70% spend + negotiation */}
+        {/* Two-column breakdown */}
         <div className="grid md:grid-cols-2 gap-6 mb-8">
           <motion.div
             className="bg-white rounded-2xl p-8 border border-black/6"
@@ -608,17 +765,17 @@ function AIWorkerTrailer() {
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.5 }}
           >
-            <div className="text-[11px] font-bold text-orange-500 uppercase tracking-widest mb-5 font-mono">
-              70% of your spend · Off-the-shelf items
+            <div className="text-[14px] font-bold text-orange-500 uppercase tracking-widest mb-5 font-mono">
+              70% of your spend &middot; Off-the-shelf items
             </div>
             <div className="space-y-4">
               {[
-                "Quote comes in — AI checks your PO history for this exact MPN",
+                "Quote arrives — AI instantly checks your PO history for this exact MPN",
                 "Finds alternate parts with similar functionality and quality",
                 "Builds a supplier matrix: qty tiers, volume history, discount patterns",
                 "Sends alternates to design for verification — accept/reject saved forever",
               ].map((line, i) => (
-                <div key={i} className="border-l-2 border-black/8 pl-5 py-0.5 text-[#525252] text-[14px] leading-relaxed">
+                <div key={i} className="border-l-2 border-black/8 pl-5 py-0.5 text-[#525252] text-[15px] leading-relaxed">
                   {line}
                 </div>
               ))}
@@ -631,17 +788,17 @@ function AIWorkerTrailer() {
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <div className="text-[11px] font-bold text-orange-500 uppercase tracking-widest mb-5 font-mono">
+            <div className="text-[14px] font-bold text-orange-500 uppercase tracking-widest mb-5 font-mono">
               Live negotiation intelligence
             </div>
             <div className="space-y-4">
               {[
                 "Before the meeting — AI reads every past negotiation with this vendor",
-                `Gives exact % targets: "This supplier typically gives 14% on this volume"`,
-                "Surfaces what arguments worked before and where they cave",
+                "Gives exact % targets: \"This supplier typically gives 14% on this volume\"",
+                "Shows what arguments worked last time and where they gave in",
                 "Every outcome saved — next negotiation is sharper than the last",
               ].map((line, i) => (
-                <div key={i} className="border-l-2 border-black/8 pl-5 py-0.5 text-[#525252] text-[14px] leading-relaxed">
+                <div key={i} className="border-l-2 border-black/8 pl-5 py-0.5 text-[#525252] text-[15px] leading-relaxed">
                   {line}
                 </div>
               ))}
@@ -659,28 +816,28 @@ function AIWorkerTrailer() {
             },
             {
               dept: "Design Engineering",
-              headline: "MPN went EOL. 3 verified alternates found in 40 seconds.",
-              desc: "AI cross-references your approved parts list with supplier catalogs. Design reviews, approvals saved forever — no email chains.",
+              headline: "Part went end-of-life. 3 verified alternates found in 40 seconds.",
+              desc: "AI checks your approved parts list against supplier catalogs. Design reviews, approvals saved forever — no more email chains.",
             },
             {
               dept: "Finance",
-              headline: "₹2.4 crore in off-contract spend. Found before the audit.",
-              desc: "Every purchase benchmarked against approved vendor rates. Maverick spend flagged in real time. Budget vs. actual on every category.",
+              headline: "₹2.4 crore off-contract spend. Caught before the audit.",
+              desc: "Every purchase checked against approved vendor rates. Rogue spend flagged in real time. Budget vs actual on every category.",
             },
             {
               dept: "Quality",
-              headline: "Supplier defect rate: 4.2%. You were giving them 40% more volume.",
-              desc: "Scorecards built from every NCR, FAI, and incoming inspection record. Updated with every delivery. No spreadsheet required.",
+              headline: "Supplier defect rate: 4.2%. You kept giving them more orders.",
+              desc: "Scorecards built from every NCR, FAI, incoming inspection. Updated with every delivery. No spreadsheet maintenance needed.",
             },
             {
               dept: "Supply Planning",
-              headline: "Lead times jumped 6 → 14 weeks. AI flagged it 90 days ago.",
-              desc: "PO history feeds a forecasting engine that spots disruptions before they hit your line. Reorder points calculated, not guessed.",
+              headline: "Lead time jumped from 6 to 14 weeks. AI flagged it 90 days ago.",
+              desc: "PO history feeds a forecasting engine. It spots disruptions before they hit your production line. Reorder points calculated, not guessed.",
             },
             {
               dept: "Leadership",
-              headline: "₹50 crore procurement spend. Understood in 3 minutes.",
-              desc: "Spend by category, supplier, department. Every saving identified, every risk surfaced. The brief your team never had time to write.",
+              headline: "₹50 crore procurement spend. Understood in 3 minutes flat.",
+              desc: "Spend by category, supplier, department. Every saving identified, every risk visible. The brief your team never had time to prepare.",
             },
           ].map((item, i) => (
             <motion.div
@@ -691,13 +848,13 @@ function AIWorkerTrailer() {
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.4, delay: i * 0.07 }}
             >
-              <div className="text-[10px] font-bold text-orange-500 uppercase tracking-widest mb-3 font-mono">
+              <div className="text-[12px] font-bold text-orange-500 uppercase tracking-widest mb-3 font-mono">
                 {item.dept}
               </div>
-              <div className="text-[15px] font-bold text-[#1a1a1a] leading-snug mb-3 flex-1">
+              <div className="text-[16px] font-bold text-[#1a1a1a] leading-snug mb-3 flex-1">
                 {item.headline}
               </div>
-              <p className="text-[13px] text-[#525252] leading-relaxed">
+              <p className="text-[15px] text-[#525252] leading-relaxed text-justify">
                 {item.desc}
               </p>
             </motion.div>
@@ -706,11 +863,11 @@ function AIWorkerTrailer() {
 
         {/* Bottom: compounding moat */}
         <div className="text-center">
-          <p className="text-[#525252] text-[15px] leading-relaxed mb-8 max-w-lg mx-auto">
-            Every interaction makes the system smarter. Alternate approvals,
-            negotiation outcomes, vendor performance, price trends &mdash; all
-            searchable, all compounding. Your company&apos;s institutional
-            memory grows with every deal, every search, every decision.
+          <p className="text-[#525252] text-[16px] leading-relaxed mb-8 max-w-lg mx-auto text-justify">
+            Every interaction compounds the memory. Alternate approvals,
+            negotiation outcomes, vendor performance, price trends — all
+            searchable, all growing. This is the system of record your suppliers
+            hope you never build.
           </p>
           <Link
             href="/waitlist"
@@ -724,48 +881,205 @@ function AIWorkerTrailer() {
   );
 }
 
-/* ── ROI Calculator ───────────────────────────────────── */
-function ROICalculator() {
-  const [spend, setSpend] = useState(5);        // crores
-  const [saving, setSaving] = useState(8);       // pct
-
-  const spendInr    = spend * 1_00_00_000;
-  const savingsInr  = spendInr * (saving / 100);
-  const annualCost  = 4_999 * 12;               // Pro plan
-  const roi         = Math.round(savingsInr / annualCost);
-  const fmt         = (n: number) =>
-    n >= 1_00_00_000
-      ? `₹${(n / 1_00_00_000).toFixed(1)} Cr`
-      : n >= 1_00_000
-      ? `₹${(n / 1_00_000).toFixed(0)}L`
-      : `₹${n.toLocaleString("en-IN")}`;
+/* ══════════════════════════════════════════════════════════
+   SECTION 7: THE 70% GUARDRAIL
+   "Beyond the Drawing — the spend nobody audits."
+   ══════════════════════════════════════════════════════════ */
+function SeventyPercentGuardrail() {
+  const mpnItems = [
+    {
+      icon: <Package className="w-6 h-6" />,
+      label: "Bearings & bushings",
+      problem: "Your vendor charges 62% above market price.",
+      solution: "Same spec, same grade — AI flags it before the PO goes out.",
+    },
+    {
+      icon: <AlertTriangle className="w-6 h-6" />,
+      label: "Motors & actuators",
+      problem: "Same MPN, three distributors — prices vary 40%.",
+      solution: "AI compares all sources and picks the best one in seconds.",
+    },
+    {
+      icon: <TrendingDown className="w-6 h-6" />,
+      label: "Connectors & harnesses",
+      problem: "Your vendor charges 2.5x what the market pays.",
+      solution: "Flagged automatically. Alternate source suggested with pricing.",
+    },
+    {
+      icon: <Search className="w-6 h-6" />,
+      label: "Sensors & switches",
+      problem: "Vendor substituted a higher-margin equivalent.",
+      solution: "Your spec says standard part. AI catches the swap before approval.",
+    },
+  ];
 
   return (
-    <section className="py-28 px-4 sm:px-8 bg-[#09090B] text-white">
+    <section className="py-40 px-4 sm:px-8 bg-[#1a1a1a] text-white relative overflow-hidden">
+      <motion.div
+        className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full bg-orange-500/8 blur-[120px] pointer-events-none"
+        animate={{ x: [0, 40, 0], y: [0, -30, 0] }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full bg-blue-500/5 blur-[120px] pointer-events-none"
+        animate={{ x: [0, -30, 0], y: [0, 40, 0] }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+      />
+
+      <div className="max-w-[1200px] mx-auto relative z-10">
+        <motion.div
+          className="text-center mb-20"
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-orange-500/15 border border-orange-500/25 text-orange-400 text-[14px] sm:text-[16px] font-bold uppercase tracking-widest mb-8">
+            The 70% nobody audits
+          </div>
+          <h2
+            className="text-4xl sm:text-5xl lg:text-7xl font-semibold tracking-tight mb-8"
+            style={{ fontFamily: "var(--font-headline)" }}
+          >
+            <em>Not just drawings.</em>
+            <br />
+            <span className="text-white/40 not-italic">Your entire spend.</span>
+          </h2>
+          <p className="text-xl text-white/70 max-w-3xl mx-auto leading-relaxed text-justify">
+            Most cost tools only handle custom machined parts — that&apos;s 30% of your spend.
+            The other{" "}
+            <span className="text-white font-bold">
+              70% is off-the-shelf
+            </span>{" "}
+            — bearings, motors, connectors, sensors. Catalog items that nobody audits.
+            You overpay on them every single time. Newton-Metre audits everything.
+          </p>
+        </motion.div>
+
+        {/* Visual split — 70/30 bar */}
+        <motion.div
+          className="mb-20 max-w-3xl mx-auto"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="flex gap-2 mb-4">
+            <motion.div
+              className="h-5 rounded-full bg-orange-500"
+              initial={{ width: 0 }}
+              whileInView={{ width: "70%" }}
+              viewport={{ once: true }}
+              transition={{ duration: 1.2, ease: "easeOut" }}
+            />
+            <motion.div
+              className="h-5 rounded-full bg-white/20"
+              initial={{ width: 0 }}
+              whileInView={{ width: "30%" }}
+              viewport={{ once: true }}
+              transition={{ duration: 1.2, ease: "easeOut", delay: 0.3 }}
+            />
+          </div>
+          <div className="flex justify-between text-[14px]">
+            <span className="text-white font-bold">70% Off-the-shelf MPN items — <span className="text-orange-400">unaudited</span></span>
+            <span className="text-white/50">30% Made-to-drawing</span>
+          </div>
+        </motion.div>
+
+        {/* MPN examples — bigger cards with problem/solution split */}
+        <div className="grid sm:grid-cols-2 gap-6 mb-16">
+          {mpnItems.map((item, i) => (
+            <motion.div
+              key={i}
+              className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-8 hover:border-orange-500/30 transition-all duration-300"
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              whileHover={{ y: -4 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.4, delay: i * 0.1 }}
+            >
+              <div className="flex items-center gap-4 mb-5">
+                <div className="w-12 h-12 rounded-xl bg-orange-500/15 flex items-center justify-center text-orange-400">
+                  {item.icon}
+                </div>
+                <div className="text-[16px] font-bold text-white">{item.label}</div>
+              </div>
+              <p className="text-[16px] text-white/80 leading-relaxed mb-3">
+                <span className="text-orange-400 font-semibold">Problem:</span> {item.problem}
+              </p>
+              <p className="text-[16px] text-white/80 leading-relaxed">
+                <span className="text-emerald-400 font-semibold">Fix:</span> {item.solution}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+
+        <motion.div
+          className="text-center"
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.5 }}
+        >
+          <p className="text-white/80 text-lg max-w-2xl mx-auto mb-8 text-justify">
+            <span className="text-white font-bold">One platform.</span>{" "}
+            Drawings and MPNs. Custom parts and catalog items.
+            The full procurement stack — not just the pretty half.
+          </p>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════
+   SECTION 8: ROI CALCULATOR
+   "How much value is leaking?"
+   ══════════════════════════════════════════════════════════ */
+function ROICalculator() {
+  const [spend, setSpend] = useState(5);
+  const [saving, setSaving] = useState(8);
+
+  const spendInr = spend * 1_00_00_000;
+  const savingsInr = spendInr * (saving / 100);
+  const annualCost = 4_999 * 12;
+  const roi = Math.round(savingsInr / annualCost);
+  const fmt = (n: number) =>
+    n >= 1_00_00_000
+      ? `${(n / 1_00_00_000).toFixed(1)} Cr`
+      : n >= 1_00_000
+        ? `${(n / 1_00_000).toFixed(0)}L`
+        : n.toLocaleString("en-IN");
+
+  return (
+    <section className="py-32 px-4 sm:px-8 warm-gradient-hero">
       <div className="max-w-[1200px] mx-auto">
-        <div className="text-center mb-16">
-          <div className="text-[11px] font-bold uppercase tracking-widest text-white/30 mb-4 font-mono">
+        <div className="text-center mb-20">
+          <div className="text-[14px] font-bold uppercase tracking-widest text-orange-500 mb-6 font-mono">
             ROI calculator
           </div>
-          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">
-            What&apos;s your overspend worth?
+          <h2
+            className="text-5xl sm:text-6xl font-semibold tracking-tight mb-6 text-[#1a1a1a]"
+            style={{ fontFamily: "var(--font-headline)" }}
+          >
+            <em>How much value is leaking?</em>
           </h2>
-          <p className="text-lg text-white/50 max-w-xl mx-auto">
-            Indian manufacturers overpay by 8–14% on average. One corrected
-            quote pays for a year of Newton-Metre.
+          <p className="text-xl text-[#525252] max-w-2xl mx-auto leading-relaxed text-justify">
+            Manufacturing companies overpay suppliers by 8–14% on average.
+            One corrected quote pays for a full year of Newton-Metre.
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-center max-w-4xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-16 items-center max-w-5xl mx-auto">
           {/* Sliders */}
-          <div className="space-y-8">
+          <div className="space-y-10">
             <div>
-              <div className="flex justify-between items-baseline mb-3">
-                <label className="text-[12px] font-bold uppercase tracking-widest text-white/40 font-mono">
+              <div className="flex justify-between items-baseline mb-4">
+                <label className="text-[12px] font-bold uppercase tracking-widest text-[#6b7280] font-mono">
                   Annual procurement spend
                 </label>
-                <span className="text-xl font-bold font-mono text-white">
-                  ₹{spend} Cr
+                <span className="text-2xl font-bold font-mono text-[#1a1a1a]">
+                  <R>{spend} Cr</R>
                 </span>
               </div>
               <input
@@ -775,19 +1089,20 @@ function ROICalculator() {
                 step={1}
                 value={spend}
                 onChange={(e) => setSpend(Number(e.target.value))}
-                className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer accent-orange-500"
+                className="w-full h-2 bg-black/10 rounded-full appearance-none cursor-pointer accent-orange-500"
               />
-              <div className="flex justify-between text-[10px] text-white/20 font-mono mt-1.5">
-                <span>₹1 Cr</span><span>₹100 Cr</span>
+              <div className="flex justify-between text-[14px] text-[#9ca3af] font-mono mt-2">
+                <span>₹1 Cr</span>
+                <span>₹100 Cr</span>
               </div>
             </div>
 
             <div>
-              <div className="flex justify-between items-baseline mb-3">
-                <label className="text-[12px] font-bold uppercase tracking-widest text-white/40 font-mono">
+              <div className="flex justify-between items-baseline mb-4">
+                <label className="text-[12px] font-bold uppercase tracking-widest text-[#6b7280] font-mono">
                   Negotiation improvement
                 </label>
-                <span className="text-xl font-bold font-mono text-white">
+                <span className="text-2xl font-bold font-mono text-[#1a1a1a]">
                   {saving}%
                 </span>
               </div>
@@ -798,37 +1113,48 @@ function ROICalculator() {
                 step={1}
                 value={saving}
                 onChange={(e) => setSaving(Number(e.target.value))}
-                className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer accent-orange-500"
+                className="w-full h-2 bg-black/10 rounded-full appearance-none cursor-pointer accent-orange-500"
               />
-              <div className="flex justify-between text-[10px] text-white/20 font-mono mt-1.5">
-                <span>2% (conservative)</span><span>20% (aggressive)</span>
+              <div className="flex justify-between text-[14px] text-[#9ca3af] font-mono mt-2">
+                <span>2% (conservative)</span>
+                <span>20% (aggressive)</span>
               </div>
             </div>
           </div>
 
           {/* Result card */}
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
-            <div className="space-y-5">
-              <div className="flex justify-between items-center pb-4 border-b border-white/10">
+          <div className="bg-[#1a1a1a] rounded-2xl p-10 shadow-2xl">
+            <div className="space-y-6">
+              <div className="flex justify-between items-center pb-5 border-b border-white/10">
                 <span className="text-sm text-white/40">Procurement spend</span>
-                <span className="font-mono font-bold text-white">{fmt(spendInr)}/yr</span>
+                <span className="font-mono font-bold text-white text-lg">
+                  <R className="text-white">{fmt(spendInr)}</R>/yr
+                </span>
               </div>
-              <div className="flex justify-between items-center pb-4 border-b border-white/10">
-                <span className="text-sm text-white/40">Savings at {saving}%</span>
-                <span className="font-mono font-bold text-emerald-400 text-lg">{fmt(savingsInr)}/yr</span>
+              <div className="flex justify-between items-center pb-5 border-b border-white/10">
+                <span className="text-sm text-white/40">
+                  Savings at {saving}%
+                </span>
+                <span className="font-mono font-bold text-emerald-400 text-2xl">
+                  <R className="text-emerald-400">{fmt(savingsInr)}</R>/yr
+                </span>
               </div>
-              <div className="flex justify-between items-center pb-4 border-b border-white/10">
+              <div className="flex justify-between items-center pb-5 border-b border-white/10">
                 <span className="text-sm text-white/40">Newton-Metre Pro</span>
-                <span className="font-mono text-white/60">₹59,988/yr</span>
+                <span className="font-mono text-white/60"><R className="text-white/60">59,988</R>/yr</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm font-bold text-white">Return on investment</span>
-                <span className="font-mono font-bold text-orange-400 text-2xl">{roi}x</span>
+                <span className="text-base font-bold text-white">
+                  Return on investment
+                </span>
+                <span className="font-mono font-bold text-orange-400 text-4xl">
+                  {roi}x
+                </span>
               </div>
             </div>
             <Link
               href="/login"
-              className="block w-full mt-8 py-3.5 rounded-full bg-white text-[#09090B] text-xs font-bold uppercase tracking-widest text-center hover:bg-white/90 transition-colors"
+              className="block w-full mt-10 py-4 rounded-full bg-white text-[#1a1a1a] text-xs font-bold uppercase tracking-widest text-center hover:bg-white/90 transition-colors"
             >
               Start saving — free
             </Link>
@@ -839,35 +1165,42 @@ function ROICalculator() {
   );
 }
 
-/* ── Pricing ───────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════
+   SECTION 9: PRICING
+   ══════════════════════════════════════════════════════════ */
 function Pricing() {
   return (
-    <section id="pricing" className="py-28 px-4 sm:px-8 bg-white border-t border-black/5">
+    <section id="pricing" className="py-28 px-4 sm:px-8 warm-gradient-subtle">
       <div className="max-w-[1200px] mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-4xl sm:text-5xl font-bold text-[#1a1a1a] tracking-tight mb-4">
-            Simple pricing
+          <h2
+            className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-[#1a1a1a] tracking-tight mb-4"
+            style={{ fontFamily: "var(--font-headline)" }}
+          >
+            <em>Simple pricing.</em>
           </h2>
           <p className="text-lg text-[#525252]">
-            One corrected quote pays for a year.
+            One corrected quote pays for the entire year.
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 max-w-[800px] mx-auto">
-          {/* Free — light card */}
-          <div className="p-8 rounded-2xl bg-[#f9fafb] border border-black/6 flex flex-col">
-            <div className="text-[11px] font-bold uppercase tracking-widest text-[#A3A3A3] mb-3 font-mono">
+          {/* Free */}
+          <div className="p-8 rounded-2xl bg-white/80 border border-black/6 flex flex-col">
+            <div className="text-[14px] font-bold uppercase tracking-widest text-[#A3A3A3] mb-3 font-mono">
               Free
             </div>
-            <div className="text-5xl font-bold text-[#1a1a1a] font-mono mb-1">₹0</div>
-            <p className="text-[13px] text-[#A3A3A3] mb-8">No credit card required</p>
+            <div className="text-5xl font-bold text-[#1a1a1a] font-mono mb-1">
+              <R>0</R>
+            </div>
+            <p className="text-[15px] text-[#A3A3A3] mb-8">No credit card required</p>
             <ul className="space-y-3 mb-8 flex-1">
               {[
                 "10 estimates / month",
-                "Cost estimator breakdown",
+                "Should-cost breakdown",
                 "Company brain search",
                 "MPN part number lookup",
-                "PDF, DXF & image uploads",
+                "DWG, STEP, DXF, PDF & image uploads",
               ].map((f) => (
                 <li key={f} className="flex items-center gap-2.5 text-[14px] text-[#525252]">
                   <CheckCircle2 className="w-4 h-4 text-orange-500 shrink-0" />
@@ -883,41 +1216,43 @@ function Pricing() {
             </Link>
           </div>
 
-          {/* Pro — dark card, stands out */}
+          {/* Pro */}
           <div className="p-8 rounded-2xl bg-[#1a1a1a] flex flex-col relative overflow-hidden">
             <div className="absolute top-5 right-5">
               <span className="text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">
                 Most popular
               </span>
             </div>
-            <div className="text-[11px] font-bold uppercase tracking-widest text-white/40 mb-3 font-mono">
+            <div className="text-[14px] font-bold uppercase tracking-widest text-white/40 mb-3 font-mono">
               Pro
             </div>
             <div className="flex items-baseline gap-1 mb-1">
-              <span className="text-5xl font-bold text-white font-mono">₹4,999</span>
+              <span className="text-5xl font-bold text-white font-mono">
+                <R className="text-white">4,999</R>
+              </span>
               <span className="text-sm text-white/40">/mo</span>
             </div>
-            <p className="text-[13px] text-white/40 mb-8">One corrected quote covers it</p>
+            <p className="text-[14px] text-white/40 mb-8">One corrected quote covers it</p>
             <ul className="space-y-3 mb-8 flex-1">
               {[
                 "Unlimited estimates",
                 "MPN lookup — market price before you negotiate",
-                "AI procurement worker — RFQ, compare, negotiate",
-                "Similarity search across full drawing library",
+                "AI procurement engine — RFQ, compare, negotiate",
+                "Full drawing library with similarity search",
                 "Priority support",
                 "Team features",
               ].map((f) => (
-                <li key={f} className="flex items-center gap-2.5 text-[14px] text-white/80">
+                <li key={f} className="flex items-center gap-2.5 text-[15px] text-white/80">
                   <CheckCircle2 className="w-4 h-4 text-orange-400 shrink-0" />
                   {f}
                 </li>
               ))}
             </ul>
             <Link
-              href="/login"
+              href="/waitlist"
               className="block w-full py-3.5 rounded-full bg-white text-[#1a1a1a] text-xs font-bold uppercase tracking-widest text-center hover:bg-white/90 transition-colors"
             >
-              Get started
+              Join the waitlist
             </Link>
           </div>
         </div>
@@ -926,7 +1261,9 @@ function Pricing() {
   );
 }
 
-/* ── Footer ───────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════
+   FOOTER
+   ══════════════════════════════════════════════════════════ */
 function Footer() {
   return (
     <footer className="py-16 px-4 sm:px-8 warm-gradient-footer relative overflow-hidden">
@@ -944,20 +1281,20 @@ function Footer() {
                 Newton-Metre
               </span>
             </div>
-            <p className="text-[15px] text-[#1a1a1a]/60 leading-relaxed">
-              Know what it costs, before they quote.
+            <p className="text-[16px] text-[#1a1a1a]/60 leading-relaxed">
+              The price integrity layer for global manufacturing.
             </p>
           </div>
 
           <div>
-            <div className="text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a] mb-4">
+            <div className="text-[14px] font-bold uppercase tracking-widest text-[#1a1a1a] mb-4">
               Company
             </div>
             <ul className="space-y-2.5">
               <li>
                 <a
                   href="mailto:chand@costimize.dev"
-                  className="text-[15px] text-[#1a1a1a]/60 hover:text-[#1a1a1a] transition-colors"
+                  className="text-[16px] text-[#1a1a1a]/60 hover:text-[#1a1a1a] transition-colors"
                 >
                   Contact Us
                 </a>
@@ -966,19 +1303,19 @@ function Footer() {
           </div>
 
           <div>
-            <div className="text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a] mb-4">
+            <div className="text-[14px] font-bold uppercase tracking-widest text-[#1a1a1a] mb-4">
               Product
             </div>
             <ul className="space-y-2.5">
               {[
                 { label: "Should-Cost", href: "/estimate/new" },
-                { label: "Similarity Search", href: "/similar" },
-                { label: "AI Procurement", href: "/login" },
+                { label: "Company Brain", href: "/similar" },
+                { label: "AI Procurement", href: "/waitlist" },
               ].map((item) => (
                 <li key={item.label}>
                   <Link
                     href={item.href}
-                    className="text-[15px] text-[#1a1a1a]/60 hover:text-[#1a1a1a] transition-colors"
+                    className="text-[16px] text-[#1a1a1a]/60 hover:text-[#1a1a1a] transition-colors"
                   >
                     {item.label}
                   </Link>
@@ -988,48 +1325,27 @@ function Footer() {
           </div>
 
           <div>
-            <div className="text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a] mb-4">
-              Legal
+            <div className="text-[14px] font-bold uppercase tracking-widest text-[#1a1a1a] mb-4">
+              Enterprise
             </div>
             <ul className="space-y-2.5">
-              <li>
-                <a
-                  href="mailto:chand@costimize.dev"
-                  className="text-[15px] text-[#1a1a1a]/60 hover:text-[#1a1a1a] transition-colors"
-                >
-                  Contact
-                </a>
-              </li>
+              {["On-Premise Hosting", "Defense & Aerospace", "Custom Integration"].map((item) => (
+                <li key={item}>
+                  <span className="text-[16px] text-[#1a1a1a]/60">
+                    {item}
+                  </span>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
 
         <div className="pt-6 border-t border-[#1a1a1a]/10 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="text-sm text-[#1a1a1a]/40">
-            &copy; 2026 Newton-Metre. Manufacturing intelligence.
+            &copy; 2026 Newton-Metre. Price integrity for global manufacturing. Made in India.
           </div>
         </div>
       </div>
     </footer>
-  );
-}
-
-/* ── Page ──────────────────────────────────────────────── */
-export default function LandingPage() {
-  return (
-    <div className="min-h-screen bg-white">
-      <LandingNav />
-      <main>
-        <Hero />
-        <Proof />
-        <Problem />
-        <ShouldCost />
-        <SimilaritySearch />
-        <AIWorkerTrailer />
-        <ROICalculator />
-        <Pricing />
-      </main>
-      <Footer />
-    </div>
   );
 }
