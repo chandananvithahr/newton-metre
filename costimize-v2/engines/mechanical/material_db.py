@@ -71,6 +71,34 @@ _MECHANICAL_PROPERTIES: dict[str, dict] = {
         "uts_mpa": 950, "yield_mpa": 880, "hardness_bhn": 334,
         "elongation_pct": 14.0, "aisi_equivalent": "Ti-6Al-4V",
     },
+    "EN19 Steel": {
+        "uts_mpa": 850, "yield_mpa": 680, "hardness_bhn": 248,
+        "elongation_pct": 13.0, "aisi_equivalent": "AISI 4140",
+        # EN19 = 40Cr1Mo28 = AISI 4140 (P.N. Rao Table 2.7)
+    },
+    "Stainless Steel 316": {
+        "uts_mpa": 515, "yield_mpa": 205, "hardness_bhn": 170,
+        "elongation_pct": 40.0, "aisi_equivalent": "AISI 316",
+    },
+    "Aluminum 7075-T6": {
+        "uts_mpa": 572, "yield_mpa": 503, "hardness_bhn": 150,
+        "elongation_pct": 11.0, "aisi_equivalent": "7075-T6",
+    },
+    "SG Iron FCD500": {
+        "uts_mpa": 500, "yield_mpa": 320, "hardness_bhn": 170,
+        "elongation_pct": 7.0, "aisi_equivalent": "ASTM A536 65-45-12",
+        # Spheroidal graphite iron, also known as ductile iron
+    },
+    "20MnCr5 Steel": {
+        "uts_mpa": 780, "yield_mpa": 590, "hardness_bhn": 230,
+        "elongation_pct": 14.0, "aisi_equivalent": "AISI 5120",
+        # Case-hardening steel, common in Indian gear manufacturing
+    },
+    "Inconel 718": {
+        "uts_mpa": 1240, "yield_mpa": 1036, "hardness_bhn": 363,
+        "elongation_pct": 12.0, "aisi_equivalent": "UNS N07718",
+        # Nickel superalloy for aerospace, extremely difficult to machine
+    },
 }
 
 

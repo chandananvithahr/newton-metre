@@ -6,6 +6,68 @@ import math
 from dataclasses import dataclass
 
 
+# Minimum bend radius as multiplier of thickness (R_min = factor × T)
+# Source: Machinery's Handbook + Indian shop data
+MIN_BEND_RADIUS_FACTOR: dict[str, float] = {
+    "Mild Steel CR":       0.8,
+    "Mild Steel HR":       0.8,
+    "Stainless Steel 304": 1.0,
+    "Stainless Steel 316": 1.0,
+    "Aluminum 5052":       0.5,
+    "Aluminum 6061":       0.5,
+    "Galvanized Steel":    0.8,
+    "Copper":              0.3,
+    "Brass":               0.3,
+}
+
+# Springback angle correction (degrees to overbend)
+# Applied to compensate elastic recovery after bending
+SPRINGBACK_DEG: dict[str, float] = {
+    "Mild Steel CR":       2.0,
+    "Mild Steel HR":       2.0,
+    "Stainless Steel 304": 3.0,
+    "Stainless Steel 316": 3.0,
+    "Aluminum 5052":       1.0,
+    "Aluminum 6061":       1.5,
+    "Galvanized Steel":    2.0,
+    "Copper":              0.5,
+    "Brass":               0.5,
+}
+
+# Surcharge when requested radius is below minimum
+BELOW_MIN_RADIUS_SURCHARGE = 0.20  # 20%
+
+
+def get_min_bend_radius_mm(material_name: str, thickness_mm: float) -> float:
+    """Minimum inside bend radius in mm for a given material and thickness."""
+    factor = MIN_BEND_RADIUS_FACTOR.get(material_name, 0.8)  # default = mild steel
+    return factor * thickness_mm
+
+
+def get_springback_deg(material_name: str) -> float:
+    """Springback angle correction in degrees."""
+    return SPRINGBACK_DEG.get(material_name, 2.0)
+
+
+def check_bend_radius(
+    material_name: str,
+    thickness_mm: float,
+    requested_radius_mm: float | None,
+) -> tuple[bool, float]:
+    """Check if requested bend radius meets minimum.
+
+    Returns (is_below_minimum, surcharge_multiplier).
+    surcharge_multiplier is 1.0 if OK, 1.0 + BELOW_MIN_RADIUS_SURCHARGE if below minimum.
+    If requested_radius_mm is None, assumes standard radius (no surcharge).
+    """
+    if requested_radius_mm is None:
+        return False, 1.0
+    min_r = get_min_bend_radius_mm(material_name, thickness_mm)
+    if requested_radius_mm < min_r:
+        return True, 1.0 + BELOW_MIN_RADIUS_SURCHARGE
+    return False, 1.0
+
+
 # Die opening rule of thumb: V = 8 × T
 _DIE_OPENING_FACTOR = 8
 

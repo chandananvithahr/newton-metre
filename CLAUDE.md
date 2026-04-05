@@ -333,6 +333,7 @@ The original single-process CNC turning estimator. Monolithic `app.py` (1146 lin
 - **QA everything before deploy** — test all auth flows, redirects, nav states, empty/loading/error states. User should never find edge case bugs.
 - **Copy rules** — never say "physics" or show formulas in user-facing copy. Sell the answer, not the method. Multi-audience positioning (procurement, design, QA, leadership). Similarity search = "knowledge as asset" (CADDi-inspired), must appear in 3+ places.
 - **Verify file writes** — after writing session/save files, always `ls -la` to confirm they exist. User burned by phantom saves.
+- **Save session verification** — after running `/save-session`, ALWAYS verify the session file was actually written to disk with `ls -la <filepath>`. If the file doesn't exist or is empty, re-save immediately. Never assume the write succeeded.
 
 ## Execution Discipline
 

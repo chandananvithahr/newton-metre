@@ -24,6 +24,8 @@ from engines.sheet_metal.cutting_db import (
 )
 from engines.sheet_metal.bending_db import (
     estimate_bending_cost,
+    check_bend_radius,
+    get_springback_deg,
     BEND_SETUP_FIRST_MIN,
 )
 
@@ -47,6 +49,15 @@ WELD_RATE_PER_M: dict[str, float] = {
 }
 WELD_SETUP_MIN = 20
 
+# Hardware insert rates: (cost_per_insert_inr, install_time_min)
+HARDWARE_RATES: dict[str, tuple[float, float]] = {
+    "pem_nut":   (8.0,  0.3),
+    "pem_stud":  (10.0, 0.3),
+    "rivnut":    (6.0,  0.5),
+    "standoff":  (12.0, 0.3),
+}
+HARDWARE_PRESS_RATE = 600  # ₹/hr for insertion press
+
 
 @dataclass(frozen=True)
 class SheetMetalCostLine:
@@ -65,6 +76,7 @@ class SheetMetalCostBreakdown:
     bending_cost: float
     welding_cost: float
     finish_cost: float
+    hardware_cost: float
     total_setup_cost: float
     total_labour_cost: float
     total_power_cost: float
@@ -87,12 +99,14 @@ def calculate_sheet_metal_cost(
     pierce_count: int,
     n_bends: int = 0,
     bend_length_mm: float | None = None,
+    bend_radius_mm: float | None = None,
     bend_complexity: str = "simple",
     n_tool_changes: int = 0,
     weld_type: str | None = None,
     weld_length_mm: float = 0,
     weld_spot_count: int = 0,
     finish_type: str = "none",
+    hardware_items: list[dict] | None = None,
     quantity: int = 1,
     has_tight_tolerances: bool = False,
 ) -> SheetMetalCostBreakdown:
@@ -163,10 +177,20 @@ def calculate_sheet_metal_cost(
         bending_setup_cost = setup_per_unit
         if has_tight_tolerances:
             bending_cost *= 1.30
+
+        # Bend radius validation — surcharge if below minimum
+        below_min, radius_mult = check_bend_radius(material_name, thickness_mm, bend_radius_mm)
+        bending_cost *= radius_mult
+        bending_setup_cost *= radius_mult
+
+        springback = get_springback_deg(material_name)
+        bend_desc = f"{n_bends} bends ({bend_complexity}), {bl:.0f}mm length"
+        if below_min:
+            bend_desc += f", tight radius (+20%)"
+        bend_desc += f", springback {springback:.1f}°"
+
         lines.append(SheetMetalCostLine(
-            "Bending",
-            f"{n_bends} bends ({bend_complexity}), {bl:.0f}mm length",
-            round(bending_cost, 2),
+            "Bending", bend_desc, round(bending_cost, 2),
         ))
 
     # --- Welding ---
@@ -197,6 +221,30 @@ def calculate_sheet_metal_cost(
             round(finish_cost, 2),
         ))
 
+    # --- Hardware Inserts ---
+    hardware_cost = 0.0
+    if hardware_items:
+        total_hw_material = 0.0
+        total_hw_time_min = 0.0
+        hw_desc_parts = []
+        for hw in hardware_items:
+            hw_type = hw.get("type", "pem_nut")
+            hw_qty = hw.get("quantity", 1)
+            if hw_type not in HARDWARE_RATES:
+                continue
+            cost_each, time_each = HARDWARE_RATES[hw_type]
+            total_hw_material += cost_each * hw_qty
+            total_hw_time_min += time_each * hw_qty
+            hw_desc_parts.append(f"{hw_qty}× {hw_type.replace('_', ' ')}")
+        hw_labour = (total_hw_time_min / 60) * HARDWARE_PRESS_RATE
+        hardware_cost = total_hw_material + hw_labour
+        if hw_desc_parts:
+            lines.append(SheetMetalCostLine(
+                "Hardware Inserts",
+                ", ".join(hw_desc_parts),
+                round(hardware_cost, 2),
+            ))
+
     # --- Setup (laser + bending) ---
     # Laser setup: 10 min per batch (program load, material load)
     laser_setup_per_unit = ((10 / 60) * LASER_MACHINE_RATE) / quantity
@@ -226,7 +274,7 @@ def calculate_sheet_metal_cost(
     # --- Totals ---
     subtotal = (
         material_cost + cutting_cost + bending_cost + welding_cost
-        + finish_cost + total_setup + labour_cost + power_cost
+        + finish_cost + hardware_cost + total_setup + labour_cost + power_cost
     )
     overhead = subtotal * (OVERHEAD_PCT / 100)
     profit = (subtotal + overhead) * (PROFIT_PCT / 100)
@@ -242,6 +290,7 @@ def calculate_sheet_metal_cost(
         bending_cost=round(bending_cost, 2),
         welding_cost=round(welding_cost, 2),
         finish_cost=round(finish_cost, 2),
+        hardware_cost=round(hardware_cost, 2),
         total_setup_cost=round(total_setup, 2),
         total_labour_cost=round(labour_cost, 2),
         total_power_cost=round(power_cost, 2),

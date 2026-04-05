@@ -84,10 +84,26 @@ async def embed_drawing(
     # Generate text description for BM25 hybrid search (non-blocking on failure)
     text_description = _describe_drawing(image_bytes)
 
-    # Parse key attributes from the text description for structured metadata
+    # Extract structured metadata (material, dimensions, processes) for ranker
     metadata = {"filename": file.filename}
     if text_description:
         metadata["description"] = text_description[:200]
+
+    try:
+        from extractors.vision import analyze_drawing
+        extracted = analyze_drawing(image_bytes, file.filename or "drawing.png")
+        dims = extracted.get("dimensions", {})
+        # Store only non-null dimension values
+        metadata["dimensions"] = {k: v for k, v in dims.items() if v}
+        metadata["material"] = extracted.get("material") or ""
+        metadata["processes"] = extracted.get("suggested_processes", [])
+        tol = extracted.get("tolerances", {})
+        if tol.get("tightest_tolerance_mm"):
+            metadata["tolerances"] = {"tightest_tolerance_mm": tol["tightest_tolerance_mm"]}
+        metadata["surface_finish_ra"] = 0.0  # TODO: extract Ra from drawing
+    except Exception as e:
+        logger.warning("Metadata extraction failed for %s (non-blocking): %s", file.filename, e)
+        # Non-blocking: embed works without metadata, ranker falls back to defaults
 
     sb = get_supabase_admin()
     result = sb.table("drawings").insert({
@@ -113,6 +129,7 @@ async def embed_drawing(
 async def search_similar(
     request: Request,
     file: UploadFile = File(...),
+    role: str = "default",
     user_id: str = Depends(get_current_user_id),
 ):
     if not check_budget():
@@ -137,17 +154,36 @@ async def search_similar(
     except Exception:
         raise HTTPException(status_code=500, detail="Failed to process drawing for search.")
 
+    # Extract query drawing metadata for ranker
+    query_material = ""
+    query_dimensions: dict = {}
+    query_processes: list[str] = []
+    query_tolerances: dict = {}
+    try:
+        from extractors.vision import analyze_drawing
+        extracted = analyze_drawing(image_bytes, file.filename or "drawing.png")
+        query_material = extracted.get("material") or ""
+        query_dimensions = {k: v for k, v in extracted.get("dimensions", {}).items() if v}
+        query_processes = extracted.get("suggested_processes", [])
+        tol = extracted.get("tolerances", {})
+        if tol.get("tightest_tolerance_mm"):
+            query_tolerances = {"tightest_tolerance_mm": tol["tightest_tolerance_mm"]}
+    except Exception as e:
+        logger.warning("Query metadata extraction failed (ranker will use defaults): %s", e)
+
     # Generate text description for hybrid BM25 search
     query_text = _describe_drawing(image_bytes)
 
     sb = get_supabase_admin()
 
-    # Use hybrid search (vector + BM25) when we have a text description, else vector-only
+    # Fetch 20 candidates from Supabase (over-fetch for re-ranking)
+    fetch_count = 20
+
     if query_text:
         result = sb.rpc("match_drawings_hybrid", {
             "query_embedding": query_embedding.tolist(),
             "query_text": query_text,
-            "match_count": 10,
+            "match_count": fetch_count,
             "p_user_id": user_id,
             "vector_weight": 0.7,
             "text_weight": 0.3,
@@ -155,24 +191,59 @@ async def search_similar(
     else:
         result = sb.rpc("match_drawings", {
             "query_embedding": query_embedding.tolist(),
-            "match_threshold": 0.3,
-            "match_count": 10,
+            "match_threshold": 0.2,
+            "match_count": fetch_count,
             "p_user_id": user_id,
         }).execute()
 
+    rows = result.data or []
+
+    if not rows:
+        log_usage(user_id, "similarity_search", 0.005, {"matches_found": 0})
+        return SimilaritySearchResponse(matches=[])
+
+    # Re-rank with multi-signal ranker (visual + material + dimension + process + tolerance + finish)
+    from engines.similarity.ranker import rank_candidates, PRESET_WEIGHTS
+
+    weights = PRESET_WEIGHTS.get(role, PRESET_WEIGHTS["default"])
+
+    candidates = []
+    for row in rows:
+        meta = row.get("metadata") or {}
+        meta["drawing_id"] = row["id"]
+        meta["text_description"] = row.get("text_description", "")
+        candidates.append((meta, row["similarity"]))
+
+    ranked = rank_candidates(
+        candidates=candidates,
+        query_material=query_material,
+        query_dimensions=query_dimensions,
+        query_processes=query_processes,
+        query_tolerances=query_tolerances,
+        top_k=10,
+        weights=weights,
+    )
+
     matches = [
         SimilarityMatch(
-            drawing_id=row["id"],
-            score=row["similarity"],
+            drawing_id=r.drawing_id,
+            score=r.combined_score,
             metadata={
-                **row.get("metadata", {}),
-                "text_description": row.get("text_description", ""),
+                **r.metadata,
+                "score_breakdown": {
+                    "visual": r.visual_score,
+                    "material": r.material_score,
+                    "dimension": r.dimension_score,
+                    "process": r.process_score,
+                    "tolerance": r.tolerance_score,
+                    "finish": r.finish_score,
+                },
             },
         )
-        for row in (result.data or [])
+        for r in ranked
     ]
 
-    log_usage(user_id, "similarity_search", 0.005, {"matches_found": len(matches)})
+    log_usage(user_id, "similarity_search", 0.005, {"matches_found": len(matches), "role": role})
 
     return SimilaritySearchResponse(matches=matches)
 

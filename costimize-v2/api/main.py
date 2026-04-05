@@ -9,7 +9,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
-from api.routes import agent, assembly, extract, estimate, material, mpn, similarity, estimates, usage, rfq, chat
+from api.routes import agent, assembly, extract, estimate, material, mpn, similarity, estimates, usage, rfq, chat, treatments
 
 logger = logging.getLogger("costimize")
 logging.basicConfig(level=logging.INFO)
@@ -62,6 +62,7 @@ app.include_router(estimates.router, prefix="/api")
 app.include_router(usage.router, prefix="/api")
 app.include_router(rfq.router, prefix="/api")
 app.include_router(chat.router, prefix="/api")
+app.include_router(treatments.router, prefix="/api")
 
 
 @app.get("/api/health")

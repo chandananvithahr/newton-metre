@@ -57,6 +57,34 @@ JOINING_METHODS: dict[str, dict] = {
         "time_per_joint_min": 10.0,
         "material_per_joint": 0.0,
     },
+    "brazing_torch": {
+        "label": "Torch Brazing",
+        "machine_rate_per_hr": 300,
+        "labour_rate_per_hr": 250,
+        "time_per_joint_min": 4.0,
+        "material_per_joint": 40.0,  # silver/copper filler rod + flux
+    },
+    "brazing_furnace": {
+        "label": "Furnace Brazing",
+        "machine_rate_per_hr": 800,
+        "labour_rate_per_hr": 250,
+        "time_per_joint_min": 8.0,
+        "material_per_joint": 25.0,  # pre-placed filler, less waste
+    },
+    "laser_welding": {
+        "label": "Laser Welding",
+        "machine_rate_per_hr": 2500,
+        "labour_rate_per_hr": 250,
+        "time_per_joint_min": 1.5,
+        "material_per_joint": 5.0,  # filler wire (optional)
+    },
+    "resistance_seam": {
+        "label": "Resistance Seam Welding",
+        "machine_rate_per_hr": 900,
+        "labour_rate_per_hr": 250,
+        "time_per_joint_min": 0.3,
+        "material_per_joint": 2.0,  # electrode wear
+    },
 }
 
 

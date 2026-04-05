@@ -310,6 +310,8 @@ export default function SimilarPartsPage() {
                   "";
                 const filename =
                   (m.metadata.filename as string) || m.drawing_id;
+                const breakdown = (m.metadata.score_breakdown || {}) as Record<string, number>;
+                const material = (m.metadata.material as string) || "";
 
                 return (
                   <div
@@ -332,15 +334,45 @@ export default function SimilarPartsPage() {
                           >
                             {filename}
                           </h3>
+                          {material && (
+                            <span className="text-[11px] px-2 py-0.5 rounded-full bg-[var(--color-surface-container-low)] text-[var(--color-text-muted)]" style={{ fontFamily: "var(--font-mono)" }}>
+                              {material}
+                            </span>
+                          )}
                         </div>
 
                         {description && (
                           <p
-                            className="text-[13px] text-[var(--color-text-description)] leading-relaxed mb-2 line-clamp-2"
+                            className="text-[13px] text-[var(--color-text-description)] leading-relaxed mb-2.5 line-clamp-2"
                             style={{ fontFamily: "var(--font-body)" }}
                           >
                             {description}
                           </p>
+                        )}
+
+                        {/* Score breakdown bars */}
+                        {Object.keys(breakdown).length > 0 && (
+                          <div className="flex gap-3 flex-wrap">
+                            {([
+                              ["visual", "Visual"],
+                              ["material", "Material"],
+                              ["dimension", "Dims"],
+                              ["process", "Process"],
+                              ["tolerance", "Tolerance"],
+                              ["finish", "Finish"],
+                            ] as const).map(([key, label]) => {
+                              const val = breakdown[key] ?? 0;
+                              const barColor = val >= 0.8 ? "bg-emerald-400" : val >= 0.5 ? "bg-amber-400" : "bg-gray-300";
+                              return (
+                                <div key={key} className="flex items-center gap-1.5">
+                                  <span className="text-[10px] text-[var(--color-text-muted)] w-[52px]" style={{ fontFamily: "var(--font-mono)" }}>{label}</span>
+                                  <div className="w-[40px] h-[4px] bg-black/5 rounded-full overflow-hidden">
+                                    <div className={`h-full rounded-full ${barColor}`} style={{ width: `${val * 100}%` }} />
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
                         )}
                       </div>
 

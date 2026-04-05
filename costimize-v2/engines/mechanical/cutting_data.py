@@ -144,6 +144,12 @@ RA_CORRECTION_FACTOR: dict[str, float] = {
     "Copper": 1.15,
     "Cast Iron": 1.40,
     "Titanium Grade 5": 1.35,
+    "EN19 Steel": 1.28,
+    "Stainless Steel 316": 1.32,
+    "Aluminum 7075-T6": 1.18,
+    "SG Iron FCD500": 1.35,
+    "20MnCr5 Steel": 1.28,
+    "Inconel 718": 1.40,
 }
 
 # Surface roughness achievable by process (Ghosh & Mallik Table 4.17, μm Ra)
@@ -195,6 +201,12 @@ MILLING_SPECIFIC_ENERGY: dict[str, float] = {
     "Copper": 1.5,              # copper alloys range
     "Cast Iron": 2.5,           # CI: 1.5-3.5
     "Titanium Grade 5": 4.5,    # similar to hard steel
+    "EN19 Steel": 4.5,          # AISI 4140 ~BHN 248
+    "Stainless Steel 316": 4.8, # harder than 304 (Mo addition)
+    "Aluminum 7075-T6": 1.0,    # harder Al alloy
+    "SG Iron FCD500": 2.8,      # ductile iron, slightly harder than gray CI
+    "20MnCr5 Steel": 4.5,       # case-hardening steel, pre-hardened
+    "Inconel 718": 6.0,         # superalloy, very high specific energy
 }
 
 # Milling force coefficients A and k (Ghosh & Mallik Table 4.13)
@@ -209,6 +221,12 @@ MILLING_FORCE_COEFFICIENTS: dict[str, tuple[float, float]] = {
     "Copper": (400.0, 0.55),           # estimated
     "Stainless Steel 304": (1000.0, 1.00),  # between mild and alloy steel
     "Titanium Grade 5": (1100.0, 1.06),     # similar to alloy steel
+    "EN19 Steel": (1100.0, 1.06),           # AISI 4140, similar to EN24
+    "Stainless Steel 316": (1050.0, 1.02),  # slightly harder than 304
+    "Aluminum 7075-T6": (280.0, 0.42),      # harder Al, slightly higher than 6061
+    "SG Iron FCD500": (600.0, 0.75),        # ductile iron, between CI and mild steel
+    "20MnCr5 Steel": (1100.0, 1.06),        # alloy steel range
+    "Inconel 718": (1300.0, 1.15),           # superalloy, highest force coefficients
 }
 
 
@@ -423,6 +441,148 @@ CUTTING_DATA: dict[str, MaterialCuttingData] = {
         # Cross-validated: Sandvik S4=1500, r3ditor=1500,
         # Stephenson us=0.053-0.066. Ti is notoriously difficult.
         shear_stress=550.0,  # Ti-6Al-4V shear yield
+    ),
+    # --- Phase 2 materials (6 priority additions for defense/aero/auto) ---
+    "EN19 Steel": MaterialCuttingData(
+        turning=TurningParams(
+            vc_rough=130, vc_finish=170,
+            f_rough=0.22, f_finish=0.08,
+            ap_rough=1.5, ap_finish=0.25,
+        ),
+        milling=MillingParams(
+            vc_rough=110, vc_finish=150,
+            fz_rough=0.12, fz_finish=0.06,
+            ap_rough=2.0, ap_finish=0.3,
+            ae_ratio_rough=0.55, ae_ratio_finish=0.22,
+        ),
+        drilling=DrillingParams(vc=60, f_per_rev=0.14),
+        grinding=GrindingParams(
+            wheel_speed=28, infeed_rough=0.015, infeed_finish=0.004,
+            traverse_rate=0.9, sparkout_passes=3,
+        ),
+        kp=0.80, taylor_n=0.22, taylor_c=250,
+        kc1=1800, mc=0.25,
+        # EN19 = AISI 4140. P.N. Rao: V*T^0.22=475 for AISI 4140.
+        # Sandvik P2.1 range: 1700-1900. 1800 is midpoint.
+        shear_stress=700.0,  # 40Cr1Mo28 shear yield
+    ),
+    "Stainless Steel 316": MaterialCuttingData(
+        turning=TurningParams(
+            vc_rough=110, vc_finish=150,
+            f_rough=0.18, f_finish=0.08,
+            ap_rough=1.5, ap_finish=0.25,
+        ),
+        milling=MillingParams(
+            vc_rough=90, vc_finish=130,
+            fz_rough=0.10, fz_finish=0.05,
+            ap_rough=1.5, ap_finish=0.3,
+            ae_ratio_rough=0.50, ae_ratio_finish=0.20,
+        ),
+        drilling=DrillingParams(vc=45, f_per_rev=0.10),
+        grinding=GrindingParams(
+            wheel_speed=25, infeed_rough=0.012, infeed_finish=0.003,
+            traverse_rate=0.7, sparkout_passes=4,
+        ),
+        kp=0.82, taylor_n=0.21, taylor_c=180,
+        kc1=2100, mc=0.25,
+        # SS316 harder than 304 due to Mo. Sandvik M2=2100.
+        # Lower Vc than 304, worse machinability (0.36 vs 0.45).
+        shear_stress=520.0,  # austenitic SS with Mo
+    ),
+    "Aluminum 7075-T6": MaterialCuttingData(
+        turning=TurningParams(
+            vc_rough=380, vc_finish=480,
+            f_rough=0.28, f_finish=0.10,
+            ap_rough=2.5, ap_finish=0.3,
+        ),
+        milling=MillingParams(
+            vc_rough=320, vc_finish=420,
+            fz_rough=0.14, fz_finish=0.07,
+            ap_rough=3.0, ap_finish=0.5,
+            ae_ratio_rough=0.65, ae_ratio_finish=0.28,
+        ),
+        drilling=DrillingParams(vc=110, f_per_rev=0.18),
+        grinding=GrindingParams(
+            wheel_speed=30, infeed_rough=0.020, infeed_finish=0.005,
+            traverse_rate=1.4, sparkout_passes=2,
+        ),
+        kp=0.28, taylor_n=0.27, taylor_c=580,
+        kc1=750, mc=0.25,
+        # 7075-T6 slightly harder than 6061 (BHN 150 vs 95).
+        # Slightly lower speeds than 6061 due to higher strength.
+        shear_stress=330.0,  # Al 7075-T6 shear yield
+    ),
+    "SG Iron FCD500": MaterialCuttingData(
+        turning=TurningParams(
+            vc_rough=140, vc_finish=180,
+            f_rough=0.25, f_finish=0.10,
+            ap_rough=2.0, ap_finish=0.3,
+        ),
+        milling=MillingParams(
+            vc_rough=120, vc_finish=160,
+            fz_rough=0.14, fz_finish=0.07,
+            ap_rough=2.5, ap_finish=0.4,
+            ae_ratio_rough=0.60, ae_ratio_finish=0.25,
+        ),
+        drilling=DrillingParams(vc=75, f_per_rev=0.16),
+        grinding=GrindingParams(
+            wheel_speed=30, infeed_rough=0.020, infeed_finish=0.005,
+            traverse_rate=1.1, sparkout_passes=3,
+        ),
+        kp=0.60, taylor_n=0.25, taylor_c=220,
+        kc1=1300, mc=0.25,
+        # SG Iron (ductile iron): better machinability than gray CI,
+        # higher speeds due to nodular graphite. Sandvik K2 range.
+        shear_stress=420.0,  # FCD500 shear yield
+    ),
+    "20MnCr5 Steel": MaterialCuttingData(
+        turning=TurningParams(
+            vc_rough=120, vc_finish=160,
+            f_rough=0.20, f_finish=0.08,
+            ap_rough=1.5, ap_finish=0.25,
+        ),
+        milling=MillingParams(
+            vc_rough=100, vc_finish=140,
+            fz_rough=0.11, fz_finish=0.06,
+            ap_rough=1.5, ap_finish=0.3,
+            ae_ratio_rough=0.52, ae_ratio_finish=0.20,
+        ),
+        drilling=DrillingParams(vc=55, f_per_rev=0.12),
+        grinding=GrindingParams(
+            wheel_speed=28, infeed_rough=0.015, infeed_finish=0.003,
+            traverse_rate=0.8, sparkout_passes=4,
+        ),
+        kp=0.82, taylor_n=0.22, taylor_c=230,
+        kc1=1850, mc=0.25,
+        # 20MnCr5 = case-hardening steel for gears/shafts.
+        # Similar to EN24 in hardness but slightly better machinability
+        # before case hardening. Sandvik P2 range.
+        shear_stress=680.0,  # case-hardening steel (unhardened)
+    ),
+    "Inconel 718": MaterialCuttingData(
+        turning=TurningParams(
+            vc_rough=30, vc_finish=45,
+            f_rough=0.12, f_finish=0.05,
+            ap_rough=0.8, ap_finish=0.15,
+        ),
+        milling=MillingParams(
+            vc_rough=25, vc_finish=35,
+            fz_rough=0.06, fz_finish=0.03,
+            ap_rough=0.8, ap_finish=0.15,
+            ae_ratio_rough=0.35, ae_ratio_finish=0.12,
+        ),
+        drilling=DrillingParams(vc=15, f_per_rev=0.06),
+        grinding=GrindingParams(
+            wheel_speed=18, infeed_rough=0.008, infeed_finish=0.002,
+            traverse_rate=0.4, sparkout_passes=6,
+        ),
+        kp=0.80, taylor_n=0.15, taylor_c=70,
+        kc1=2400, mc=0.25,
+        # Inconel 718: nickel superalloy, extremely difficult to machine.
+        # Very low Taylor C (rapid tool wear), high specific cutting force.
+        # Sandvik S5=2200-2600. Requires ceramic/CBN tooling at higher speeds
+        # but Indian shops typically use coated carbide at conservative speeds.
+        shear_stress=650.0,  # Inconel 718 shear yield (aged condition)
     ),
 }
 

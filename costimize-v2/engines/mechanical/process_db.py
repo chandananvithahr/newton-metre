@@ -130,7 +130,9 @@ def estimate_process_time_min(
     height = dimensions.get("height_mm", 30)
     hole_dia = dimensions.get("hole_diameter_mm", 8)
     hole_count = dimensions.get("hole_count", 1)
-    hole_depth = dimensions.get("hole_depth_mm", 0) or length * 0.5
+    # Through-hole default: drill through the thinnest dimension (height for plates,
+    # length for shafts). min(height, length) handles both geometries correctly.
+    hole_depth = dimensions.get("hole_depth_mm", 0) or min(height, length)
     thread_length = dimensions.get("thread_length_mm", 20)
     thread_count = dimensions.get("thread_count", 1)
     thread_pitch = dimensions.get("thread_pitch_mm", 1.5)
@@ -190,8 +192,43 @@ def estimate_process_time_min(
         return _estimate_broaching(length)
 
     elif process_id == "heat_treatment":
-        weight_proxy = od * od * length / 1e6
-        return max(5.0, weight_proxy * 10)
+        # Real furnace cycles: soak time depends on cross-section thickness.
+        # Rule of thumb: 1 hour per 25mm of thickness for through-hardening
+        # (ASM Handbook Vol 4, AMS 2759). Minimum 45 min for any part.
+        # Use only explicitly-provided dimensions (not defaults) to avoid
+        # turned parts getting inflated by fallback width/height values.
+        section_candidates = [25.0]  # minimum assumed section
+        if dimensions.get("outer_diameter_mm", 0) > 0:
+            section_candidates.append(dimensions["outer_diameter_mm"])
+        if dimensions.get("width_mm", 0) > 0:
+            section_candidates.append(dimensions["width_mm"])
+        if dimensions.get("height_mm", 0) > 0:
+            section_candidates.append(dimensions["height_mm"])
+        max_section_mm = max(section_candidates)
+        soak_time_min = (max_section_mm / 25.0) * 60.0
+        # Add 15 min for load/heat-up + 15 min for quench/temper handling
+        return max(45.0, soak_time_min + 30.0)
+
+    elif process_id == "edm_wire":
+        return _estimate_edm_wire(dimensions, cd)
+
+    elif process_id == "edm_sinker":
+        return _estimate_edm_sinker(dimensions, cd)
+
+    elif process_id == "chamfering":
+        return _estimate_chamfering(dimensions)
+
+    elif process_id == "deburring":
+        return _estimate_deburring(dimensions)
+
+    elif process_id == "honing":
+        return _estimate_honing(id_mm, length)
+
+    elif process_id == "lapping":
+        return _estimate_lapping(surface_area)
+
+    elif process_id == "polishing":
+        return _estimate_polishing(surface_area)
 
     elif process_id.startswith("surface_treatment"):
         return max(2.0, surface_area / 50)
@@ -268,10 +305,10 @@ def _estimate_face_milling(length: float, width: float, m) -> float:
         m.vc_rough, m.fz_rough, FACE_MILL_TEETH, FACE_MILL_DIA_MM,
         ae, m.ap_rough,
     )
-    # Number of passes across width
-    n_stepover = max(1, math.ceil(width / ae))
     rough_vol = length * width * m.ap_rough
-    rough_time = rough_vol / max(rough_mrr, 1) * (n_stepover / max(n_stepover, 1))
+    # MRR includes ae (radial engagement), so vol/MRR naturally accounts for
+    # multiple passes across the width — no separate stepover factor needed.
+    rough_time = rough_vol / max(rough_mrr, 1)
 
     # Finishing pass (light cut)
     ae_fin = FACE_MILL_DIA_MM * m.ae_ratio_finish
@@ -445,3 +482,137 @@ def _estimate_broaching(length: float) -> float:
     cut_time = stroke / broach_speed
     return_time = stroke / (broach_speed * 3)  # fast return
     return (cut_time + return_time) * NON_CUT_TIME_FACTOR * 2  # safety factor
+
+
+# ---------------------------------------------------------------------------
+# Phase 2 process estimators: EDM, chamfering, deburring, honing, lapping, polishing
+# ---------------------------------------------------------------------------
+
+def _estimate_edm_wire(dimensions: dict, cd) -> float:
+    """Wire EDM: cutting time based on perimeter/profile length and thickness.
+
+    Wire speed: 3-5 mm/min for steel (slower for harder materials).
+    Scaled by machinability — harder material = slower wire speed.
+    """
+    # Cutting length: use perimeter of the profile to cut.
+    # For typical parts: approximate as 2*(length + width) or pi*od.
+    od = dimensions.get("outer_diameter_mm", 0)
+    length = dimensions.get("length_mm", 100)
+    width = dimensions.get("width_mm", 50)
+    height = dimensions.get("height_mm", 30)
+
+    if od > 0:
+        cutting_length_mm = math.pi * od
+    else:
+        cutting_length_mm = 2 * (length + width)
+
+    # Thickness = height or reasonable default
+    thickness_mm = dimensions.get("height_mm", 0) or dimensions.get("length_mm", 30)
+
+    # Wire speed: base 4 mm/min for mild steel, scaled by material difficulty
+    # kc1 as proxy: higher kc1 → harder → slower wire speed
+    kc1 = cd.kc1
+    base_speed = 4.0  # mm/min for mild steel (kc1=1650)
+    wire_speed = base_speed * (1650 / max(kc1, 500))
+
+    # Time = cutting_length / wire_speed
+    # Thicker material slows proportionally (rough: ×thickness/25 factor)
+    thickness_factor = max(1.0, thickness_mm / 25.0)
+    cut_time = (cutting_length_mm / max(wire_speed, 0.5)) * thickness_factor
+
+    return cut_time * NON_CUT_TIME_FACTOR
+
+
+def _estimate_edm_sinker(dimensions: dict, cd) -> float:
+    """Sinker EDM: time based on volume to erode.
+
+    Erosion rate: ~50 mm³/min for steel, scaled by material.
+    """
+    od = dimensions.get("outer_diameter_mm", 0)
+    length = dimensions.get("length_mm", 100)
+    width = dimensions.get("width_mm", 50)
+    height = dimensions.get("height_mm", 30)
+    pocket_depth = dimensions.get("pocket_depth_mm", 0) or height * 0.3
+
+    if od > 0:
+        # Approximate cavity as cylindrical bore
+        cavity_dia = od * 0.3
+        volume_mm3 = math.pi * (cavity_dia / 2) ** 2 * pocket_depth
+    else:
+        # Rectangular cavity
+        volume_mm3 = width * 0.5 * length * 0.5 * pocket_depth
+
+    # Erosion rate: base 50 mm³/min for mild steel
+    kc1 = cd.kc1
+    base_rate = 50.0
+    erosion_rate = base_rate * (1650 / max(kc1, 500))
+
+    cut_time = volume_mm3 / max(erosion_rate, 1.0)
+    return cut_time * NON_CUT_TIME_FACTOR
+
+
+def _estimate_chamfering(dimensions: dict) -> float:
+    """Chamfering: time per edge/hole. ~0.15 min per chamfer point.
+
+    Edge count approximated from geometry: holes + 2 (top/bottom edges).
+    """
+    hole_count = dimensions.get("hole_count", 0)
+    # Each hole has 2 chamfers (entry + exit), plus 2 for part edges
+    edge_count = hole_count * 2 + 2
+    return edge_count * 0.15 * NON_CUT_TIME_FACTOR
+
+
+def _estimate_deburring(dimensions: dict) -> float:
+    """Deburring: time proportional to perimeter of machined edges.
+
+    Rate: ~500 mm/min manual deburring, ~1000 mm/min tumble.
+    Using manual rate as default (more common in Indian shops).
+    """
+    od = dimensions.get("outer_diameter_mm", 0)
+    length = dimensions.get("length_mm", 100)
+    width = dimensions.get("width_mm", 50)
+
+    if od > 0:
+        perimeter_mm = math.pi * od + 2 * length
+    else:
+        perimeter_mm = 2 * (length + width)
+
+    deburr_rate = 500.0  # mm/min
+    return (perimeter_mm / deburr_rate) * NON_CUT_TIME_FACTOR
+
+
+def _estimate_honing(bore_dia: float, bore_depth: float) -> float:
+    """Honing: precision bore finishing with reciprocating abrasive stones.
+
+    Stroke rate ~40 strokes/min, 0.01mm stock removal per pass,
+    typically 3-5 passes. Time = bore_depth / (stroke_rate × stroke_length) × passes.
+    """
+    if bore_dia <= 0:
+        return 2.0 * NON_CUT_TIME_FACTOR
+
+    # Honing parameters
+    stroke_speed = 15.0  # m/min reciprocation speed
+    stock_per_pass = 0.005  # mm per pass (radius)
+    total_stock = 0.02  # mm total (radius) — typical finish allowance
+    n_passes = max(3, math.ceil(total_stock / stock_per_pass))
+
+    # Time per pass = bore_depth / stroke_speed (with overtravel)
+    stroke_length_m = (bore_depth * 1.3) / 1000  # 30% overtravel
+    time_per_pass = stroke_length_m / max(stroke_speed, 1) * 4  # 4 strokes per pass cycle
+    return time_per_pass * n_passes * NON_CUT_TIME_FACTOR
+
+
+def _estimate_lapping(surface_area_cm2: float) -> float:
+    """Lapping: ultra-precision flat surface finishing.
+
+    Rate: ~0.5 min per cm² for single-sided lapping.
+    """
+    return max(2.0, surface_area_cm2 * 0.5) * NON_CUT_TIME_FACTOR
+
+
+def _estimate_polishing(surface_area_cm2: float) -> float:
+    """Polishing: mirror finish surface treatment.
+
+    Rate: ~0.3 min per cm² for mechanical polishing.
+    """
+    return max(1.5, surface_area_cm2 * 0.3) * NON_CUT_TIME_FACTOR

@@ -24,6 +24,9 @@ class EstimateRequest(BaseModel):
     quantity: int = 1
     supplier_quote: float | None = None  # actual quote from supplier, for calibration tracking
     gdt_symbols: list[str] = []  # GD&T symbols from extraction, used for per-symbol cost surcharges
+    surface_treatment_id: str | None = None  # specific treatment from surface_treatment_db (e.g. "zinc_clear")
+    heat_treatment_id: str | None = None     # specific treatment from heat_treatment_db (e.g. "through_hardening")
+    machine_tier: str = "cnc_3axis"  # conventional, cnc_2axis, cnc_3axis, cnc_5axis, hmc
 
 
 class ProcessLine(BaseModel):
@@ -46,6 +49,9 @@ class EstimateResponse(BaseModel):
     total_tooling_cost: float
     total_labour_cost: float
     total_power_cost: float
+    surface_treatment_cost: float = 0.0
+    heat_treatment_cost: float = 0.0
+    machine_tier: str = "cnc_3axis"
     subtotal: float
     overhead: float
     profit: float

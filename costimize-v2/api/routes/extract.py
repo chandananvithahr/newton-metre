@@ -1,5 +1,7 @@
 """POST /api/extract -- upload drawing, AI extracts dimensions + processes."""
+import io
 import logging
+import zipfile
 from pathlib import Path
 from typing import List
 from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, Request, UploadFile
@@ -16,6 +18,8 @@ router = APIRouter()
 limiter = Limiter(key_func=get_remote_address)
 
 MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024  # 20 MB (CAD files can be larger)
+MAX_ZIP_SIZE_BYTES = 50 * 1024 * 1024   # 50 MB for assembly ZIPs
+MAX_ZIP_FILES = 20                       # max drawing files inside ZIP
 MAX_SHEETS = 5
 
 ALLOWED_CONTENT_TYPES = {
@@ -70,6 +74,46 @@ def _auto_embed_drawing(image_bytes: bytes, filename: str, user_id: str) -> None
         logger.warning("Auto-embed failed for '%s': %s", filename, e)
 
 
+def _extract_single_file(raw_bytes: bytes, filename: str, content_type: str | None = None) -> dict:
+    """Core extraction logic for a single drawing file.
+
+    Returns the raw result dict from the AI extractor.
+    Raises ValueError for bad input, RuntimeError for AI failures.
+    """
+    from extractors.vision import analyze_drawing, analyze_step_text
+    from extractors.cad_converter import dxf_to_text, step_to_text, is_dxf_dwg, is_step
+
+    if is_dxf_dwg(content_type, filename):
+        try:
+            cad_text = dxf_to_text(raw_bytes, filename)
+            return analyze_step_text(cad_text)
+        except (RuntimeError, Exception) as dwg_err:
+            logger.warning("DXF/DWG native extraction failed (%s), falling back to AI vision", dwg_err)
+            return analyze_drawing(raw_bytes, filename)
+    elif is_step(content_type, filename):
+        cad_text = step_to_text(raw_bytes)
+        return analyze_step_text(cad_text)
+    else:
+        return analyze_drawing(raw_bytes, filename)
+
+
+def _result_to_response(result: dict) -> ExtractionResponse:
+    """Convert raw extraction dict to ExtractionResponse."""
+    material = result.get("material")
+    overall_confidence = result.get("confidence", "low")
+    material_confidence = "low" if material is None else overall_confidence
+    return ExtractionResponse(
+        dimensions=result.get("dimensions", {}),
+        material=material,
+        material_confidence=material_confidence,
+        tolerances=result.get("tolerances", {}),
+        suggested_processes=result.get("suggested_processes", []),
+        gdt_symbols=result.get("gdt_symbols", []),
+        confidence=overall_confidence,
+        notes=result.get("notes", ""),
+    )
+
+
 @router.post("/extract", response_model=ExtractionResponse)
 @limiter.limit("10/minute")
 async def extract_drawing(
@@ -104,33 +148,14 @@ async def extract_drawing(
         raise HTTPException(status_code=400, detail="File too large. Maximum 20MB.")
 
     try:
-        from extractors.vision import analyze_drawing, analyze_step_text
-        from extractors.cad_converter import dxf_to_text, step_to_text, is_dxf_dwg, is_step
-
-        if is_dxf_dwg(file.content_type, filename):
-            try:
-                cad_text = dxf_to_text(raw_bytes, filename)
-                result = analyze_step_text(cad_text)   # same text AI path
-            except (RuntimeError, Exception) as dwg_err:
-                import logging
-                logging.getLogger(__name__).warning("DXF/DWG native extraction failed (%s), falling back to AI vision", dwg_err)
-                # Fallback: send raw bytes to AI vision (GPT-4o handles many binary formats)
-                result = analyze_drawing(raw_bytes, filename)
-        elif is_step(file.content_type, filename):
-            cad_text = step_to_text(raw_bytes)
-            result = analyze_step_text(cad_text)
-        else:
-            result = analyze_drawing(raw_bytes, filename)
-
+        result = _extract_single_file(raw_bytes, filename, file.content_type)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except RuntimeError as e:
-        import logging
-        logging.getLogger(__name__).exception("Extract RuntimeError: %s", e)
+        logger.exception("Extract RuntimeError: %s", e)
         raise HTTPException(status_code=500, detail="Failed to analyze drawing. Please try a clearer image.")
     except Exception as e:
-        import logging
-        logging.getLogger(__name__).exception("Extract failed: %s", e)
+        logger.exception("Extract failed: %s", e)
         raise HTTPException(
             status_code=500, detail="Failed to analyze drawing. Please try a clearer image.",
         )
@@ -140,20 +165,7 @@ async def extract_drawing(
     # Auto-embed into similarity index (background — doesn't block response)
     background_tasks.add_task(_auto_embed_drawing, raw_bytes, filename, user_id)
 
-    material = result.get("material")
-    overall_confidence = result.get("confidence", "low")
-    material_confidence = "low" if material is None else overall_confidence
-
-    return ExtractionResponse(
-        dimensions=result.get("dimensions", {}),
-        material=material,
-        material_confidence=material_confidence,
-        tolerances=result.get("tolerances", {}),
-        suggested_processes=result.get("suggested_processes", []),
-        gdt_symbols=result.get("gdt_symbols", []),
-        confidence=overall_confidence,
-        notes=result.get("notes", ""),
-    )
+    return _result_to_response(result)
 
 
 @router.post("/extract/multi", response_model=ExtractionResponse)
@@ -195,17 +207,94 @@ async def extract_multi_view_drawing(
 
     log_usage(user_id, "extract_multi", 0.004, {"sheet_count": len(files)})
 
-    material = result.get("material")
-    overall_confidence = result.get("confidence", "low")
-    material_confidence = "low" if material is None else overall_confidence
+    return _result_to_response(result)
 
-    return ExtractionResponse(
-        dimensions=result.get("dimensions", {}),
-        material=material,
-        material_confidence=material_confidence,
-        tolerances=result.get("tolerances", {}),
-        suggested_processes=result.get("suggested_processes", []),
-        gdt_symbols=result.get("gdt_symbols", []),
-        confidence=overall_confidence,
-        notes=result.get("notes", ""),
-    )
+
+@router.post("/extract/assembly-zip", response_model=list[ExtractionResponse])
+@limiter.limit("3/minute")
+async def extract_assembly_zip(
+    request: Request,
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(...),
+    user_id: str = Depends(get_current_user_id),
+) -> list[ExtractionResponse]:
+    """Extract dimensions from every drawing inside a ZIP file.
+
+    Accepts a ZIP containing PDF/PNG/JPEG/DXF/STEP files — one per component.
+    Returns an array of ExtractionResponse objects, one per file.
+    Files that fail extraction are included with confidence="failed" and error in notes.
+    """
+    if not check_budget():
+        raise HTTPException(status_code=429, detail="Service temporarily at capacity. Please try again tomorrow.")
+    if not check_user_budget(user_id):
+        raise HTTPException(status_code=429, detail="You've used your $0.50 credit for this period. Credits refresh every 48 hours.")
+
+    raw_bytes = await file.read()
+    if len(raw_bytes) > MAX_ZIP_SIZE_BYTES:
+        raise HTTPException(status_code=400, detail="ZIP too large. Maximum 50MB.")
+
+    try:
+        zf = zipfile.ZipFile(io.BytesIO(raw_bytes))
+    except zipfile.BadZipFile:
+        raise HTTPException(status_code=400, detail="Invalid ZIP file.")
+
+    # Filter to drawing files only (skip directories, __MACOSX, hidden files)
+    drawing_entries = []
+    for info in zf.infolist():
+        if info.is_dir():
+            continue
+        name = info.filename
+        if name.startswith("__MACOSX") or "/." in name or name.startswith("."):
+            continue
+        ext = Path(name).suffix.lower()
+        if ext in ALLOWED_EXTENSIONS:
+            drawing_entries.append(info)
+
+    if not drawing_entries:
+        raise HTTPException(status_code=400, detail="ZIP contains no supported drawing files (PDF, PNG, JPEG, DXF, STEP).")
+    if len(drawing_entries) > MAX_ZIP_FILES:
+        raise HTTPException(status_code=400, detail=f"Too many files. Maximum {MAX_ZIP_FILES} drawings per ZIP.")
+
+    responses: list[ExtractionResponse] = []
+    for info in drawing_entries:
+        member_bytes = zf.read(info.filename)
+        fname = Path(info.filename).name  # strip directory path
+        try:
+            result = _extract_single_file(member_bytes, fname)
+            resp = _result_to_response(result)
+            # Tag the filename in notes so frontend can match components
+            resp = ExtractionResponse(
+                dimensions=resp.dimensions,
+                material=resp.material,
+                material_confidence=resp.material_confidence,
+                tolerances=resp.tolerances,
+                suggested_processes=resp.suggested_processes,
+                gdt_symbols=resp.gdt_symbols,
+                confidence=resp.confidence,
+                notes=f"[{fname}] {resp.notes}" if resp.notes else fname,
+            )
+        except Exception as e:
+            logger.warning("Assembly ZIP: failed to extract '%s': %s", fname, e)
+            resp = ExtractionResponse(
+                dimensions={},
+                material=None,
+                material_confidence="low",
+                tolerances={},
+                suggested_processes=[],
+                gdt_symbols=[],
+                confidence="failed",
+                notes=f"[{fname}] Extraction failed: {e}",
+            )
+        responses.append(resp)
+
+    # Auto-embed each drawing in background
+    for info in drawing_entries:
+        member_bytes = zf.read(info.filename)
+        fname = Path(info.filename).name
+        background_tasks.add_task(_auto_embed_drawing, member_bytes, fname, user_id)
+
+    log_usage(user_id, "extract_assembly_zip", 0.002 * len(drawing_entries), {
+        "filename": file.filename, "drawing_count": len(drawing_entries),
+    })
+
+    return responses

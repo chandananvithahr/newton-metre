@@ -11,9 +11,12 @@ from engines.sheet_metal.bending_db import (
     calculate_bending_tonnage, select_press_brake_size,
     estimate_bending_time_min, estimate_bending_cost,
     calculate_bend_allowance,
+    get_min_bend_radius_mm, get_springback_deg, check_bend_radius,
+    MIN_BEND_RADIUS_FACTOR, SPRINGBACK_DEG,
 )
 from engines.sheet_metal.cost_engine import (
     calculate_sheet_metal_cost, SheetMetalCostBreakdown,
+    HARDWARE_RATES,
 )
 import math
 import pytest
@@ -275,3 +278,214 @@ def test_thicker_material_slower_cutting():
         cutting_length_mm=1000, pierce_count=5, quantity=100,
     )
     assert thick.cutting_cost > thin.cutting_cost * 2
+
+
+# --- Bend Radius Validation (Phase 3B) ---
+
+def test_min_bend_radius_mild_steel():
+    """2mm MS → min radius = 0.8 × 2 = 1.6mm."""
+    r = get_min_bend_radius_mm("Mild Steel CR", 2.0)
+    assert abs(r - 1.6) < 0.01
+
+
+def test_min_bend_radius_stainless():
+    """2mm SS304 → min radius = 1.0 × 2 = 2.0mm."""
+    r = get_min_bend_radius_mm("Stainless Steel 304", 2.0)
+    assert abs(r - 2.0) < 0.01
+
+
+def test_min_bend_radius_aluminum():
+    """3mm Al 5052 → min radius = 0.5 × 3 = 1.5mm."""
+    r = get_min_bend_radius_mm("Aluminum 5052", 3.0)
+    assert abs(r - 1.5) < 0.01
+
+
+def test_springback_values():
+    assert get_springback_deg("Mild Steel CR") == 2.0
+    assert get_springback_deg("Stainless Steel 304") == 3.0
+    assert get_springback_deg("Aluminum 5052") == 1.0
+    assert get_springback_deg("Copper") == 0.5
+
+
+def test_springback_default_unknown():
+    """Unknown material should get default 2.0°."""
+    assert get_springback_deg("Unobtanium") == 2.0
+
+
+def test_check_bend_radius_ok():
+    """2mm MS with 2.0mm radius (above 1.6mm min) → no surcharge."""
+    below, mult = check_bend_radius("Mild Steel CR", 2.0, 2.0)
+    assert not below
+    assert mult == 1.0
+
+
+def test_check_bend_radius_below_min():
+    """2mm MS with 1.0mm radius (below 1.6mm min) → 20% surcharge."""
+    below, mult = check_bend_radius("Mild Steel CR", 2.0, 1.0)
+    assert below
+    assert abs(mult - 1.20) < 0.01
+
+
+def test_check_bend_radius_none():
+    """None radius → no surcharge (standard assumed)."""
+    below, mult = check_bend_radius("Mild Steel CR", 2.0, None)
+    assert not below
+    assert mult == 1.0
+
+
+def test_all_materials_have_bend_data():
+    """Every sheet material should have min bend radius and springback entries."""
+    from engines.sheet_metal.material_db import SHEET_MATERIALS
+    for name in SHEET_MATERIALS:
+        assert name in MIN_BEND_RADIUS_FACTOR, f"Missing min bend radius for {name}"
+        assert name in SPRINGBACK_DEG, f"Missing springback for {name}"
+
+
+def test_cost_with_tight_bend_radius():
+    """Part with below-min bend radius should cost more than standard."""
+    standard = calculate_sheet_metal_cost(
+        material_name="Mild Steel CR", thickness_mm=2,
+        part_length_mm=300, part_width_mm=200,
+        cutting_length_mm=1000, pierce_count=5,
+        n_bends=4, bend_radius_mm=2.0, quantity=100,
+    )
+    tight = calculate_sheet_metal_cost(
+        material_name="Mild Steel CR", thickness_mm=2,
+        part_length_mm=300, part_width_mm=200,
+        cutting_length_mm=1000, pierce_count=5,
+        n_bends=4, bend_radius_mm=0.5, quantity=100,  # well below 1.6mm min
+    )
+    assert tight.bending_cost > standard.bending_cost
+    assert tight.unit_cost > standard.unit_cost
+
+
+def test_springback_in_bending_description():
+    """Bending line description should mention springback."""
+    result = calculate_sheet_metal_cost(
+        material_name="Stainless Steel 304", thickness_mm=2,
+        part_length_mm=300, part_width_mm=200,
+        cutting_length_mm=1000, pierce_count=5,
+        n_bends=4, quantity=100,
+    )
+    bend_lines = [l for l in result.lines if l.item == "Bending"]
+    assert len(bend_lines) == 1
+    assert "springback 3.0°" in bend_lines[0].description
+
+
+# --- Hardware Inserts (Phase 3C) ---
+
+def test_hardware_rates_exist():
+    """All four hardware types should be defined."""
+    assert "pem_nut" in HARDWARE_RATES
+    assert "pem_stud" in HARDWARE_RATES
+    assert "rivnut" in HARDWARE_RATES
+    assert "standoff" in HARDWARE_RATES
+
+
+def test_cost_with_hardware_inserts():
+    """Part with hardware inserts should cost more."""
+    no_hw = calculate_sheet_metal_cost(
+        material_name="Mild Steel CR", thickness_mm=2,
+        part_length_mm=300, part_width_mm=200,
+        cutting_length_mm=1000, pierce_count=5, quantity=100,
+    )
+    with_hw = calculate_sheet_metal_cost(
+        material_name="Mild Steel CR", thickness_mm=2,
+        part_length_mm=300, part_width_mm=200,
+        cutting_length_mm=1000, pierce_count=5,
+        hardware_items=[
+            {"type": "pem_nut", "quantity": 4},
+            {"type": "rivnut", "quantity": 2},
+        ],
+        quantity=100,
+    )
+    assert with_hw.hardware_cost > 0
+    assert with_hw.unit_cost > no_hw.unit_cost
+    assert no_hw.hardware_cost == 0
+
+
+def test_hardware_cost_calculation():
+    """Verify hardware cost math: 4 pem_nut (₹8 each + 0.3min) + 2 rivnut (₹6 each + 0.5min)."""
+    result = calculate_sheet_metal_cost(
+        material_name="Mild Steel CR", thickness_mm=2,
+        part_length_mm=300, part_width_mm=200,
+        cutting_length_mm=1000, pierce_count=5,
+        hardware_items=[
+            {"type": "pem_nut", "quantity": 4},
+            {"type": "rivnut", "quantity": 2},
+        ],
+        quantity=1,
+    )
+    # Material: 4×8 + 2×6 = 44
+    # Time: 4×0.3 + 2×0.5 = 2.2 min → (2.2/60) × 600 = 22
+    # Total: 44 + 22 = 66
+    assert abs(result.hardware_cost - 66.0) < 0.1
+
+
+def test_hardware_in_line_items():
+    """Hardware inserts should appear as a line item."""
+    result = calculate_sheet_metal_cost(
+        material_name="Mild Steel CR", thickness_mm=2,
+        part_length_mm=300, part_width_mm=200,
+        cutting_length_mm=1000, pierce_count=5,
+        hardware_items=[{"type": "standoff", "quantity": 6}],
+        quantity=100,
+    )
+    hw_lines = [l for l in result.lines if l.item == "Hardware Inserts"]
+    assert len(hw_lines) == 1
+    assert "6× standoff" in hw_lines[0].description
+
+
+def test_unknown_hardware_type_ignored():
+    """Unknown hardware types should be silently skipped."""
+    result = calculate_sheet_metal_cost(
+        material_name="Mild Steel CR", thickness_mm=2,
+        part_length_mm=300, part_width_mm=200,
+        cutting_length_mm=1000, pierce_count=5,
+        hardware_items=[{"type": "unknown_widget", "quantity": 10}],
+        quantity=100,
+    )
+    assert result.hardware_cost == 0
+
+
+# --- Assembly ZIP extraction (Phase 3A) ---
+
+_has_api_env = True
+try:
+    from api.routes.extract import _extract_single_file, _result_to_response
+except (KeyError, ImportError):
+    _has_api_env = False
+
+
+@pytest.mark.skipif(not _has_api_env, reason="API env vars not set")
+def test_extract_single_file_refactor():
+    """Verify _extract_single_file is importable and callable."""
+    assert callable(_extract_single_file)
+    assert callable(_result_to_response)
+
+
+@pytest.mark.skipif(not _has_api_env, reason="API env vars not set")
+def test_result_to_response_basic():
+    """_result_to_response should convert a dict to ExtractionResponse."""
+    result = {
+        "dimensions": {"od": 50, "length": 100},
+        "material": "Mild Steel",
+        "confidence": "high",
+        "tolerances": {},
+        "suggested_processes": ["turning"],
+        "gdt_symbols": [],
+        "notes": "Test",
+    }
+    resp = _result_to_response(result)
+    assert resp.material == "Mild Steel"
+    assert resp.confidence == "high"
+    assert resp.material_confidence == "high"
+
+
+@pytest.mark.skipif(not _has_api_env, reason="API env vars not set")
+def test_result_to_response_no_material():
+    """No material → material_confidence should be 'low'."""
+    result = {"dimensions": {}, "confidence": "medium"}
+    resp = _result_to_response(result)
+    assert resp.material is None
+    assert resp.material_confidence == "low"

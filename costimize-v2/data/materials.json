@@ -8,6 +8,12 @@
     {"name": "EN24 Steel", "price_per_kg_inr": 120, "density_kg_per_m3": 7850, "machinability": 0.45},
     {"name": "Copper", "price_per_kg_inr": 750, "density_kg_per_m3": 8960, "machinability": 0.7},
     {"name": "Cast Iron", "price_per_kg_inr": 55, "density_kg_per_m3": 7200, "machinability": 0.65},
-    {"name": "Titanium Grade 5", "price_per_kg_inr": 3500, "density_kg_per_m3": 4430, "machinability": 0.25}
+    {"name": "Titanium Grade 5", "price_per_kg_inr": 3500, "density_kg_per_m3": 4430, "machinability": 0.25},
+    {"name": "EN19 Steel", "price_per_kg_inr": 95, "density_kg_per_m3": 7850, "machinability": 0.45},
+    {"name": "Stainless Steel 316", "price_per_kg_inr": 350, "density_kg_per_m3": 8000, "machinability": 0.36},
+    {"name": "Aluminum 7075-T6", "price_per_kg_inr": 450, "density_kg_per_m3": 2810, "machinability": 0.75},
+    {"name": "SG Iron FCD500", "price_per_kg_inr": 70, "density_kg_per_m3": 7100, "machinability": 0.55},
+    {"name": "20MnCr5 Steel", "price_per_kg_inr": 110, "density_kg_per_m3": 7850, "machinability": 0.42},
+    {"name": "Inconel 718", "price_per_kg_inr": 5000, "density_kg_per_m3": 8190, "machinability": 0.15}
   ]
 }

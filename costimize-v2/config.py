@@ -34,6 +34,13 @@ MACHINE_RATES = {
     "surface_treatment_plating": 400,
     "surface_treatment_anodizing": 450,
     "surface_treatment_painting": 300,
+    "edm_wire": 1500,
+    "edm_sinker": 1200,
+    "chamfering": 600,
+    "deburring": 400,
+    "honing": 1400,
+    "lapping": 1000,
+    "polishing": 500,
 }
 
 # --- Mechanical: Setup Times (minutes per process) ---
@@ -56,6 +63,13 @@ SETUP_TIMES = {
     "surface_treatment_plating": 15,
     "surface_treatment_anodizing": 15,
     "surface_treatment_painting": 10,
+    "edm_wire": 45,
+    "edm_sinker": 30,
+    "chamfering": 10,
+    "deburring": 10,
+    "honing": 30,
+    "lapping": 20,
+    "polishing": 15,
 }
 
 # --- Mechanical: Power Consumption (kW per process) ---
@@ -78,6 +92,13 @@ POWER_CONSUMPTION = {
     "surface_treatment_plating": 2,
     "surface_treatment_anodizing": 3,
     "surface_treatment_painting": 1,
+    "edm_wire": 8,
+    "edm_sinker": 6,
+    "chamfering": 2,
+    "deburring": 1,
+    "honing": 5,
+    "lapping": 3,
+    "polishing": 2,
 }
 
 # --- Mechanical: Tooling Cost per Unit (₹) ---
@@ -100,6 +121,13 @@ TOOLING_COST_PER_UNIT = {
     "surface_treatment_plating": 0,
     "surface_treatment_anodizing": 0,
     "surface_treatment_painting": 0,
+    "edm_wire": 25,       # wire consumable per part
+    "edm_sinker": 30,     # electrode wear per part
+    "chamfering": 3,
+    "deburring": 2,
+    "honing": 15,         # abrasive stone wear
+    "lapping": 10,        # abrasive compound
+    "polishing": 5,       # polishing compound
 }
 
 # --- Mechanical: General ---
@@ -131,6 +159,24 @@ PROFIT_PCT = 20  # %
 # Real shops run at 65-85% of catalog cutting speeds (Practical Machining Data research).
 # 0.75 is the midpoint — parts take longer than catalog predicts.
 SHOP_FLOOR_EFFICIENCY = 0.75
+
+# Minimum per-part cycle time (minutes) AFTER shop efficiency.
+# Even a tiny part needs: load workpiece → indicate → cut → measure → unload.
+# Indian CNC shops: 30-60 sec minimum regardless of part size.
+MIN_CYCLE_TIME_MIN = 0.5  # 30 seconds absolute floor
+
+# --- Machine Tier Model ---
+# Indian shops have a wide range of equipment. The tier multipliers adjust
+# machine rate, cutting speed, and setup time relative to the CNC 3-axis baseline.
+# Sources: IndiaMART machine listings, Indian CNC shop rate surveys.
+MACHINE_TIERS = {
+    "conventional":  {"rate_mult": 0.45, "speed_mult": 0.50, "setup_mult": 2.0},  # manual lathe/mill ₹300-450/hr
+    "cnc_2axis":     {"rate_mult": 0.75, "speed_mult": 0.85, "setup_mult": 1.2},  # CNC lathe ₹500-700/hr
+    "cnc_3axis":     {"rate_mult": 1.00, "speed_mult": 1.00, "setup_mult": 1.0},  # VMC baseline ₹800-1100/hr
+    "cnc_5axis":     {"rate_mult": 2.00, "speed_mult": 1.15, "setup_mult": 1.5},  # 5-axis ₹1800-2500/hr
+    "hmc":           {"rate_mult": 1.80, "speed_mult": 1.10, "setup_mult": 1.3},  # HMC ₹1500-2000/hr
+}
+DEFAULT_MACHINE_TIER = "cnc_3axis"
 
 # Uncertainty band shown to users: ±15% for known materials, ±25% for dynamic AI-fetched materials.
 ESTIMATE_UNCERTAINTY_PCT = 10

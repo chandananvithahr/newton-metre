@@ -17,6 +17,13 @@
     {"id": "heat_treatment", "name": "Heat Treatment", "category": "treatment", "description": "Hardening, tempering, annealing"},
     {"id": "surface_treatment_plating", "name": "Plating", "category": "treatment", "description": "Chrome, nickel, zinc plating"},
     {"id": "surface_treatment_anodizing", "name": "Anodizing", "category": "treatment", "description": "Anodic oxide coating (aluminium)"},
-    {"id": "surface_treatment_painting", "name": "Painting", "category": "treatment", "description": "Paint/powder coating"}
+    {"id": "surface_treatment_painting", "name": "Painting", "category": "treatment", "description": "Paint/powder coating"},
+    {"id": "edm_wire", "name": "Wire EDM", "category": "machining", "description": "Wire electrical discharge machining for complex profiles"},
+    {"id": "edm_sinker", "name": "Sinker EDM", "category": "machining", "description": "Die-sinking EDM for cavities and complex 3D shapes"},
+    {"id": "chamfering", "name": "Chamfering", "category": "machining", "description": "Edge chamfers/bevels on holes and edges"},
+    {"id": "deburring", "name": "Deburring", "category": "finishing", "description": "Remove burrs from machined edges"},
+    {"id": "honing", "name": "Honing", "category": "finishing", "description": "Precision bore finishing with abrasive stones"},
+    {"id": "lapping", "name": "Lapping", "category": "finishing", "description": "Ultra-precision flat surface finishing"},
+    {"id": "polishing", "name": "Polishing", "category": "finishing", "description": "Mirror finish surface polishing"}
   ]
 }

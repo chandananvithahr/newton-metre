@@ -29,6 +29,12 @@ _MATERIAL_ALIASES: list[tuple[list[str], str]] = [
     (["cast iron", "grey iron", "gray iron", "ci "], "Cast Iron"),
     (["copper", "cu ", " cu", "electrolytic copper"], "Copper"),
     (["titanium", "ti ", " ti", "grade 5", "gr5", "gr.5", "ti-6al-4v", "ti6al4v"], "Titanium Grade 5"),
+    (["en19", "en 19", "4140", "aisi 4140", "aisi4140", "40cr1mo28", "alloy steel en19"], "EN19 Steel"),
+    (["ss316", "ss 316", "316", "aisi 316", "aisi316", "stainless 316"], "Stainless Steel 316"),
+    (["al7075", "al 7075", "7075", "al-7075", "aluminum 7075", "aluminium 7075", "7075-t6"], "Aluminum 7075-T6"),
+    (["sg iron", "sgi", "fcd500", "fcd 500", "ductile iron", "nodular iron", "spheroidal graphite"], "SG Iron FCD500"),
+    (["20mncr5", "20 mncr5", "5120", "aisi 5120", "case hardening steel"], "20MnCr5 Steel"),
+    (["inconel", "inconel 718", "in718", "alloy 718", "uns n07718", "nickel alloy"], "Inconel 718"),
 ]
 
 
@@ -90,6 +96,9 @@ async def create_estimate(
             )
 
     gdt_symbols = body.gdt_symbols or []
+    surface_treatment_id = body.surface_treatment_id
+    heat_treatment_id = body.heat_treatment_id
+    machine_tier = body.machine_tier or "cnc_3axis"
 
     try:
         from engines.validation.orchestrator import orchestrate
@@ -104,6 +113,9 @@ async def create_estimate(
             material_override=dynamic_material_obj,
             is_dynamic_material=dynamic_material_obj is not None,
             gdt_symbols=gdt_symbols,
+            surface_treatment_id=surface_treatment_id,
+            heat_treatment_id=heat_treatment_id,
+            machine_tier=machine_tier,
         )
     except ValueError as e:
         # Dimension validation or other input errors — return 400 with clear message
@@ -173,6 +185,9 @@ async def create_estimate(
         total_tooling_cost=breakdown.total_tooling_cost,
         total_labour_cost=breakdown.total_labour_cost,
         total_power_cost=breakdown.total_power_cost,
+        surface_treatment_cost=breakdown.surface_treatment_cost,
+        heat_treatment_cost=breakdown.heat_treatment_cost,
+        machine_tier=breakdown.machine_tier,
         subtotal=breakdown.subtotal,
         overhead=breakdown.overhead,
         profit=breakdown.profit,

@@ -59,6 +59,9 @@ def orchestrate(
     material_override=None,
     is_dynamic_material: bool = False,
     gdt_symbols: list[str] | None = None,
+    surface_treatment_id: str | None = None,
+    heat_treatment_id: str | None = None,
+    machine_tier: str = "cnc_3axis",
 ) -> ValidationResult:
     """The brain. Runs physics + Gemini in parallel, compares, routes to sub-agents.
 
@@ -99,6 +102,9 @@ def orchestrate(
             material_override=material_override,
             is_dynamic_material=is_dynamic_material,
             gdt_symbols=gdt_symbols or [],
+            surface_treatment_id=surface_treatment_id,
+            heat_treatment_id=heat_treatment_id,
+            machine_tier=machine_tier,
         )
         ai_result = None
 
