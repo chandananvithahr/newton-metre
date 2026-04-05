@@ -66,12 +66,79 @@ GROUND_TRUTHS = {
             "processes_not_empty": True,
         },
     },
+    # ── Complex drawings (ezdxf-generated, exact ground truth) ────────────────
+    "complex_shaft.dxf": {
+        "description": "5-step EN24 shaft: D80-D25, 280mm total, M30 thread, keyway, GD&T",
+        "file": Path(__file__).parent.parent.parent / "test-files/dxf/complex_shaft.dxf",
+        "format": "dxf",
+        "expected": {
+            "outer_diameter_mm": 80.0,      # largest journal diameter
+            "length_mm": 280.0,
+            "material": "EN24",             # substring match
+            "has_tight_tolerances": True,   # D45h6 = ±0.016mm
+            "processes_contains": ["turning"],
+            "processes_contains_any": ["threading", "heat_treatment", "grinding_cylindrical"],
+            "gdt_contains_any": ["cylindricity", "circularity", "circular_runout"],
+            "confidence_not": ["failed"],
+        },
+        "tolerances": {
+            "outer_diameter_mm": 0.10,
+            "length_mm": 0.10,
+        },
+    },
+    "bearing_housing.dxf": {
+        "description": "Cast Iron bearing housing 200x160x80mm, D75H7 bore, GD&T",
+        "file": Path(__file__).parent.parent.parent / "test-files/dxf/bearing_housing.dxf",
+        "format": "dxf",
+        "expected": {
+            # LWH axis assignment is non-deterministic for prismatic parts — use has_all_dims
+            # Each tuple: (expected_value, tolerance_fraction)
+            "has_all_dims": [(200.0, 0.10), (160.0, 0.10), (80.0, 0.15), (75.0, 0.10)],
+            "material": "Cast Iron",        # substring match
+            "has_tight_tolerances": True,   # D75H7 = +0.030/0
+            "processes_contains_any": ["boring", "milling_face", "drilling"],
+            "gdt_contains_any": ["perpendicularity", "true_position", "flatness"],
+            "confidence_not": ["failed"],
+        },
+    },
+    "gearbox_cover.dxf": {
+        "description": "SS304 sheet metal 300x200x2mm, 3 bends, 8xM6 holes, powder coat",
+        "file": Path(__file__).parent.parent.parent / "test-files/dxf/gearbox_cover.dxf",
+        "format": "dxf",
+        "expected": {
+            "has_all_dims": [(300.0, 0.15), (200.0, 0.15)],  # 2mm thickness often missed
+            "material": "304",              # substring — "Stainless Steel 304"
+            "processes_contains_any": ["milling_face", "drilling", "surface_treatment_painting"],
+            "confidence_not": ["failed"],
+        },
+    },
+    "hydraulic_manifold.dxf": {
+        "description": "Al 7075-T6 hydraulic manifold 150x100x80mm, G1/4 ports, hard anodize",
+        "file": Path(__file__).parent.parent.parent / "test-files/dxf/hydraulic_manifold.dxf",
+        "format": "dxf",
+        "expected": {
+            "has_all_dims": [(150.0, 0.15), (100.0, 0.15), (80.0, 0.15)],
+            "material": "7075",             # substring — "Aluminum 7075-T6"
+            "processes_contains_any": ["milling_face", "milling_pocket", "drilling", "surface_treatment_anodizing"],
+            "confidence_not": ["failed"],
+        },
+    },
+    "assembly_spindle.dxf": {
+        "description": "Assembly drawing: spindle+bearings+housing+locknut, BOM table",
+        "file": Path(__file__).parent.parent.parent / "test-files/dxf/assembly_spindle.dxf",
+        "format": "dxf",
+        "expected": {
+            "confidence_not": ["failed"],
+            "has_dimensions": True,
+            "processes_not_empty": True,
+        },
+    },
 }
 
 COL = {
-    "PASS": "\033[92m✓ PASS\033[0m",
-    "FAIL": "\033[91m✗ FAIL\033[0m",
-    "WARN": "\033[93m~ WARN\033[0m",
+    "PASS": "\033[92mPASS\033[0m",
+    "FAIL": "\033[91mFAIL\033[0m",
+    "WARN": "\033[93mWARN\033[0m",
 }
 
 
@@ -192,11 +259,46 @@ def _check(name: str, expected: dict, result: dict, tolerances: dict) -> list[di
         passed = len(processes) > 0
         record("processes", "non-empty", processes, passed)
 
+    # GD&T symbols — at least one must be present
+    if "gdt_contains_any" in expected:
+        gdt = result.get("gdt_symbols") or []
+        any_match = any(g in gdt for g in expected["gdt_contains_any"])
+        record("gdt (any)", expected["gdt_contains_any"], gdt, any_match)
+
+    # Inner diameter numeric check
+    if "inner_diameter_mm" in expected:
+        exp_val = expected["inner_diameter_mm"]
+        got_val = dims.get("inner_diameter_mm")
+        tol = tolerances.get("inner_diameter_mm", 0.10)
+        if got_val is None or got_val == 0:
+            record("inner_diameter_mm", f"{exp_val}mm", got_val, False, "not extracted")
+        else:
+            delta_pct = abs(got_val - exp_val) / exp_val
+            passed = delta_pct <= tol
+            record("inner_diameter_mm", f"{exp_val}mm", f"{got_val}mm", passed,
+                   f"delta {delta_pct*100:.1f}% (tol {tol*100:.0f}%)")
+
     # Has at least one dimension
     if "has_dimensions" in expected and expected["has_dimensions"]:
         non_zero = [k for k, v in dims.items() if v is not None and v != 0]
         passed = len(non_zero) > 0
         record("dimensions", "at least 1 non-zero", non_zero, passed)
+
+    # has_all_dims: verify a set of expected values appear in any dimension field (±tol)
+    # Used for prismatic parts where L/W/H axis assignment is non-deterministic
+    if "has_all_dims" in expected:
+        all_dim_values = [v for v in dims.values() if v is not None and v != 0]
+        missing = []
+        for exp_val, tol_pct in expected["has_all_dims"]:
+            found = any(
+                abs(got - exp_val) / exp_val <= tol_pct
+                for got in all_dim_values
+            )
+            if not found:
+                missing.append(exp_val)
+        passed = len(missing) == 0
+        record("all_dims_present", expected["has_all_dims"], all_dim_values, passed,
+               f"missing: {missing}" if missing else "")
 
     return checks
 
@@ -248,15 +350,15 @@ def _print_gemini_comparison(name: str, gt: dict, result: dict):
             tol = tolerances_field.get(field, 0.10)
             if got:
                 delta = abs(got - expected[field]) / expected[field] * 100
-                marker = "✓" if delta <= tol * 100 else "✗"
+                marker = "OK" if delta <= tol * 100 else "FAIL"
                 nm_rows.append(f"  {field}: {got}mm  (delta: {delta:.1f}%)  {marker}")
             else:
-                nm_rows.append(f"  {field}: NOT EXTRACTED  ✗")
+                nm_rows.append(f"  {field}: NOT EXTRACTED  FAIL")
 
     if "material" in expected:
         gt_rows.append(f"  material: {expected['material']} (from DXF text annotation)")
         mat = result.get("material") or "null"
-        marker = "✓" if expected["material"].lower() in mat.lower() else "✗"
+        marker = "OK" if expected["material"].lower() in mat.lower() else "FAIL"
         nm_rows.append(f"  material: {mat}  {marker}")
 
     print("\nGROUND TRUTH (DXF vector data — 100% accurate):")
@@ -315,9 +417,9 @@ def main():
 
     print(f"\n{'='*70}")
     if total_failures == 0:
-        print(f"\033[92m✓ ALL CHECKS PASSED\033[0m")
+        print(f"\033[92mALL CHECKS PASSED\033[0m")
     else:
-        print(f"\033[91m✗ {total_failures} CHECKS FAILED\033[0m")
+        print(f"\033[91m{total_failures} CHECKS FAILED\033[0m")
     print(f"{'='*70}\n")
 
     sys.exit(0 if total_failures == 0 else 1)
