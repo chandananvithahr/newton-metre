@@ -2,6 +2,7 @@
 import json
 import base64
 import logging
+from pathlib import Path
 from typing import Literal, Optional
 from pydantic import BaseModel, Field, field_validator
 from config import OPENAI_API_KEY, GEMINI_API_KEY
@@ -365,3 +366,40 @@ def _analyze_step_with_gemini(step_text: str) -> dict:
         generation_config={"max_output_tokens": 2000, "temperature": 0.0},
     )
     return _parse_and_validate(response.text.strip())
+
+
+def analyze_cad_file(file_bytes: bytes, filename: str) -> dict:
+    """Full pipeline entry point for DXF/DWG/STEP files.
+
+    Handles all fallback paths automatically:
+    1. DXF/DWG → ezdxf entity parse → AI text extraction (best)
+    2. DXF/DWG → ezdxf render → PNG → vision AI (when ezdxf can't entity-parse)
+    3. DXF/DWG → raw text grep → AI text extraction (last resort for corrupt files)
+    4. STEP → geometry analysis → AI text extraction
+    5. Image (PNG/JPG/PDF) → vision AI directly
+
+    This is the recommended API for all callers instead of calling dxf_to_text +
+    analyze_step_text separately.
+    """
+    from extractors.cad_converter import dxf_to_text, step_to_text, is_dxf_dwg, is_step
+    from extractors.cad_converter import DwgRenderFallback
+
+    ext = Path(filename).suffix.lower() if filename else ""
+
+    if is_step(file_bytes, filename):
+        cad_text = step_to_text(file_bytes)
+        return analyze_step_text(cad_text)
+
+    if is_dxf_dwg(file_bytes, filename):
+        try:
+            cad_text = dxf_to_text(file_bytes, filename)
+            return analyze_step_text(cad_text)
+        except DwgRenderFallback as rf:
+            # ezdxf couldn't entity-parse but rendered to PNG — use vision AI
+            logger.info("DWG/DXF: entity parse failed, using rendered PNG via vision AI")
+            return analyze_drawing(rf.png_bytes, filename + ".png")
+        except Exception as e:
+            raise RuntimeError(f"CAD extraction failed for {filename}: {e}") from e
+
+    # Images (PNG, JPG, PDF scan)
+    return analyze_drawing(file_bytes, filename)

@@ -584,6 +584,101 @@ _RE_RAW_DXF_SKIP = re.compile(
 )
 
 
+class DwgRenderFallback(Exception):
+    """Raised when ezdxf can't parse a DXF but we rendered it to PNG instead.
+
+    The .png_bytes attribute contains the rendered image for vision AI processing.
+    Callers (e.g. analyze_step_text wrapper) should catch this and call analyze_drawing().
+    """
+    def __init__(self, png_bytes: bytes):
+        super().__init__("DXF parsed via render fallback")
+        self.png_bytes = png_bytes
+
+
+def _render_dwg_via_svg(dxf_path: str) -> bytes:
+    """Convert DXF to SVG via LibreDWG dwg2svg, then SVG to PNG.
+
+    Used when ezdxf completely fails (Invalid Handle). dwg2svg reads the DWG/DXF
+    file directly using LibreDWG's own parser (different from ezdxf), so it
+    succeeds on files ezdxf rejects.
+
+    Requires: dwg2svg in PATH (built with LibreDWG) and cairosvg pip package.
+    Falls back to rsvg-convert if cairosvg not available.
+    Raises RuntimeError if neither tool is available.
+    """
+    dwg2svg_cmd = shutil.which("dwg2svg") or shutil.which("dwg2svg.exe")
+    if not dwg2svg_cmd:
+        raise RuntimeError("dwg2svg not available (not in PATH)")
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        svg_path = Path(tmpdir) / "out.svg"
+        result = subprocess.run(
+            [dwg2svg_cmd, "-o", str(svg_path), dxf_path],
+            capture_output=True, timeout=30,
+        )
+        if not svg_path.exists():
+            raise RuntimeError(f"dwg2svg produced no SVG output (exit {result.returncode})")
+
+        # Convert SVG to PNG
+        svg_bytes = svg_path.read_bytes()
+        return _svg_to_png(svg_bytes)
+
+
+def _svg_to_png(svg_bytes: bytes, width: int = 2400) -> bytes:
+    """Convert SVG bytes to PNG bytes. Tries cairosvg then rsvg-convert."""
+    # Try cairosvg (pip install cairosvg)
+    try:
+        import cairosvg
+        return cairosvg.svg2png(bytestring=svg_bytes, output_width=width)
+    except ImportError:
+        pass
+
+    # Try rsvg-convert (apt install librsvg2-bin)
+    rsvg = shutil.which("rsvg-convert")
+    if rsvg:
+        import io
+        result = subprocess.run(
+            [rsvg, "--width", str(width), "--format", "png"],
+            input=svg_bytes, capture_output=True, timeout=30,
+        )
+        if result.returncode == 0 and result.stdout:
+            return result.stdout
+
+    raise RuntimeError("No SVG→PNG converter available (install cairosvg or librsvg2-bin)")
+
+
+def _render_dxf_to_png(dxf_path: str, dpi: int = 200) -> bytes:
+    """Render a DXF file to PNG bytes using ezdxf's matplotlib backend.
+
+    Works on partially-corrupt DXF files that can't be entity-parsed.
+    Returns PNG bytes suitable for passing to the vision AI.
+    """
+    import io
+    import matplotlib
+    matplotlib.use("Agg")  # headless, no display needed
+    import matplotlib.pyplot as plt
+    from ezdxf import recover as ezdxf_recover
+    from ezdxf.addons.drawing import RenderContext, Frontend
+    from ezdxf.addons.drawing.matplotlib import MatplotlibBackend
+
+    doc, _ = ezdxf_recover.readfile(dxf_path)
+    msp = doc.modelspace()
+
+    fig = plt.figure(figsize=(16, 12))
+    ax = fig.add_axes([0, 0, 1, 1])
+    ctx = RenderContext(doc)
+    backend = MatplotlibBackend(ax)
+    Frontend(ctx, backend).draw_layout(msp, finalize=True)
+
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", dpi=dpi, bbox_inches="tight",
+                facecolor="white", edgecolor="none")
+    plt.close(fig)
+    buf.seek(0)
+    logger.info("DXF rendered to PNG via ezdxf matplotlib backend (%d bytes)", len(buf.getvalue()))
+    return buf.getvalue()
+
+
 def _dxf_raw_text_fallback(raw_dxf: str) -> str:
     """Last-resort DXF parser: scan raw DXF ENTITIES section for dimensions/annotations.
 
@@ -693,21 +788,41 @@ def dxf_to_text(file_bytes: bytes, filename: str = "drawing.dxf") -> str:
     try:
         doc = ezdxf.readfile(tmp_path)
     except Exception as exc:
-        # DWG-converted DXFs often have corrupt/invalid handles — use recovery mode
+        # DWG-converted DXFs often have corrupt/invalid handles — try recovery mode
+        recovered_doc = None
         try:
             from ezdxf import recover as ezdxf_recover
-            doc, _ = ezdxf_recover.readfile(tmp_path)
+            recovered_doc, _ = ezdxf_recover.readfile(tmp_path)
+            doc = recovered_doc
             logger.warning("DXF read with recovery mode (tolerant parsing): %s", exc)
         except Exception as exc2:
-            # Final fallback: raw text parsing for DXF files ezdxf can't handle at all
-            logger.warning("ezdxf recovery failed, using raw text fallback: %s", exc2)
+            # Recovery failed. Two paths:
+            # A) dwg2svg available → render to PNG → vision AI (best quality)
+            # B) Raw text fallback → partial extraction (always available)
+            logger.warning("ezdxf recovery failed (%s) — trying render/text fallback", exc2)
+
+            # Path A: render via dwg2svg → rsvg-convert / cairosvg
+            try:
+                png_bytes = _render_dwg_via_svg(tmp_path)
+                Path(tmp_path).unlink(missing_ok=True)
+                raise DwgRenderFallback(png_bytes) from exc2
+            except DwgRenderFallback:
+                raise  # pass to caller
+            except Exception as svg_exc:
+                logger.debug("dwg2svg render failed: %s", svg_exc)
+
+            # Path B: ezdxf render (only works if recovery gave us a doc)
+            # — skipped here since recovered_doc is None
+
+            # Path C: raw text grep
             try:
                 raw_text = Path(tmp_path).read_bytes().decode("latin-1", errors="replace")
+                Path(tmp_path).unlink(missing_ok=True)
                 return _dxf_raw_text_fallback(raw_text)
             except Exception:
                 pass
             Path(tmp_path).unlink(missing_ok=True)
-            raise RuntimeError(f"ezdxf failed to read file even in recovery mode: {exc2}") from exc2
+            raise RuntimeError(f"All DXF parsing strategies failed: {exc2}") from exc2
     finally:
         Path(tmp_path).unlink(missing_ok=True)
 
