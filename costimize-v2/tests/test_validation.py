@@ -72,6 +72,9 @@ def _make_physics_result(unit_cost: float = 820.0, material: str = "EN8 Steel") 
         overhead=17.95,
         profit=27.53,
         unit_cost=unit_cost,
+        unit_cost_low=round(unit_cost * 0.9),
+        unit_cost_high=round(unit_cost * 1.1),
+        uncertainty_pct=10,
         order_cost=unit_cost * 100,
         quantity=100,
     )

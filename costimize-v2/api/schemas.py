@@ -8,6 +8,7 @@ class ExtractionResponse(BaseModel):
     material_confidence: str  # "high" | "medium" | "low" — separate from overall drawing confidence
     tolerances: dict
     suggested_processes: list[str]
+    gdt_symbols: list[str] = []  # GD&T symbol names detected in the drawing
     confidence: str
     notes: str
 
@@ -22,6 +23,7 @@ class EstimateRequest(BaseModel):
     extracted_data: dict
     quantity: int = 1
     supplier_quote: float | None = None  # actual quote from supplier, for calibration tracking
+    gdt_symbols: list[str] = []  # GD&T symbols from extraction, used for per-symbol cost surcharges
 
 
 class ProcessLine(BaseModel):

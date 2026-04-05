@@ -103,5 +103,5 @@ def _classify_with_gemini(text: str) -> dict:
     genai.configure(api_key=GEMINI_API_KEY)
     model = genai.GenerativeModel("gemini-2.0-flash-lite")
     prompt = _CLASSIFY_PROMPT.format(text=text)
-    response = model.generate_content(prompt, generation_config={"max_output_tokens": 200})
+    response = model.generate_content(prompt, generation_config={"max_output_tokens": 200, "temperature": 0.0})
     return _parse_classification(response.text.strip())

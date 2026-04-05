@@ -102,7 +102,7 @@ def estimate_cost_from_drawing(
 
     response = model.generate_content(
         [prompt, {"mime_type": "image/png", "data": image_bytes}],
-        generation_config={"max_output_tokens": 2000},
+        generation_config={"max_output_tokens": 2000, "temperature": 0.0},
     )
 
     text = response.text.strip()

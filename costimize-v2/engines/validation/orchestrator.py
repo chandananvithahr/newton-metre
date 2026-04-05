@@ -58,6 +58,7 @@ def orchestrate(
     round_number: int = 1,
     material_override=None,
     is_dynamic_material: bool = False,
+    gdt_symbols: list[str] | None = None,
 ) -> ValidationResult:
     """The brain. Runs physics + Gemini in parallel, compares, routes to sub-agents.
 
@@ -85,6 +86,7 @@ def orchestrate(
         physics_result, ai_result = _run_parallel(
             image_bytes, dimensions, material_name,
             selected_processes, quantity, has_tight_tolerances,
+            gdt_symbols=gdt_symbols or [],
         )
     else:
         # No image = manual entry, skip Gemini validation
@@ -96,6 +98,7 @@ def orchestrate(
             has_tight_tolerances=has_tight_tolerances,
             material_override=material_override,
             is_dynamic_material=is_dynamic_material,
+            gdt_symbols=gdt_symbols or [],
         )
         ai_result = None
 
@@ -188,6 +191,7 @@ def _run_parallel(
     selected_processes: list[str],
     quantity: int,
     has_tight_tolerances: bool,
+    gdt_symbols: list[str] | None = None,
 ) -> tuple[MechanicalCostBreakdown, GeminiCostEstimate | None]:
     """Run physics engine and Gemini estimator in parallel using ThreadPoolExecutor."""
     with ThreadPoolExecutor(max_workers=2) as executor:
@@ -198,6 +202,7 @@ def _run_parallel(
             selected_processes=selected_processes,
             quantity=quantity,
             has_tight_tolerances=has_tight_tolerances,
+            gdt_symbols=gdt_symbols or [],
         )
         gemini_future: Future[GeminiCostEstimate] = executor.submit(
             estimate_cost_from_drawing,

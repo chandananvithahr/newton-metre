@@ -44,7 +44,7 @@ def _describe_drawing(image_bytes: bytes) -> str:
                 "dimensions/proportions, and complexity. Be technical and precise.",
                 {"mime_type": "image/png", "data": image_bytes},
             ],
-            generation_config={"max_output_tokens": 300},
+            generation_config={"max_output_tokens": 300, "temperature": 0.0},
         )
         return response.text.strip()
     except Exception as e:

@@ -66,7 +66,7 @@ def _extract_gemini(pdf_bytes: bytes) -> list[dict]:
     model = genai.GenerativeModel("gemini-2.0-flash-lite")
     response = model.generate_content(
         [BOM_PROMPT, {"mime_type": "application/pdf", "data": pdf_bytes}],
-        generation_config={"max_output_tokens": 4000},
+        generation_config={"max_output_tokens": 4000, "temperature": 0.0},
     )
     text = response.text.strip()
     if text.startswith("```"):

@@ -15,8 +15,36 @@ import subprocess
 import tempfile
 import logging
 from pathlib import Path
+from typing import NamedTuple
 
 logger = logging.getLogger("costimize")
+
+
+# ── Regex patterns for TEXT-encoded dimensions ────────────────────────────────
+# Matches "D50", "Ø50", "d=50", "DIA 50"  → diameter
+_RE_TEXT_DIA = re.compile(
+    r"^(?:D|Ø|O|DIA\.?\s*|DIAM\.?\s*)(\d+(?:\.\d+)?)\s*(?:mm)?$",
+    re.IGNORECASE,
+)
+# Matches "R8", "r=8", "RAD 8" → radius
+_RE_TEXT_RAD = re.compile(
+    r"^(?:R|RAD\.?\s*)(\d+(?:\.\d+)?)\s*(?:mm)?$",
+    re.IGNORECASE,
+)
+# Matches thread callouts: "M8", "M12x1.5", "M8 THRU"
+_RE_TEXT_THREAD = re.compile(
+    r"^(M\d+(?:x[\d.]+)?(?:\s*THRU)?(?:\s*DEEP\s*\d+)?)",
+    re.IGNORECASE,
+)
+# Bare integer / decimal → likely linear dimension e.g. "40", "120.5"
+_RE_TEXT_LINEAR = re.compile(r"^(\d+(?:\.\d+)?)$")
+
+
+class _Entity(NamedTuple):
+    etype: str
+    x: float
+    y: float
+    value: float | str  # radius for circles; text string for TEXT
 
 
 # ── DWG → DXF conversion ────────────────────────────────────────────────────
@@ -99,16 +127,401 @@ def _dwg_to_dxf_bytes(file_bytes: bytes) -> bytes:
 
 # ── DXF / DWG direct extraction ───────────────────────────────────────────────
 
+def _detect_units(insunits: int | None, annotation_texts: list[str]) -> str:
+    """Resolve drawing units.
+
+    $INSUNITS=6 (meters) is the AutoCAD default when no units are set, but
+    virtually all mechanical drawings in Indian manufacturing are in mm.
+    If any annotation text contains 'mm' we trust that over the header value.
+    """
+    header_map = {
+        0: "unitless", 1: "inches", 2: "feet", 4: "mm",
+        5: "cm", 6: "m", 14: "dm",
+    }
+    header_unit = header_map.get(insunits or 0, f"code {insunits}")
+
+    joined = " ".join(annotation_texts).lower()
+    if "mm" in joined and header_unit != "mm":
+        logger.debug(
+            "Units header says '%s' but annotations contain 'mm' — overriding to mm",
+            header_unit,
+        )
+        return "mm"
+    return header_unit
+
+
+def _parse_text_dimension(text: str) -> tuple[str, float] | None:
+    """Parse a TEXT entity that encodes a dimension.
+
+    Returns (kind, value_mm) or None if not a dimension annotation.
+    kind is one of: 'diameter', 'radius', 'thread', 'linear'
+    """
+    t = text.strip()
+    m = _RE_TEXT_DIA.match(t)
+    if m:
+        return ("diameter", float(m.group(1)))
+    m = _RE_TEXT_RAD.match(t)
+    if m:
+        return ("radius", float(m.group(1)))
+    m = _RE_TEXT_THREAD.match(t)
+    if m:
+        return ("thread", 0.0)  # value not numeric; caller uses raw text
+    m = _RE_TEXT_LINEAR.match(t)
+    if m:
+        return ("linear", float(m.group(1)))
+    return None
+
+
+def _cluster_circles(
+    circle_entities: list[tuple[float, float, float]],  # (x, y, r)
+    main_bbox: tuple[float, float, float, float] | None,  # (xmin, xmax, ymin, ymax)
+) -> tuple[list[tuple[float, float, float]], list[tuple[float, float, float]]]:
+    """Split circles into (main_view, end_view) based on spatial position.
+
+    Circles that fall well outside the main LINE bounding box are placed in
+    the end/section view — they're a separate projected view, not geometry
+    to double-count.
+    """
+    if main_bbox is None or not circle_entities:
+        return circle_entities, []
+
+    xmin, xmax, ymin, ymax = main_bbox
+    margin_x = (xmax - xmin) * 0.5 if xmax > xmin else 50.0
+
+    main: list[tuple[float, float, float]] = []
+    end: list[tuple[float, float, float]] = []
+    for cx, cy, r in circle_entities:
+        if cx < xmin - margin_x or cx > xmax + margin_x:
+            end.append((cx, cy, r))
+        else:
+            main.append((cx, cy, r))
+    return main, end
+
+
+def _detect_centerline(line_entities: list[tuple[float, float, float, float]]) -> bool:
+    """Return True if a center line exists (long horizontal line with symmetric profile).
+
+    A rotational (turned) part has a horizontal axis line with LINE entities at
+    equal +d and -d offsets from it. A sheet metal bracket has asymmetric lines
+    and must NOT be flagged as rotational.
+
+    Algorithm:
+    1. Find candidate horizontal lines near the profile centroid.
+    2. For each candidate, collect the set of distinct y-values from all profile lines.
+    3. Check that at least one pair of y-values is symmetric about the candidate y.
+    """
+    if not line_entities:
+        return False
+    ys_all = [y for x1, y1, x2, y2 in line_entities for y in (y1, y2)]
+    if not ys_all:
+        return False
+    y_span = max(ys_all) - min(ys_all)
+    if y_span == 0:
+        return False
+    centroid_y = sum(ys_all) / len(ys_all)
+
+    # Unique y-levels present in the drawing
+    unique_ys = sorted(set(round(y, 2) for y in ys_all))
+
+    for x1, y1, x2, y2 in line_entities:
+        length = abs(x2 - x1)
+        if length == 0:
+            continue
+        if abs(y2 - y1) / length >= 0.05:  # must be nearly horizontal
+            continue
+        mid_y = (y1 + y2) / 2
+        if abs(mid_y - centroid_y) >= y_span * 0.15:
+            continue  # too far from centroid
+
+        # Check for at least one symmetric pair about this mid_y
+        tol = y_span * 0.05
+        for y in unique_ys:
+            if abs(y - mid_y) < tol:
+                continue  # skip the centerline itself
+            mirror = 2 * mid_y - y
+            if any(abs(uy - mirror) < tol for uy in unique_ys):
+                return True  # found symmetric pair → rotational
+
+    return False
+
+
+# GD&T symbol → canonical name mapping
+# Covers both Unicode symbols (from CAD exports) and ASCII text equivalents
+_GDT_SYMBOL_MAP: dict[str, str] = {
+    # Form
+    "○": "circularity", "⌭": "circularity", "⌒": "cylindricity",
+    "—": "straightness", "□": "flatness",
+    # Orientation
+    "⊥": "perpendicularity", "∠": "angularity", "//": "parallelism", "⫽": "parallelism",
+    # Location
+    "⌖": "true_position", "◎": "concentricity", "⌯": "symmetry",
+    # Runout
+    "↗": "circular_runout", "⌰": "total_runout",
+    # Profile
+    "⌓": "profile_of_surface", "⌒": "profile_of_line",
+    # ASCII fallbacks
+    "PERP": "perpendicularity", "PARA": "parallelism", "CIRC": "circularity",
+    "SYM": "symmetry", "POS": "true_position", "RUN": "circular_runout",
+    "CYL": "cylindricity", "FLAT": "flatness", "STR": "straightness",
+}
+
+# All known GD&T canonical names
+_ALL_GDT_NAMES = frozenset(_GDT_SYMBOL_MAP.values())
+
+# Regex: Feature Control Frame text — e.g. "⊥|0.02|A" or "//|0.05|A|B"
+_RE_FCF = re.compile(
+    r"([⊥∠//⫽⌖◎⌯↗⌰⌓○⌭⌒—□]|PERP|PARA|CIRC|SYM|POS|RUN|CYL|FLAT|STR)"
+    r"[\s|,]*([\d.]+)\s*(?:mm)?"
+    r"(?:[\s|,]+([A-Z]))?",
+    re.IGNORECASE,
+)
+
+# Layer name keywords that hint at which view an entity belongs to
+_VIEW_LAYER_KEYWORDS: dict[str, str] = {
+    "FRONT": "FRONT VIEW", "FVIEW": "FRONT VIEW",
+    "TOP": "TOP VIEW", "PLAN": "TOP VIEW",
+    "SIDE": "SIDE VIEW", "RIGHT": "RIGHT VIEW", "LEFT": "LEFT VIEW",
+    "ISO": "ISOMETRIC VIEW", "ISOMETRIC": "ISOMETRIC VIEW",
+    "SECTION": "SECTION VIEW", "SECT": "SECTION VIEW",
+    "DETAIL": "DETAIL VIEW", "DET": "DETAIL VIEW",
+    "AUX": "AUXILIARY VIEW",
+}
+
+# Cutting plane line type names that indicate section cuts
+_CUTTING_PLANE_LINETYPES = frozenset({
+    "DASHDOT", "DASHDOT2", "DASHDOTX2",
+    "CENTER", "CENTER2", "CENTERX2",
+    "PHANTOM", "PHANTOM2", "PHANTOMX2",
+    "CHAIN",
+})
+
+
+def _get_paperspace_views(doc) -> list[dict]:
+    """Parse paperspace viewports to get named views with modelspace bounding boxes.
+
+    Each viewport is a window into modelspace. By extracting the center and
+    dimensions of each viewport we can determine which modelspace entities
+    belong to which named view (front, top, section, etc.).
+
+    Returns list of dicts: {name, xmin, xmax, ymin, ymax}
+    """
+    views: list[dict] = []
+    try:
+        psp = doc.paperspace()
+        for i, vp in enumerate(psp.query("VIEWPORT")):
+            try:
+                cx = vp.dxf.view_center_point.x
+                cy = vp.dxf.view_center_point.y
+                vh = vp.dxf.view_height
+                # Compute modelspace width from paperspace aspect ratio
+                ps_w = getattr(vp.dxf, "width", vh)
+                ps_h = getattr(vp.dxf, "height", vh)
+                vw = vh * (ps_w / ps_h) if ps_h and ps_h > 0 else vh
+                # Try to get a meaningful view name from the layer
+                layer = (vp.dxf.get("layer", "") or "").upper()
+                name = f"VIEW_{i+1}"
+                for kw, label in _VIEW_LAYER_KEYWORDS.items():
+                    if kw in layer:
+                        name = label
+                        break
+                views.append({
+                    "name": name,
+                    "xmin": cx - vw / 2,
+                    "xmax": cx + vw / 2,
+                    "ymin": cy - vh / 2,
+                    "ymax": cy + vh / 2,
+                })
+            except Exception:
+                continue
+    except Exception:
+        pass
+    return views
+
+
+def _assign_view(x: float, y: float, viewports: list[dict]) -> str | None:
+    """Return the viewport name whose modelspace bounding box contains (x, y)."""
+    for vp in viewports:
+        if vp["xmin"] <= x <= vp["xmax"] and vp["ymin"] <= y <= vp["ymax"]:
+            return vp["name"]
+    return None
+
+
+def _detect_section_views(msp) -> list[dict]:
+    """Detect section views by finding HATCH entities and linking them to section labels.
+
+    Algorithm:
+    1. Find all HATCH entities (cross-hatching = cut material in section views).
+    2. Find all TEXT entities containing section-label patterns ("A-A", "SECTION A-A").
+    3. Find cutting plane lines (chain-dash linetypes).
+    4. Spatially link each HATCH to the nearest section label.
+
+    Returns list of dicts: {label, hatch_center, pattern, cutting_plane_found}
+    """
+    hatches: list[dict] = []
+    section_label_texts: list[tuple[str, float, float]] = []  # (text, x, y)
+    has_cutting_plane = False
+
+    _RE_SECTION_LABEL = re.compile(
+        r"(?:SECTION\s+)?([A-Z])\s*[-–]\s*([A-Z])\b|^([A-Z])-([A-Z])$",
+        re.IGNORECASE,
+    )
+
+    for entity in msp:
+        dtype = entity.dxftype()
+
+        if dtype == "HATCH":
+            try:
+                pattern = entity.dxf.get("pattern_name", "ANSI31")
+                # Approximate centroid from first boundary path
+                cx, cy = 0.0, 0.0
+                count = 0
+                for path in entity.paths:
+                    try:
+                        for vertex in path.vertices:
+                            cx += vertex[0]
+                            cy += vertex[1]
+                            count += 1
+                    except Exception:
+                        pass
+                if count > 0:
+                    hatches.append({
+                        "cx": cx / count,
+                        "cy": cy / count,
+                        "pattern": pattern,
+                        "label": None,
+                    })
+            except Exception:
+                pass
+
+        elif dtype in ("TEXT", "MTEXT"):
+            try:
+                val = (getattr(entity.dxf, "text", None) or "").strip()
+                val = re.sub(r"\\[A-Za-z][^;]*;", "", val).strip()
+                if _RE_SECTION_LABEL.search(val):
+                    pos = entity.dxf.get("insert", None) or entity.dxf.get("insert", None)
+                    if pos is not None:
+                        section_label_texts.append((val, pos.x, pos.y))
+            except Exception:
+                pass
+
+        elif dtype == "LINE":
+            try:
+                lt = (entity.dxf.get("linetype", "") or "").upper().replace(" ", "")
+                if any(k in lt for k in _CUTTING_PLANE_LINETYPES):
+                    has_cutting_plane = True
+            except Exception:
+                pass
+
+    # Link each hatch to the nearest section label
+    for hatch in hatches:
+        if not section_label_texts:
+            break
+        best_label, best_dist = None, float("inf")
+        for label_text, lx, ly in section_label_texts:
+            dist = ((hatch["cx"] - lx) ** 2 + (hatch["cy"] - ly) ** 2) ** 0.5
+            if dist < best_dist:
+                best_dist = dist
+                best_label = label_text
+        if best_dist < 500:  # within 500 drawing units — same view cluster
+            hatch["label"] = best_label
+
+    for hatch in hatches:
+        hatch["cutting_plane_found"] = has_cutting_plane
+
+    return hatches
+
+
+def _extract_gdt_from_texts(texts: list[str]) -> list[str]:
+    """Extract GD&T symbol names from raw text annotations.
+
+    Handles:
+    - Unicode GD&T symbols (⊥, ○, ⌖, etc.) from CAD exports
+    - Feature Control Frame patterns ("⊥|0.02|A")
+    - ASCII text equivalents ("PERP", "PARA")
+    - Note text ("perpendicularity 0.02 A")
+
+    Returns list of canonical GD&T names (e.g. ["perpendicularity", "circularity"])
+    """
+    found: set[str] = set()
+
+    # Extended name patterns in plain text
+    _GDT_TEXT_PATTERNS = {
+        r"\bperpendicular": "perpendicularity",
+        r"\bparallelism\b|\bparallel\b": "parallelism",
+        r"\bcircularity\b|\broundness\b": "circularity",
+        r"\bcylindricity\b": "cylindricity",
+        r"\bflatness\b": "flatness",
+        r"\bstraightness\b": "straightness",
+        r"\btrue.?position\b|\bposition.?tol": "true_position",
+        r"\bconcentricity\b": "concentricity",
+        r"\bsymmetry\b": "symmetry",
+        r"\brunout\b": "circular_runout",
+        r"\btotal.?runout\b": "total_runout",
+        r"\bprofile.?surface\b": "profile_of_surface",
+        r"\bangularity\b": "angularity",
+    }
+
+    for text in texts:
+        # Direct symbol lookup
+        for symbol, name in _GDT_SYMBOL_MAP.items():
+            if symbol in text:
+                found.add(name)
+
+        # FCF pattern match
+        for m in _RE_FCF.finditer(text):
+            sym = m.group(1)
+            canonical = _GDT_SYMBOL_MAP.get(sym, _GDT_SYMBOL_MAP.get(sym.upper()))
+            if canonical:
+                found.add(canonical)
+
+        # Plain-text pattern match
+        text_lower = text.lower()
+        for pattern, name in _GDT_TEXT_PATTERNS.items():
+            if re.search(pattern, text_lower):
+                found.add(name)
+
+    return sorted(found)
+
+
+def _group_entities_by_layer(msp) -> dict[str, list[str]]:
+    """Group entity types by layer, detecting named views from layer names.
+
+    Many real-world drawings use layers like 'FRONT_VIEW', 'SECTION_AA', 'TOP'.
+    This returns {view_label: [entity_type, ...]} for informational output.
+    """
+    layer_groups: dict[str, list[str]] = {}
+    for entity in msp:
+        try:
+            layer = (entity.dxf.get("layer", "0") or "0").upper()
+            dtype = entity.dxftype()
+            # Only emit if layer has a view-significant name
+            for kw, label in _VIEW_LAYER_KEYWORDS.items():
+                if kw in layer:
+                    layer_groups.setdefault(label, []).append(dtype)
+                    break
+        except Exception:
+            pass
+    return layer_groups
+
+
 def dxf_to_text(file_bytes: bytes, filename: str = "drawing.dxf") -> str:
     """Extract engineering data directly from DXF/DWG using ezdxf entity traversal.
 
     For DWG files, converts to DXF first using available system converters.
 
-    Collects:
-    - DIMENSION entities (exact numeric values with units)
-    - TEXT / MTEXT (annotations, title block, tolerances, notes)
-    - CIRCLE / ARC entities (radii → diameters)
-    - LEADER annotations
+    Improvements over naive entity dump:
+    - Units: cross-checks $INSUNITS against annotation text; overrides header
+      'meters' with 'mm' when annotations confirm mm (common AutoCAD default bug)
+    - TEXT dimensions: parses "D50", "R8", "M12x1.5", bare "40" into typed
+      dimension entries so the AI sees structured values, not raw strings
+    - Spatial clustering: circles far outside the main LINE bounding box are
+      identified as an end/section view — not double-counted as extra features
+    - Center line detection: long horizontal line through profile centroid
+      signals a rotational (turned) part
+    - Paperspace viewports: each entity is tagged with its named view
+    - Section view detection: HATCH + label linking + cutting plane lines
+    - Layer grouping: named view layers (FRONT, TOP, SECTION) surfaced explicitly
+    - GD&T extraction: Unicode symbols + FCF patterns + plain-text names
 
     Returns structured text the AI reads directly — no PNG, no quality loss.
     """
@@ -137,17 +550,25 @@ def dxf_to_text(file_bytes: bytes, filename: str = "drawing.dxf") -> str:
 
     sections: list[str] = ["=== DXF/DWG FILE CONTENTS ===", ""]
 
-    # Units
-    header = doc.header
-    insunits = header.get("$INSUNITS", None)
-    unit_label = {
-        0: "unitless", 1: "inches", 2: "feet", 4: "mm",
-        5: "cm", 6: "m", 14: "dm",
-    }.get(insunits, f"code {insunits}")
+    # ── Pass 1: collect all raw text for units cross-check ────────────────────
+    msp = doc.modelspace()
+    raw_texts: list[str] = []
+    for e in msp:
+        if e.dxftype() in ("TEXT", "MTEXT"):
+            try:
+                val = (getattr(e.dxf, "text", None) or "").strip()
+                if val:
+                    raw_texts.append(val)
+            except Exception:
+                pass
+
+    # Units (with annotation override)
+    insunits = doc.header.get("$INSUNITS", None)
+    unit_label = _detect_units(insunits, raw_texts)
     sections.append(f"UNITS: {unit_label}")
     sections.append("")
 
-    # Title block texts from named blocks
+    # ── Title block from named blocks ─────────────────────────────────────────
     title_texts: list[str] = []
     for block in doc.blocks:
         bname = block.name.upper()
@@ -163,11 +584,15 @@ def dxf_to_text(file_bytes: bytes, filename: str = "drawing.dxf") -> str:
             sections.append(f"  {t}")
         sections.append("")
 
-    msp = doc.modelspace()
-    dimensions: list[str] = []
-    texts: list[str] = []
-    circles: list[str] = []
+    # ── Pass 2: full entity traversal ─────────────────────────────────────────
+    dim_entities: list[str] = []
+    text_dims: list[str] = []        # parsed from TEXT entities
+    annotation_texts: list[str] = [] # informational text (not parseable as dims)
+    circle_raw: list[tuple[float, float, float]] = []  # (cx, cy, r)
+    arc_raw: list[tuple[float, float, float]] = []
+    line_raw: list[tuple[float, float, float, float]] = []  # (x1,y1,x2,y2)
     leaders: list[str] = []
+    hatch_count = 0
 
     for entity in msp:
         dtype = entity.dxftype()
@@ -182,9 +607,9 @@ def dxf_to_text(file_bytes: bytes, filename: str = "drawing.dxf") -> str:
                     entry = f"{type_label}: {val:.4f} {unit_label}"
                     if override and override != "<>":
                         entry += f"  [label: {override}]"
-                    dimensions.append(entry)
+                    dim_entities.append(entry)
                 elif override and override != "<>":
-                    dimensions.append(f"{type_label}: {override}")
+                    dim_entities.append(f"{type_label}: {override}")
             except Exception:
                 pass
 
@@ -193,22 +618,43 @@ def dxf_to_text(file_bytes: bytes, filename: str = "drawing.dxf") -> str:
                 val = (getattr(entity.dxf, "text", None) or "").strip()
                 val = re.sub(r"\\[A-Za-z][^;]*;", "", val)
                 val = re.sub(r"\{[^}]*\}", "", val).strip()
-                if val and len(val) > 1:
-                    texts.append(val)
+                if not val or len(val) < 1:
+                    continue
+                parsed = _parse_text_dimension(val)
+                if parsed:
+                    kind, num = parsed
+                    if kind == "thread":
+                        text_dims.append(f"thread callout: {val}")
+                    elif kind == "diameter":
+                        text_dims.append(f"diameter: {num:.4f} {unit_label}  [from text \"{val}\"]")
+                    elif kind == "radius":
+                        text_dims.append(f"radius: {num:.4f} {unit_label}  [from text \"{val}\"]")
+                    elif kind == "linear":
+                        text_dims.append(f"linear: {num:.4f} {unit_label}  [from text \"{val}\"]")
+                else:
+                    if len(val) > 1:
+                        annotation_texts.append(val)
             except Exception:
                 pass
 
         elif dtype == "CIRCLE":
             try:
-                r = entity.dxf.radius
-                circles.append(f"circle  r={r:.4f} {unit_label}  d={r*2:.4f} {unit_label}")
+                c = entity.dxf.center
+                circle_raw.append((c.x, c.y, entity.dxf.radius))
             except Exception:
                 pass
 
         elif dtype == "ARC":
             try:
-                r = entity.dxf.radius
-                circles.append(f"arc  r={r:.4f} {unit_label}  d={r*2:.4f} {unit_label}")
+                c = entity.dxf.center
+                arc_raw.append((c.x, c.y, entity.dxf.radius))
+            except Exception:
+                pass
+
+        elif dtype == "LINE":
+            try:
+                s, e2 = entity.dxf.start, entity.dxf.end
+                line_raw.append((s.x, s.y, e2.x, e2.y))
             except Exception:
                 pass
 
@@ -220,28 +666,135 @@ def dxf_to_text(file_bytes: bytes, filename: str = "drawing.dxf") -> str:
             except Exception:
                 pass
 
-    if dimensions:
-        sections.append(f"DIMENSIONS ({len(dimensions)} found):")
-        for d in dimensions:
+        elif dtype == "HATCH":
+            hatch_count += 1
+
+    # ── Spatial & structural analysis ────────────────────────────────────────
+
+    # Main LINE bounding box
+    main_bbox: tuple[float, float, float, float] | None = None
+    if line_raw:
+        xs = [x for x1, y1, x2, y2 in line_raw for x in (x1, x2)]
+        ys = [y for x1, y1, x2, y2 in line_raw for y in (y1, y2)]
+        main_bbox = (min(xs), max(xs), min(ys), max(ys))
+
+    # Cluster circles: main view vs end/section view
+    main_circles, end_circles = _cluster_circles(circle_raw, main_bbox)
+
+    # Center line → rotational symmetry hint
+    has_centerline = _detect_centerline(line_raw)
+
+    # Paperspace viewport → named view mapping
+    viewports = _get_paperspace_views(doc)
+
+    # Section views: HATCH + label linking
+    section_views = _detect_section_views(msp)
+
+    # Layer-based view grouping
+    layer_groups = _group_entities_by_layer(msp)
+
+    # GD&T symbols from all text
+    all_text_for_gdt = annotation_texts + [d for d in text_dims] + leaders
+    gdt_symbols = _extract_gdt_from_texts(all_text_for_gdt)
+
+    # ── Build output ──────────────────────────────────────────────────────────
+
+    # Named views from paperspace viewports
+    if viewports:
+        sections.append(f"NAMED VIEWS (from paperspace layout, {len(viewports)} viewports):")
+        for vp in viewports:
+            sections.append(
+                f"  {vp['name']}: modelspace region "
+                f"x=[{vp['xmin']:.1f}, {vp['xmax']:.1f}]  "
+                f"y=[{vp['ymin']:.1f}, {vp['ymax']:.1f}]"
+            )
+        sections.append("")
+
+    # Named views from layer names
+    if layer_groups:
+        sections.append("NAMED VIEWS (from layer names):")
+        for view_label, etypes in layer_groups.items():
+            from collections import Counter
+            counts = Counter(etypes)
+            summary = ", ".join(f"{k}×{v}" for k, v in counts.most_common(5))
+            sections.append(f"  {view_label}: {summary}")
+        sections.append("")
+
+    # Section views
+    if section_views:
+        sections.append(f"SECTION VIEWS DETECTED ({len(section_views)} cross-section(s)):")
+        for sv in section_views:
+            label_str = f" — labelled '{sv['label']}'" if sv["label"] else " — label not found"
+            cutting_str = " (cutting plane line present)" if sv["cutting_plane_found"] else ""
+            sections.append(
+                f"  Hatch centroid ({sv['cx']:.1f}, {sv['cy']:.1f}){label_str}{cutting_str}"
+            )
+            sections.append(
+                "  NOTE: Internal features (bores, slots, undercuts) are visible in this section."
+            )
+        sections.append("")
+
+    if dim_entities:
+        sections.append(f"DIMENSIONS ({len(dim_entities)} found):")
+        for d in dim_entities:
             sections.append(f"  {d}")
         sections.append("")
 
-    if circles:
-        sections.append(f"CIRCLES / ARCS ({len(circles)} found):")
-        for c in circles[:50]:
-            sections.append(f"  {c}")
+    if text_dims:
+        sections.append(f"DIMENSION ANNOTATIONS — parsed from text labels ({len(text_dims)} found):")
+        for d in text_dims:
+            sections.append(f"  {d}")
         sections.append("")
 
-    if texts:
-        sections.append(f"TEXT ANNOTATIONS ({len(texts)} found):")
-        for t in texts[:60]:
+    if gdt_symbols:
+        sections.append(f"GD&T SYMBOLS DETECTED ({len(gdt_symbols)} found):")
+        for sym in gdt_symbols:
+            sections.append(f"  {sym}")
+        sections.append("  NOTE: Each GD&T symbol increases precision machining cost.")
+        sections.append("")
+
+    if main_circles or arc_raw:
+        label = "CIRCLES / ARCS — MAIN VIEW"
+        if has_centerline:
+            label += " (rotational part — these are half-profiles; OD = largest diameter)"
+        entries = [f"circle  r={r:.4f} {unit_label}  d={r*2:.4f} {unit_label}" for _, _, r in main_circles]
+        entries += [f"arc  r={r:.4f} {unit_label}  d={r*2:.4f} {unit_label}" for _, _, r in arc_raw]
+        sections.append(f"{label} ({len(entries)} found):")
+        for e in entries[:50]:
+            sections.append(f"  {e}")
+        sections.append("")
+
+    if end_circles:
+        sections.append(
+            f"CIRCLES — END / SECTION VIEW "
+            f"({len(end_circles)} found, spatially separate from main profile):"
+        )
+        for _, _, r in sorted(end_circles, key=lambda t: t[2], reverse=True)[:20]:
+            sections.append(f"  circle  r={r:.4f} {unit_label}  d={r*2:.4f} {unit_label}")
+        sections.append("")
+
+    if hatch_count and not section_views:
+        # Only emit generic hatch count if detailed section detection didn't catch them
+        sections.append(
+            f"HATCH PATTERNS: {hatch_count} found — cross-section / sectional view present"
+        )
+        sections.append("")
+
+    if has_centerline:
+        sections.append("PART TYPE HINT: Center line detected — likely a rotational (turned) part.")
+        sections.append("  Profile lines represent HALF the cross-section, mirrored about the axis.")
+        sections.append("")
+
+    if annotation_texts:
+        sections.append(f"TEXT ANNOTATIONS ({len(annotation_texts)} found):")
+        for t in annotation_texts[:60]:
             sections.append(f"  {t}")
         sections.append("")
 
     if leaders:
         sections.append(f"LEADERS ({len(leaders)} found):")
-        for l in leaders[:20]:
-            sections.append(f"  {l}")
+        for ln in leaders[:20]:
+            sections.append(f"  {ln}")
         sections.append("")
 
     return "\n".join(sections)

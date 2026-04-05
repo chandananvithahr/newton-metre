@@ -71,6 +71,79 @@ class MechanicalCostBreakdown:
     quantity: int
 
 
+# ── GD&T symbol → cost surcharge table ───────────────────────────────────────
+# Each entry: (process_to_add_if_missing, machining_cost_multiplier, inspection_cost_inr)
+# Research basis: YOLOv11 + Donut pipeline (2025), Indian job shop rate survey
+#
+# multiplier applies to the TOTAL machining cost (not material).
+# process_to_add is injected into selected_processes if not already present.
+# inspection_cost is a flat per-unit cost for CMM / gauge inspection.
+
+_GDT_SURCHARGES: dict[str, dict] = {
+    # Form tolerances — require grinding or precision turning
+    "circularity":       {"add_process": "grinding_cylindrical", "multiplier": 1.35, "inspection_inr": 150},
+    "cylindricity":      {"add_process": "grinding_cylindrical", "multiplier": 1.40, "inspection_inr": 200},
+    "straightness":      {"add_process": None,                   "multiplier": 1.15, "inspection_inr": 100},
+    "flatness":          {"add_process": "grinding_surface",     "multiplier": 1.30, "inspection_inr": 150},
+    # Orientation tolerances
+    "perpendicularity":  {"add_process": "grinding_surface",     "multiplier": 1.30, "inspection_inr": 200},
+    "angularity":        {"add_process": None,                   "multiplier": 1.20, "inspection_inr": 150},
+    "parallelism":       {"add_process": "grinding_surface",     "multiplier": 1.25, "inspection_inr": 150},
+    # Location tolerances — require CMM inspection
+    "true_position":     {"add_process": None,                   "multiplier": 1.25, "inspection_inr": 400},
+    "concentricity":     {"add_process": "grinding_cylindrical", "multiplier": 1.35, "inspection_inr": 350},
+    "symmetry":          {"add_process": None,                   "multiplier": 1.20, "inspection_inr": 250},
+    # Runout — precision turning + balancing
+    "circular_runout":   {"add_process": "grinding_cylindrical", "multiplier": 1.35, "inspection_inr": 300},
+    "total_runout":      {"add_process": "grinding_cylindrical", "multiplier": 1.45, "inspection_inr": 400},
+    # Profile — complex surface control, may need 5-axis
+    "profile_of_surface":{"add_process": None,                   "multiplier": 1.60, "inspection_inr": 500},
+    "profile_of_line":   {"add_process": None,                   "multiplier": 1.40, "inspection_inr": 300},
+}
+
+
+def apply_gdt_surcharges(
+    machining_cost: float,
+    gdt_symbols: list[str],
+    selected_processes: list[str],
+    quantity: int,
+) -> tuple[float, float, list[str]]:
+    """Apply per-GD&T-symbol cost surcharges.
+
+    Returns (adjusted_machining_cost, inspection_cost_per_unit, updated_processes).
+
+    Rules:
+    - The highest multiplier among all detected symbols is applied (not compounded)
+      to avoid double-counting when multiple related symbols are present.
+    - Processes implied by GD&T (e.g. grinding for circularity) are added if absent.
+    - Inspection cost is amortized over quantity with a sample-inspection model:
+      Indian job shops inspect ~10% of batch (min 3 pieces) for GD&T compliance.
+      CMM/gauge cost is divided by sample size, so per-unit cost drops with quantity.
+    """
+    if not gdt_symbols:
+        return machining_cost, 0.0, selected_processes
+
+    max_multiplier = 1.0
+    total_inspection_batch = 0.0
+    updated_processes = list(selected_processes)
+
+    for sym in gdt_symbols:
+        rule = _GDT_SURCHARGES.get(sym)
+        if not rule:
+            continue
+        max_multiplier = max(max_multiplier, rule["multiplier"])
+        total_inspection_batch += rule["inspection_inr"]
+        if rule["add_process"] and rule["add_process"] not in updated_processes:
+            updated_processes.append(rule["add_process"])
+
+    # Sample inspection: inspect max(3, 10% of batch) pieces, amortize over full batch
+    sample_size = max(3, int(quantity * 0.10))
+    inspection_per_unit = (total_inspection_batch * sample_size) / quantity
+
+    adjusted_machining = machining_cost * max_multiplier
+    return adjusted_machining, inspection_per_unit, updated_processes
+
+
 def calculate_mechanical_cost(
     dimensions: dict,
     material_name: str,
@@ -79,6 +152,7 @@ def calculate_mechanical_cost(
     has_tight_tolerances: bool = False,
     material_override: "Material | None" = None,
     is_dynamic_material: bool = False,
+    gdt_symbols: list[str] | None = None,
 ) -> MechanicalCostBreakdown:
     material = material_override if material_override is not None else get_material(material_name)
     all_processes = load_processes()
@@ -86,9 +160,32 @@ def calculate_mechanical_cost(
     cd = get_cutting_data(material_name, machinability=material.machinability)
 
     # --- Raw Material Cost ---
-    od = dimensions.get("outer_diameter_mm", 0)
-    id_mm = dimensions.get("inner_diameter_mm", 0)
-    length = dimensions.get("length_mm", 0)
+    od = dimensions.get("outer_diameter_mm") or 0
+    id_mm = dimensions.get("inner_diameter_mm") or 0
+    length = dimensions.get("length_mm") or 0
+    width = dimensions.get("width_mm") or 0
+    height = dimensions.get("height_mm") or 0
+
+    MIN_DIM_MM = 5.0
+
+    # Prismatic (milled) parts have width/height but no OD.
+    # Derive a bounding cylinder so the existing volume calc still works.
+    if od < MIN_DIM_MM and width >= MIN_DIM_MM and height >= MIN_DIM_MM:
+        od = math.sqrt(width**2 + height**2)  # circumscribed cylinder
+
+    # Guard: reject if dimensions still too small (extraction likely failed)
+    if od < MIN_DIM_MM or length < MIN_DIM_MM:
+        raise ValueError(
+            f"Extracted dimensions too small or missing (OD={od:.1f}mm, L={length:.1f}mm). "
+            f"AI may have failed to read the drawing. Please re-upload a clearer image."
+        )
+
+    # Impossible geometry: bore cannot be larger than the part
+    if id_mm > 0 and id_mm >= od:
+        raise ValueError(
+            f"Inner diameter ({id_mm:.1f}mm) >= outer diameter ({od:.1f}mm). "
+            f"Check the drawing — bore cannot be larger than the part."
+        )
 
     bar_od_mm = od + MACHINING_ALLOWANCE_DIA_MM
     bar_len_mm = length + MACHINING_ALLOWANCE_LEN_MM
@@ -160,6 +257,17 @@ def calculate_mechanical_cost(
     total_labour = sum(p.labour_cost for p in process_lines)
     total_power = sum(p.power_cost for p in process_lines)
 
+    # GD&T surcharges: adjust machining cost + add inspection cost
+    gdt_inspection_cost = 0.0
+    if gdt_symbols:
+        original_machining = total_machining
+        total_machining, gdt_inspection_cost, selected_processes = apply_gdt_surcharges(
+            total_machining, gdt_symbols, selected_processes, quantity,
+        )
+        # Scale labour by the same ratio as machining (precision work needs more operator time)
+        if original_machining > 0:
+            total_labour = total_labour * (total_machining / original_machining)
+
     subtotal = (
         material_cost
         + total_machining
@@ -167,6 +275,7 @@ def calculate_mechanical_cost(
         + total_tooling
         + total_labour
         + total_power
+        + gdt_inspection_cost
     )
     overhead = subtotal * (OVERHEAD_PCT / 100)
     profit = (subtotal + overhead) * (PROFIT_PCT / 100)

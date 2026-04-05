@@ -150,6 +150,7 @@ async def extract_drawing(
         material_confidence=material_confidence,
         tolerances=result.get("tolerances", {}),
         suggested_processes=result.get("suggested_processes", []),
+        gdt_symbols=result.get("gdt_symbols", []),
         confidence=overall_confidence,
         notes=result.get("notes", ""),
     )
@@ -204,6 +205,7 @@ async def extract_multi_view_drawing(
         material_confidence=material_confidence,
         tolerances=result.get("tolerances", {}),
         suggested_processes=result.get("suggested_processes", []),
+        gdt_symbols=result.get("gdt_symbols", []),
         confidence=overall_confidence,
         notes=result.get("notes", ""),
     )

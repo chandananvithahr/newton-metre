@@ -35,6 +35,15 @@ class _Tolerances(BaseModel):
     tightest_tolerance_mm: Optional[float] = None
 
 
+_VALID_GDT = frozenset({
+    "circularity", "cylindricity", "straightness", "flatness",
+    "perpendicularity", "angularity", "parallelism",
+    "true_position", "concentricity", "symmetry",
+    "circular_runout", "total_runout",
+    "profile_of_surface", "profile_of_line",
+})
+
+
 class _ExtractionResult(BaseModel):
     part_type: Literal["turning", "milling", "general"] = "general"
     dimensions: _Dimensions = Field(default_factory=_Dimensions)
@@ -42,8 +51,18 @@ class _ExtractionResult(BaseModel):
     tolerances: _Tolerances = Field(default_factory=_Tolerances)
     surface_finish: Optional[str] = None
     suggested_processes: list[str] = Field(default_factory=list)
+    gdt_symbols: list[str] = Field(default_factory=list)
     confidence: Literal["high", "medium", "low"] = "low"
     notes: Optional[str] = None
+
+    @field_validator("gdt_symbols")
+    @classmethod
+    def _filter_gdt(cls, v: list[str]) -> list[str]:
+        valid = [g for g in v if g in _VALID_GDT]
+        invalid = set(v) - _VALID_GDT
+        if invalid:
+            logger.warning("LLM returned unknown GD&T symbols (stripped): %s", invalid)
+        return valid
 
     @field_validator("suggested_processes")
     @classmethod
@@ -98,6 +117,7 @@ Return a JSON object with these fields:
   },
   "surface_finish": "<Ra value or description, or null>",
   "suggested_processes": ["turning", "drilling", ...],
+  "gdt_symbols": ["perpendicularity", "circularity", ...],
   "confidence": "high" or "medium" or "low",
   "notes": "<any relevant observations>"
 }
@@ -112,6 +132,13 @@ CRITICAL:
   drilling, reaming, tapping, threading, grinding_cylindrical, grinding_surface,
   knurling, broaching, heat_treatment, surface_treatment_plating,
   surface_treatment_anodizing, surface_treatment_painting
+- For gdt_symbols, identify ALL GD&T (Geometric Dimensioning & Tolerancing) symbols present.
+  Look for feature control frames (boxes with symbols like ⊥ ○ // ⌖ ↗ etc), tolerance notes,
+  and any text like "perpendicularity", "circularity", "true position", "runout".
+  Valid symbol IDs: circularity, cylindricity, straightness, flatness,
+  perpendicularity, angularity, parallelism, true_position, concentricity, symmetry,
+  circular_runout, total_runout, profile_of_surface, profile_of_line
+  Return empty list [] if none found.
 
 Return ONLY the JSON object, no markdown fences or extra text."""
 
@@ -160,7 +187,7 @@ def _analyze_multi_with_gemini(images: list[bytes]) -> dict:
     for i, img in enumerate(images):
         parts.append(f"\n--- Sheet {i + 1} of {len(images)} ---\n")
         parts.append({"mime_type": "image/png", "data": img})
-    response = model.generate_content(parts, generation_config={"max_output_tokens": 2000})
+    response = model.generate_content(parts, generation_config={"max_output_tokens": 2000, "temperature": 0.0})
     text = response.text.strip()
     return _check_mismatch_and_parse(text)
 
@@ -177,6 +204,7 @@ def _analyze_multi_with_openai(images: list[bytes]) -> dict:
         model="gpt-4o",
         messages=[{"role": "user", "content": content}],
         max_tokens=2000,
+        temperature=0.0,
     )
     text = response.choices[0].message.content.strip()
     return _check_mismatch_and_parse(text)
@@ -220,6 +248,7 @@ def _analyze_with_openai(image_bytes: bytes) -> dict:
             {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{b64}"}},
         ]}],
         max_tokens=2000,
+        temperature=0.0,
     )
     text = response.choices[0].message.content.strip()
     return _parse_and_validate(text)
@@ -231,7 +260,7 @@ def _analyze_with_gemini(image_bytes: bytes) -> dict:
     model = genai.GenerativeModel("gemini-2.0-flash-lite")
     response = model.generate_content(
         [EXTRACTION_PROMPT, {"mime_type": "image/png", "data": image_bytes}],
-        generation_config={"max_output_tokens": 2000},
+        generation_config={"max_output_tokens": 2000, "temperature": 0.0},
     )
     text = response.text.strip()
     return _parse_and_validate(text)
@@ -276,6 +305,7 @@ def _analyze_step_with_openai(step_text: str) -> dict:
         model="gpt-4o",
         messages=[{"role": "user", "content": f"{STEP_EXTRACTION_PROMPT}\n\n{step_text}"}],
         max_tokens=2000,
+        temperature=0.0,
     )
     return _parse_and_validate(response.choices[0].message.content.strip())
 
@@ -286,6 +316,6 @@ def _analyze_step_with_gemini(step_text: str) -> dict:
     model = genai.GenerativeModel("gemini-2.0-flash-lite")
     response = model.generate_content(
         f"{STEP_EXTRACTION_PROMPT}\n\n{step_text}",
-        generation_config={"max_output_tokens": 2000},
+        generation_config={"max_output_tokens": 2000, "temperature": 0.0},
     )
     return _parse_and_validate(response.text.strip())

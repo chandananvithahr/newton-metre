@@ -89,6 +89,8 @@ async def create_estimate(
                 detail=f"Unknown material '{raw_material}' and automatic lookup failed. Please select a material manually.",
             )
 
+    gdt_symbols = body.gdt_symbols or []
+
     try:
         from engines.validation.orchestrator import orchestrate
 
@@ -101,7 +103,11 @@ async def create_estimate(
             has_tight_tolerances=has_tight,
             material_override=dynamic_material_obj,
             is_dynamic_material=dynamic_material_obj is not None,
+            gdt_symbols=gdt_symbols,
         )
+    except ValueError as e:
+        # Dimension validation or other input errors — return 400 with clear message
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         logger.exception("orchestrate() failed for user %s: %s", user_id, e)
         raise HTTPException(

@@ -117,7 +117,7 @@ def arbitrate(
     try:
         response = model.generate_content(
             [prompt],
-            generation_config={"max_output_tokens": 2000},
+            generation_config={"max_output_tokens": 2000, "temperature": 0.0},
         )
         text = response.text.strip()
         if text.startswith("```"):

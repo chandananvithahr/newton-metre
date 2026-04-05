@@ -10,13 +10,19 @@ const SUGGESTIONS = [
   "Compare turning vs milling costs",
 ];
 
-export function ChatPanel() {
+export function ChatPanel({ estimateId }: { estimateId?: string | null }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Reset chat session when estimate changes so context stays in sync
+  useEffect(() => {
+    setMessages([]);
+    setSessionId(null);
+  }, [estimateId]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -45,7 +51,7 @@ export function ChatPanel() {
     setMessages((prev) => [...prev, tempUserMsg]);
 
     try {
-      const resp = await sendChatMessage(msg, sessionId || undefined);
+      const resp = await sendChatMessage(msg, sessionId || undefined, estimateId || undefined);
       const assistantMsg: ChatMessage = {
         id: `resp-${Date.now()}`,
         role: "assistant",

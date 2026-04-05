@@ -70,7 +70,7 @@ def _count_tokens(text: str) -> int:
 
 
 def _get_estimate_context(estimate_id: str) -> str:
-    """Fetch estimate data from Supabase and format as context."""
+    """Fetch estimate data from Supabase and format as context for the chatbot."""
     try:
         sb = get_supabase_admin()
         resp = sb.table("estimates").select("*").eq("id", estimate_id).single().execute()
@@ -78,25 +78,76 @@ def _get_estimate_context(estimate_id: str) -> str:
         if not est:
             return ""
 
+        bd = est.get("cost_breakdown") or {}
+        extracted = est.get("extracted_data") or {}
+        dims = extracted.get("dimensions", {})
+
         lines = [
             "=== CURRENT ESTIMATE CONTEXT ===",
-            f"Part: {est.get('part_name', 'Unknown')}",
-            f"Material: {est.get('material_name', 'Unknown')}",
+            f"Part Type: {est.get('part_type', 'mechanical')}",
+            f"Material: {bd.get('material_name', est.get('material_name', 'Unknown'))}",
             f"Quantity: {est.get('quantity', 1)}",
+            f"Total Unit Cost: ₹{est.get('total_cost', 0):,.2f}",
+            f"Confidence: {est.get('confidence_tier', 'unknown')}",
         ]
 
-        result = est.get("result", {})
-        if isinstance(result, dict):
-            if result.get("unit_cost"):
-                lines.append(f"Unit Cost: ₹{result['unit_cost']:.2f}")
-            if result.get("material_cost"):
-                lines.append(f"Material Cost: ₹{result['material_cost']:.2f}")
-            if result.get("process_lines"):
-                lines.append("Process Breakdown:")
-                for p in result["process_lines"]:
-                    name = p.get("process", "?")
-                    cost = p.get("cost", 0)
-                    lines.append(f"  - {name}: ₹{cost:.2f}")
+        # Dimensions
+        if dims:
+            dim_parts = [f"{k}: {v}mm" for k, v in dims.items() if v]
+            if dim_parts:
+                lines.append(f"Dimensions: {', '.join(dim_parts)}")
+
+        # Cost breakdown line items
+        lines.append("")
+        lines.append("Cost Breakdown:")
+        if bd.get("material_cost"):
+            lines.append(f"  Material: ₹{bd['material_cost']:,.2f}")
+        if bd.get("total_machining_cost"):
+            lines.append(f"  Machining: ₹{bd['total_machining_cost']:,.2f}")
+        if bd.get("total_setup_cost"):
+            lines.append(f"  Setup & Tooling: ₹{bd['total_setup_cost']:,.2f}")
+        if bd.get("total_labour_cost"):
+            lines.append(f"  Labour: ₹{bd['total_labour_cost']:,.2f}")
+        if bd.get("total_power_cost"):
+            lines.append(f"  Power: ₹{bd['total_power_cost']:,.2f}")
+        if bd.get("overhead"):
+            lines.append(f"  Overhead (15%): ₹{bd['overhead']:,.2f}")
+        if bd.get("profit"):
+            lines.append(f"  Profit (20%): ₹{bd['profit']:,.2f}")
+
+        # Process details
+        process_lines = bd.get("process_lines", [])
+        if process_lines:
+            lines.append("")
+            lines.append("Process Details:")
+            for p in process_lines:
+                name = p.get("process_name", p.get("process_id", "?"))
+                time_min = p.get("time_min", 0)
+                machine = p.get("machine_cost", 0)
+                lines.append(f"  - {name}: {time_min:.1f} min, machine ₹{machine:,.2f}")
+
+        # Cost range
+        if bd.get("unit_cost_low") and bd.get("unit_cost_high"):
+            lines.append(f"\nShould-Cost Range: ₹{bd['unit_cost_low']:,.0f} – ₹{bd['unit_cost_high']:,.0f}")
+
+        # Supplier quote comparison
+        if bd.get("supplier_quote"):
+            lines.append(f"Supplier Quote: ₹{bd['supplier_quote']:,.2f}")
+
+        # Assembly estimates have component-level breakdown
+        components = bd.get("components")
+        if components:
+            lines.append("")
+            lines.append("Assembly Components:")
+            for comp in components:
+                lines.append(
+                    f"  - {comp.get('name', '?')}: {comp.get('material_name', '?')}, "
+                    f"₹{comp.get('unit_cost', 0):,.2f}/unit"
+                )
+            if bd.get("joining_cost"):
+                lines.append(f"  Joining ({bd.get('joining_method', '?')}): ₹{bd['joining_cost']:,.2f}")
+            if bd.get("assembly_subtotal"):
+                lines.append(f"  Assembly Subtotal: ₹{bd['assembly_subtotal']:,.2f}")
 
         return "\n".join(lines)
     except Exception as e:
@@ -214,7 +265,7 @@ def _summarize_messages(messages: list[dict]) -> str:
         import google.generativeai as genai
         genai.configure(api_key=GEMINI_API_KEY)
         model = genai.GenerativeModel("gemini-2.0-flash-lite")
-        response = model.generate_content(prompt)
+        response = model.generate_content(prompt, generation_config={"temperature": 0.0})
         return response.text.strip()
 
     if OPENAI_API_KEY:
@@ -224,6 +275,7 @@ def _summarize_messages(messages: list[dict]) -> str:
             model="gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}],
             max_tokens=300,
+            temperature=0.0,
         )
         return response.choices[0].message.content.strip()
 
@@ -240,7 +292,8 @@ def _auto_title(user_message: str) -> str:
             model = genai.GenerativeModel("gemini-2.0-flash-lite")
             response = model.generate_content(
                 f"Generate a 3-5 word title for this manufacturing question. "
-                f"No quotes, no punctuation:\n\n{user_message[:200]}"
+                f"No quotes, no punctuation:\n\n{user_message[:200]}",
+                generation_config={"temperature": 0.0},
             )
             return response.text.strip()[:60]
         except Exception:

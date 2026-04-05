@@ -75,6 +75,11 @@ async def create_assembly_estimate(
                 quantity=body.quantity,
                 has_tight_tolerances=has_tight,
             )
+        except ValueError as ve:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Component '{comp.name}': {ve}",
+            )
         except Exception:
             logger.exception("Assembly component cost failed: %s", comp.name)
             raise HTTPException(
