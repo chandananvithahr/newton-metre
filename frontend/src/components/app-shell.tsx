@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { ChatPanel } from "@/components/chat-widget";
 
-const FULL_WIDTH_PATHS = ["/", "/login", "/chat"];
+const FULL_WIDTH_PATHS = ["/", "/login", "/chat", "/waitlist"];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
