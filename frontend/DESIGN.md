@@ -13,7 +13,7 @@ Newton-Metre is a manufacturing intelligence platform. "Know what it costs. Befo
 - **Accent (Orange-500):** `#F97316` — used SPARINGLY. Badges, check icons, hover accents on dark sections. ONE accent color only.
 - **Surface White:** `#FFFFFF` — primary background for light sections
 - **Surface Hover:** `#f5f5f5` — hover states on light backgrounds
-- **Dark Section:** `#09090B` — Similarity Search section and AI Worker trailer
+- **Dark Section:** `#1a1a1a` — Similarity Search and 70% Guardrail sections. Body text at `white/70-80%` for readability.
 
 ### Warm Gradients (Background only)
 - **Hero:** `linear-gradient(135deg, #faf8ef 0%, #f0ece0 25%, #f5f0e8 50%, #eef0e8 75%, #f0f4ef 100%)`
@@ -35,19 +35,22 @@ Newton-Metre is a manufacturing intelligence platform. "Know what it costs. Befo
 ## Typography
 
 ### Font Stack
-- **Headlines & Body:** Space Grotesk (weights 300-700), `--font-body` / `--font-headline`
-- **Monospace/Code:** DM Mono (weights 400-500), `--font-mono`
-- **NO Newsreader. NO IBM Plex Mono. NO italic logos.**
+- **Headlines:** Newsreader (serif, italic), weights 400/600, `--font-headline` / `--font-serif`
+- **Body/UI:** Space Grotesk (weights 300-700), `--font-body`
+- **Data/Numbers:** DM Mono (weights 400-500), `--font-mono`
+- **₹ Symbol:** Space Grotesk (font-sans) at 0.95em — DM Mono's ₹ glyph has wrong cap-height
 
 ### Scale
 | Element | Size | Weight | Line-height | Tracking |
 |---------|------|--------|-------------|----------|
-| Hero headline | 56-64px | 700 | 1.08 | -0.03em |
-| Section headline | 36-48px | 700 | tight | tight |
-| Card title | 17px | 700 | - | - |
-| Body | 14-15px | 400 | 1.6-1.7 | - |
-| Label/Badge | 10-11px | 700 | - | 0.2em, uppercase |
-| Mono numbers | DM Mono | 400 | - | - |
+| Hero headline | 80px (lg), 60px (sm) | 600 | 1.0 | tight |
+| Section headline | text-4xl to text-6xl | 600 | tight | tight |
+| Section label | 15-18px | 700 | - | 0.2em, uppercase, orange-500 |
+| Card title | 16-17px | 700 | - | - |
+| Body | 15-17px, `text-justify` | 400 | 1.6-1.8 | - |
+| Label/Badge | 12-14px | 700 | - | 0.2em, uppercase |
+| Mono numbers | DM Mono | 700 | - | tighter |
+| **Minimum text size** | **12px** | - | - | **No text below 12px** |
 
 ### Max Widths
 - Hero text: 720px centered

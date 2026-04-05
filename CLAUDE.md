@@ -53,18 +53,24 @@ See `docs/POSITIONING.md` for full multi-audience messaging and one-liners.
 
 13 pages: landing, login/signup, dashboard (3-card: should-cost, similarity, chat), new estimate (single + assembly with ZIP upload), estimate detail, similarity search, library (indexed drawings with stats), MPN part search, workflows (new/list/detail), full-page chat, and waitlist. **Split-screen layout:** all authenticated pages have a fixed 380px ChatPanel on the right (ChatGPT-style AI assistant, Gemini-powered). AppShell in root layout handles the split; landing, login, waitlist get full width. Tailwind CSS v4 with **"Warm Editorial"** design system — warm gradient backgrounds (teal→peach→amber), Newsreader serif headlines, Space Grotesk body, DM Mono for data. Brand colors: `#1a1a1a` (primary dark), `orange-500` (accent), `emerald-500` (success). See `DESIGN.md` for full spec.
 
-**Landing page sections (in order):**
-1. **Hero** (`warm-gradient-hero`) — headline + 3 product cards (Should-Cost, Company Brain, Procurement Intel)
-2. **Proof** (`warm-gradient-subtle`) — real customer story: ₹43L vendor quote → ₹28L final → ₹10.05 Cr saved across 67 units
-3. **Problem** (`warm-gradient-hero`) — "Your engineering is precise. Your procurement is not." + 3 stat cards (14%, 60%, 70%)
-4. **Should-Cost** (`warm-gradient-subtle`) — section 01/03, dark preview card with cost breakdown, 4 audience cards
-5. **Similarity Search** (`bg-[#1a1a1a]` dark with orange glow orbs) — section 02/03, 7 department use cases, dark search results card
-6. **AI Worker Trailer** (`warm-gradient-hero`) — section 03/03, 70% MPN spend + negotiation intel, 6 department scenario cards
-7. **ROI Calculator** (`warm-gradient-subtle`) — two sliders (spend ₹1-100Cr + improvement 2-20%), dark result card with live ROI multiplier
-8. **Pricing** (`warm-gradient-hero`) — Free (₹0) + Pro (₹4,999/mo) cards
-9. **Footer** (`warm-gradient-footer`)
+**Landing page narrative: Problem → Vision → Products (Door Opener → Platform → Engine)**
+**Positioning: "The Price Integrity Layer for Global Manufacturing"**
 
-**Background pattern:** alternating `warm-gradient-hero` ↔ `warm-gradient-subtle`, with one dark `bg-[#1a1a1a]` section for Similarity Search. All dark accents use `#1a1a1a` (never `#09090B` or `#0F1117` except RFQ page).
+**Landing page sections (in order):**
+1. **Hero** (`warm-gradient-hero`) — "20 years of data. Zero intelligence." + drop zone CTA + should-cost product preview card. Badge: "Built for Defense, Aerospace & Automotive"
+2. **Proof** (`warm-gradient-subtle`) — real customer story: ₹43L vendor quote → ₹28L final → ₹10.05 Cr saved across 67 units. Big headline quote, slide-in animations, evidence bullet cards
+3. **Vision** (`warm-gradient-hero`) — "We turn your history into price intelligence." + 3 stat cards (14% asymmetry, 60% duplicates, 70% off-the-shelf)
+4. **Should-Cost** (`warm-gradient-subtle`) — "01/03 · The Door Opener", dark preview card with cost breakdown, 4 audience cards (Procurement, Cost Eng, Design, Leadership)
+5. **Similarity Search** (`bg-[#1a1a1a]` dark with orange glow orbs) — "02/03 · The Platform", 5 department use cases (Design, Procurement, Quality, Sales, Finance), dark search results card
+6. **AI Procurement Engine** (`warm-gradient-hero`) — "03/03 · The Revenue Engine", 70% MPN spend + negotiation intel, 6 department scenario cards
+7. **70% Guardrail** (`bg-[#1a1a1a]` dark) — "Not just drawings. Your entire spend." Animated 70/30 bar, 4 MPN category cards with Problem/Fix format
+8. **ROI Calculator** (`warm-gradient-hero`) — two sliders (spend ₹1-100Cr + improvement 2-20%), dark result card with live ROI multiplier
+9. **Pricing** (`warm-gradient-subtle`) — Free (₹0) + Pro (₹4,999/mo, CTA: "Join the waitlist")
+10. **Footer** (`warm-gradient-footer`) — "The price integrity layer for global manufacturing"
+
+**Background pattern:** alternating `warm-gradient-hero` ↔ `warm-gradient-subtle`, with two dark `bg-[#1a1a1a]` sections (Similarity Search + 70% Guardrail). All dark accents use `#1a1a1a` (never `#09090B` or `#0F1117` except RFQ page). Dark section body text uses `white/70-80%` for readability.
+
+**Typography standardization:** No text below 12px. Labels: 12-14px uppercase tracking-widest. Body copy: 15-17px with `text-justify`. All paragraphs justified edge-to-edge. `<R>` component renders ₹ in font-sans at 0.95em with `whitespace-nowrap` to prevent line-break between ₹ and number.
 
 Library page shows indexed drawings with file type badges, AI descriptions, stats (total, first indexed, last added). Login supports `?waitlist=procurement-brain` param for targeted signup copy. Favicon: N·m dark wordmark. Vercel Analytics enabled.
 
